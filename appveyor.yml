@@ -10,3 +10,4 @@ test: off
 artifacts:
 - path: bin/Arachne.*.nupkg
   name: nuget
+
