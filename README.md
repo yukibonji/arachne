@@ -1,2 +1,2 @@
 # arachne
-Types for HTTP and related standards
+Types for HTTP and related RFCs.
