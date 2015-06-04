@@ -4,8 +4,15 @@ Types for HTTP and related RFCs.
 
 ## Overview
 
+Arachne is a library of types for working with HTTP and related standards. It contains data structures modelled on the RFCs for HTTP, URI, LanguageTag, plus other specs such as CORS, along with parsing and formatting code to reliably convert valid string representations to and from the Arachne types.
+
+By having a fully defined data structure it becomes easy to pattern match over elements of complex types, or to use lenses to work with components of a complex type. It also gives you a level of confidence that your work with HTTP is reliable and safe - constructing an invalid instance of HTTP data using typed representations is a lot more difficult than working with raw strings!
+
+Here's a couple of quick examples, showing the kinds of data structures contained and the results of parsing some simple values, in this case a URI and the value of an Accept header. Quite useful!
+
 ```fsharp
 
+open Arachne.Http
 open Arachne.Uri
 
 Uri.Parse "http://www.example.com:80/path?query=str#fragment"
