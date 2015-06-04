@@ -44,7 +44,7 @@ open FParsec
 type Origin =
     | Origin of OriginListOrNull
 
-    static member Mapping =
+    static member internal Mapping =
 
         let originP =
             OriginListOrNull.Mapping.Parse |>> Origin
@@ -71,7 +71,7 @@ and OriginListOrNull =
     | Origins of SerializedOrigin list
     | Null
 
-    static member Mapping =
+    static member internal Mapping =
 
         let originListOrNullP =
             choice [
@@ -88,7 +88,7 @@ and OriginListOrNull =
 and SerializedOrigin =
     | SerializedOrigin of Scheme * Host * Port option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let serializedOriginP =
                  Scheme.Mapping.Parse .>> skipString "://" 
@@ -126,7 +126,7 @@ and SerializedOrigin =
 type AccessControlAllowOrigin =
     | AccessControlAllowOrigin of AccessControlAllowOriginRange
 
-    static member Mapping =
+    static member internal Mapping =
 
         let accessControlAllowOriginP =
             choice [
@@ -164,7 +164,7 @@ and AccessControlAllowOriginRange =
 type AccessControlAllowCredentials =
     | AccessControlAllowCredentials
 
-    static member Mapping =
+    static member internal Mapping =
 
         let accessControlAllowCredentialsP =
             skipString "true" >>% AccessControlAllowCredentials
@@ -195,7 +195,7 @@ type AccessControlAllowCredentials =
 type AccessControlExposeHeaders =
     | AccessControlExposeHeaders of string list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let accessControlExposeHeadersP =
             Grammar.infixP Grammar.tokenP (skipChar ',') |>> AccessControlExposeHeaders
@@ -226,7 +226,7 @@ type AccessControlExposeHeaders =
 type AccessControlMaxAge =
     | AccessControlMaxAge of TimeSpan
 
-    static member Mapping =
+    static member internal Mapping =
 
         let accessControlMaxAgeP =
             puint32 |>> (float >> TimeSpan.FromSeconds >> AccessControlMaxAge)
@@ -257,7 +257,7 @@ type AccessControlMaxAge =
 type AccessControlAllowMethods =
     | AccessControlAllowMethods of Method list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let accessControlAllowMethodsP =
             Grammar.infixP Method.Mapping.Parse (skipChar ',') |>> AccessControlAllowMethods
@@ -288,7 +288,7 @@ type AccessControlAllowMethods =
 type AccessControlAllowHeaders =
     | AccessControlAllowHeaders of string list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let accessControlAllowHeadersP =
             Grammar.infixP Grammar.tokenP (skipChar ',') |>> AccessControlAllowHeaders
@@ -319,7 +319,7 @@ type AccessControlAllowHeaders =
 type AccessControlRequestMethod =
     | AccessControlRequestMethod of Method
 
-    static member Mapping =
+    static member internal Mapping =
 
         let accessControlRequestMethodP =
             Method.Mapping.Parse |>> AccessControlRequestMethod
@@ -350,7 +350,7 @@ type AccessControlRequestMethod =
 type AccessControlRequestHeaders =
     | AccessControlRequestHeaders of string list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let accessControlRequestHeadersP =
             Grammar.infixP Grammar.tokenP (skipChar ',') |>> AccessControlRequestHeaders

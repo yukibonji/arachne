@@ -104,7 +104,7 @@ module private Functions =
    succeed or fail as a single parser. *)
 
 [<AutoOpen>]
-module internal Parsers =
+module private Parsers =
 
     let multi parsers =
         fun stream ->
@@ -141,10 +141,10 @@ module internal Parsers =
    NOTE: We do not currently support IRIs - this may
    be supported in future. *)
 
-[<RequireQualifiedAccess>]
-module Grammar =
+[<AutoOpen>]
+module internal Grammar =
 
-    let literal i =
+    let isLiteral i =
             i = 0x21
          || i >= 0x23 && i <= 0x24
          || i = 0x26
@@ -156,9 +156,9 @@ module Grammar =
          || i >= 0x61 && i <= 0x7a
          || i = 0x7e
 
-    let varchar i =
-            Grammar.alpha i
-         || Grammar.digit i
+    let isVarchar i =
+            isAlpha i
+         || Grammar.isDigit i
          || i = 0x5f // _
 
 (* Template
@@ -169,7 +169,7 @@ module Grammar =
 type UriTemplate =
     | UriTemplate of UriTemplatePart list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let uriTemplateP =
             many1 UriTemplatePart.Mapping.Parse |>> UriTemplate
@@ -226,7 +226,7 @@ and UriTemplatePart =
     | Literal of Literal
     | Expression of Expression
 
-    static member Mapping =
+    static member internal Mapping =
 
         let uriTemplatePartP =
             (Expression.Mapping.Parse |>> Expression) <|> (Literal.Mapping.Parse |>> Literal)
@@ -266,13 +266,13 @@ and UriTemplatePart =
 and Literal =
     | Literal of string
 
-    static member Mapping =
+    static member internal Mapping =
 
         let parser =
-            PercentEncoding.makeParser Grammar.literal
+            PercentEncoding.makeParser isLiteral
 
         let formatter =
-            PercentEncoding.makeFormatter Grammar.literal
+            PercentEncoding.makeFormatter isLiteral
 
         let literalP =
             notEmpty parser |>> Literal.Literal
@@ -300,7 +300,7 @@ and Literal =
 and Expression =
     | Expression of Operator option * VariableList
 
-    static member Mapping =
+    static member internal Mapping =
 
         let expressionP =
             between 
@@ -330,14 +330,14 @@ and Expression =
             preturn ()
 
         let simpleP =
-            PercentEncoding.makeParser Grammar.unreserved
+            PercentEncoding.makeParser isUnreserved
 
-        let reserved i =
-                Grammar.reserved i
-             || Grammar.unreserved i
+        let isReserved i =
+                isReserved i
+             || isUnreserved i
 
         let reservedP =
-            PercentEncoding.makeParser reserved
+            PercentEncoding.makeParser isReserved
 
         (* Values *)
 
@@ -441,19 +441,19 @@ and Expression =
         (* Simple Expansion *)
 
         let simpleF =
-            PercentEncoding.makeFormatter Grammar.unreserved
+            PercentEncoding.makeFormatter isUnreserved
 
         let simpleExpansion =
             renderUnary id simpleF (append ",")
 
         (* Reserved Expansion *)
 
-        let reserved i =
-                (Grammar.reserved i)
-             || (Grammar.unreserved i)
+        let isReserved i =
+                isReserved i
+             || isUnreserved i
 
         let reservedF =
-            PercentEncoding.makeFormatter reserved
+            PercentEncoding.makeFormatter isReserved
 
         let reservedExpansion =
             renderUnary id reservedF (append ",")
@@ -513,7 +513,7 @@ and Operator =
     | Level3 of OperatorLevel3
     | Reserved of OperatorReserved
 
-    static member Mapping =
+    static member internal Mapping =
 
         let operatorP =
             choice [
@@ -533,7 +533,7 @@ and OperatorLevel2 =
     | Reserved
     | Fragment
 
-    static member Mapping =
+    static member internal Mapping =
 
         let operatorLevel2P =
             choice [
@@ -554,7 +554,7 @@ and OperatorLevel3 =
     | Query
     | QueryContinuation
 
-    static member Mapping =
+    static member internal Mapping =
 
         let operatorLevel3P =
             choice [
@@ -581,7 +581,7 @@ and OperatorReserved =
     | At
     | Pipe
 
-    static member Mapping =
+    static member internal Mapping =
 
         let operatorReservedP =
             choice [
@@ -609,7 +609,7 @@ and OperatorReserved =
 and VariableList =
     | VariableList of VariableSpec list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let variableListP =
             sepBy1 VariableSpec.Mapping.Parse (skipChar ',')
@@ -624,7 +624,7 @@ and VariableList =
 and VariableSpec =
     | VariableSpec of VariableName * Modifier option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let variableSpecP =
             VariableName.Mapping.Parse .>>. opt Modifier.Mapping.Parse
@@ -643,7 +643,7 @@ and VariableSpec =
 and VariableName =
     | VariableName of string
 
-    static member Mapping =
+    static member internal Mapping =
 
         // TODO: Assess the potential non-compliance
         // with percent encoding in variable names, especially
@@ -653,10 +653,10 @@ and VariableName =
         // to avoid keys having list values...)
 
         let parser =
-            PercentEncoding.makeParser Grammar.varchar
+            PercentEncoding.makeParser isVarchar
 
         let formatter =
-            PercentEncoding.makeFormatter Grammar.varchar
+            PercentEncoding.makeFormatter isVarchar
 
         let variableNameP =
             sepBy1 (notEmpty parser) (skipChar '.')
@@ -677,7 +677,7 @@ and VariableName =
 and Modifier =
     | Level4 of ModifierLevel4
 
-    static member Mapping =
+    static member internal Mapping =
 
         let modifierP =
             ModifierLevel4.Mapping.Parse |>> Level4
@@ -692,7 +692,7 @@ and ModifierLevel4 =
     | Prefix of int
     | Explode
 
-    static member Mapping =
+    static member internal Mapping =
 
         let modifierLevel4P =
             choice [

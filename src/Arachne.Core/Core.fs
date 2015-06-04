@@ -20,11 +20,21 @@
 
 namespace Arachne.Core
 
+open System.Runtime.CompilerServices
 open System.Text
 open FParsec
 
+(* Internals *)
+
+[<assembly:InternalsVisibleTo ("Arachne.Http")>]
+[<assembly:InternalsVisibleTo ("Arachne.Http.Cors")>]
+[<assembly:InternalsVisibleTo ("Arachne.Language")>]
+[<assembly:InternalsVisibleTo ("Arachne.Uri")>]
+[<assembly:InternalsVisibleTo ("Arachne.Uri.Template")>]
+do ()
+
 [<AutoOpen>]
-module Mapping =
+module internal Mapping =
 
     (* Types *)
 
@@ -39,7 +49,7 @@ module Mapping =
         'a -> StringBuilder -> StringBuilder
 
 [<AutoOpen>]
-module Formatting =
+module internal Formatting =
 
     (* Types *)
 
@@ -70,7 +80,7 @@ module Formatting =
         join
 
 [<AutoOpen>]
-module Parsing =
+module internal Parsing =
 
     (* Parsing *)
 
@@ -84,8 +94,8 @@ module Parsing =
         | Success (x, _, _) -> Some x
         | Failure (_, _, _) -> None
 
-[<RequireQualifiedAccess>]
-module Grammar =
+[<AutoOpen>]
+module internal Grammar =
 
     (* RFC 5234
 
@@ -95,30 +105,30 @@ module Grammar =
        Taken from RFC 5234, Appendix B.1 Core Rules
        See [http://tools.ietf.org/html/rfc5234#appendix-B.1] *)
 
-    let alpha i =
+    let isAlpha i =
             i >= 0x41 && i <= 0x5a
          || i >= 0x61 && i <= 0x7a
 
-    let digit i =
+    let isDigit i =
             i >= 0x30 && i <= 0x39
 
-    let dquote i =
+    let isDquote i =
             i = 0x22
 
-    let hexdig i =
-            digit i
+    let isHexdig i =
+            isDigit i
          || i >= 0x41 && i <= 0x46
          || i >= 0x61 && i <= 0x66
 
-    let htab i =
+    let isHtab i =
             i = 0x09
 
-    let sp i =
+    let isSp i =
             i = 0x20
 
-    let vchar i =
+    let isVchar i =
             i >= 0x21 && i <= 0x7e
 
-    let wsp i =
-            htab i
-         || sp i
+    let isWsp i =
+            isHtab i
+         || isSp i

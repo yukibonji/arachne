@@ -23,9 +23,17 @@ namespace Arachne.Uri
 open System
 open System.Net
 open System.Net.Sockets
+open System.Runtime.CompilerServices
 open System.Text
 open Arachne.Core
 open FParsec
+
+(* Internals *)
+
+[<assembly:InternalsVisibleTo ("Arachne.Http")>]
+[<assembly:InternalsVisibleTo ("Arachne.Http.Cors")>]
+[<assembly:InternalsVisibleTo ("Arachne.Uri.Template")>]
+do ()
 
 (* RFC 3986
 
@@ -34,18 +42,18 @@ open FParsec
 
    Taken from [http://tools.ietf.org/html/rfc3986] *)
 
-[<RequireQualifiedAccess>]
-module Grammar =
+[<AutoOpen>]
+module internal Grammar =
 
-    let unreserved i =
-            Grammar.alpha i
-         || Grammar.digit i
+    let isUnreserved i =
+            isAlpha i
+         || Grammar.isDigit i
          || i = 0x2d // -
          || i = 0x2e // .
          || i = 0x5f // _
          || i = 0x7e // ~
 
-    let genDelim i =
+    let isGenDelim i =
             i = 0x3a // :
          || i = 0x2f // /
          || i = 0x3f // ?
@@ -54,7 +62,7 @@ module Grammar =
          || i = 0x5d // ]
          || i = 0x40 // @
 
-    let subDelim i =
+    let isSubDelim i =
             i = 0x21 // !
          || i = 0x24 // $
          || i = 0x26 // &
@@ -63,9 +71,9 @@ module Grammar =
          || i = 0x3b // ;
          || i = 0x3d // =
 
-    let reserved i=
-            genDelim i
-         || subDelim i
+    let isReserved i=
+            isGenDelim i
+         || isSubDelim i
 
 (* Percent-Encoding
 
@@ -102,11 +110,11 @@ module PercentEncoding =
         |> List.map byte
         |> List.map (fun i -> i, toBytes (i.ToString "X2"))
 
-    let internal byteIndex =
+    let private byteIndex =
         hex
         |> Map.ofList
 
-    let internal hexIndex =
+    let private hexIndex =
         hex
         |> List.map (fun (a, b) -> (b, a))
         |> Map.ofList
@@ -119,7 +127,7 @@ module PercentEncoding =
        form). *)
 
     let private hexdigP =
-        satisfy (int >> Grammar.hexdig)
+        satisfy (int >> isHexdig)
 
     let private pctP =
         skipChar '%' >>. hexdigP .>>. hexdigP
@@ -137,8 +145,8 @@ module PercentEncoding =
        given a whitelist set of allowed characters within the encoded
        output. *)
 
-    let hexdig =
-        int >> Grammar.hexdig
+    let private hexdig =
+        int >> isHexdig
 
     let private format p =
         let rec format r =
@@ -162,17 +170,17 @@ module PercentEncoding =
 type Scheme =
     | Scheme of string
 
-    static member Mapping =
+    static member internal Mapping =
 
-        let schemeChar i =
-                Grammar.alpha i
-             || Grammar.digit i
+        let isSchemeChar i =
+                isAlpha i
+             || Grammar.isDigit i
              || i = 0x2b // +
              || i = 0x2d // -
              || i = 0x2e // .
 
         let schemeP =
-            satisfy (int >> Grammar.alpha) .>>. manySatisfy (int >> schemeChar)
+            satisfy (int >> isAlpha) .>>. manySatisfy (int >> isSchemeChar)
             |>> ((fun (x, xs) -> sprintf "%c%s" x xs) >> Scheme)
 
         let schemeF =
@@ -203,7 +211,7 @@ type Scheme =
 type Authority =
     | Authority of Host * Port option * UserInfo option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let authorityP =
                  opt (attempt (UserInfo.Mapping.Parse .>> skipChar '@')) 
@@ -242,18 +250,18 @@ type Authority =
 and UserInfo =
     | UserInfo of string
 
-    static member Mapping =
+    static member internal Mapping =
 
-        let userInfoChar i =
-                Grammar.unreserved i
-             || Grammar.subDelim i
+        let isUserInfoChar i =
+                isUnreserved i
+             || isSubDelim i
              || i = 0x3a // :
 
         let parser =
-            PercentEncoding.makeParser userInfoChar
+            PercentEncoding.makeParser isUserInfoChar
 
         let formatter =
-            PercentEncoding.makeFormatter userInfoChar
+            PercentEncoding.makeFormatter isUserInfoChar
 
         let userInfoP =
             notEmpty parser |>> UserInfo
@@ -278,24 +286,24 @@ and Host =
     | IPv6 of IPAddress
     | Name of RegName
 
-    static member Mapping =
+    static member internal Mapping =
 
-        let ipv6Char i =
-                Grammar.hexdig i
+        let isIpv6Char i =
+                isHexdig i
              || i = 0x3a // :
 
         let ipv6AddressP =
-            skipChar '[' >>. (many1Satisfy (int >> ipv6Char) >>= (fun x ->
+            skipChar '[' >>. (many1Satisfy (int >> isIpv6Char) >>= (fun x ->
                 match IPAddress.TryParse x with
                 | true, x when x.AddressFamily = AddressFamily.InterNetworkV6 -> preturn (IPv6 x)
                 | _ -> pzero)) .>> skipChar ']'
 
-        let ipv4Char i =
-                (Grammar.digit i)
-             || (i = 0x2e) // .
+        let isIpv4Char i =
+                Grammar.isDigit i
+             || i = 0x2e // .
 
         let ipv4AddressP =
-            many1Satisfy (int >> ipv4Char) >>= (fun x ->
+            many1Satisfy (int >> isIpv4Char) >>= (fun x ->
                 match IPAddress.TryParse x with
                 | true, x when x.AddressFamily = AddressFamily.InterNetwork -> preturn (IPv4 x)
                 | _ -> pzero)
@@ -317,17 +325,17 @@ and Host =
 and RegName =
     | RegName of string
 
-    static member Mapping =
+    static member internal Mapping =
 
-        let regNameChar i =
-                Grammar.unreserved i
-             || Grammar.subDelim i
+        let isRegNameChar i =
+                isUnreserved i
+             || isSubDelim i
 
         let parser =
-            PercentEncoding.makeParser regNameChar
+            PercentEncoding.makeParser isRegNameChar
 
         let formatter =
-            PercentEncoding.makeFormatter regNameChar
+            PercentEncoding.makeFormatter isRegNameChar
 
         let regNameP =
             notEmpty parser |>> RegName
@@ -341,7 +349,7 @@ and RegName =
 and Port =
     | Port of int
 
-    static member Mapping =
+    static member internal Mapping =
 
         let portP =
                 skipChar ':' >>. puint32 
@@ -361,30 +369,30 @@ and Port =
 [<AutoOpen>]
 module private Path =
 
-    let pcharNc i =
-            Grammar.unreserved i
-         || Grammar.subDelim i
+    let isPcharNc i =
+            isUnreserved i
+         || isSubDelim i
          || i = 0x40 // @
 
-    let pchar i =
-            pcharNc i
+    let isPchar i =
+            isPcharNc i
          || i = 0x3a // :
 
     let pcharParser =
-        PercentEncoding.makeParser pchar
+        PercentEncoding.makeParser isPchar
 
     let pcharNcParser =
-        PercentEncoding.makeParser pcharNc
+        PercentEncoding.makeParser isPcharNc
 
     let pcharFormatter =
-        PercentEncoding.makeFormatter pchar
+        PercentEncoding.makeFormatter isPchar
 
 (* Absolute Or Empty *)
 
 type PathAbsoluteOrEmpty =
     | PathAbsoluteOrEmpty of string list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let pathAbsoluteOrEmptyP =
                 many (skipChar '/' >>. pcharParser) 
@@ -414,7 +422,7 @@ type PathAbsoluteOrEmpty =
 type PathAbsolute =
     | PathAbsolute of string list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let pathAbsoluteP =
             skipChar '/' >>. opt (notEmpty pcharParser .>>. many (skipChar '/' >>. pcharParser))
@@ -444,7 +452,7 @@ type PathAbsolute =
 type PathNoScheme =
     | PathNoScheme of string list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let pathNoSchemeP =
                  notEmpty pcharNcParser 
@@ -474,7 +482,7 @@ type PathNoScheme =
 type PathRootless =
     | PathRootless of string list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let pathRootlessP =
                  notEmpty pcharParser 
@@ -507,18 +515,18 @@ type PathRootless =
 type Query =
     | Query of string
 
-    static member Mapping =
+    static member internal Mapping =
 
-        let queryChar i =
-                pchar i
+        let isQueryChar i =
+                isPchar i
              || i = 0x2f // /
              || i = 0x3f // ?
 
         let parser =
-            PercentEncoding.makeParser queryChar
+            PercentEncoding.makeParser isQueryChar
 
         let formatter =
-            PercentEncoding.makeFormatter queryChar
+            PercentEncoding.makeFormatter isQueryChar
 
         let queryP =
             skipChar '?' >>. parser |>> Query
@@ -549,18 +557,18 @@ type Query =
 type Fragment =
     | Fragment of string
 
-    static member Mapping =
+    static member internal Mapping =
     
-        let fragmentChar i =
-                pchar i
+        let isFragmentChar i =
+                isPchar i
              || i = 0x2f // /
              || i = 0x3f // ?
 
         let parser =
-            PercentEncoding.makeParser fragmentChar
+            PercentEncoding.makeParser isFragmentChar
 
         let formatter =
-            PercentEncoding.makeFormatter fragmentChar
+            PercentEncoding.makeFormatter isFragmentChar
 
         let fragmentP =
             skipChar '#' >>. parser |>> Fragment
@@ -606,7 +614,7 @@ type Fragment =
 type Uri =
     | Uri of Scheme * HierarchyPart * Query option * Fragment option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let uriP =
                  Scheme.Mapping.Parse .>> skipChar ':'
@@ -650,7 +658,7 @@ and HierarchyPart =
     | Rootless of PathRootless
     | Empty
 
-    static member Mapping =
+    static member internal Mapping =
 
         let authorityP =
                  skipString "//" >>. Authority.Mapping.Parse 
@@ -686,7 +694,7 @@ and HierarchyPart =
 type RelativeReference =
     | RelativeReference of RelativePart * Query option * Fragment option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let relativeReferenceP =
                  RelativePart.Mapping.Parse
@@ -727,7 +735,7 @@ and RelativePart =
     | NoScheme of PathNoScheme
     | Empty
 
-    static member Mapping =
+    static member internal Mapping =
 
         let authorityP =
                  skipString "//" >>. Authority.Mapping.Parse
@@ -763,7 +771,7 @@ and RelativePart =
 type AbsoluteUri =
     | AbsoluteUri of Scheme * HierarchyPart * Query option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let absoluteUriP =
                  Scheme.Mapping.Parse .>> skipChar ':' 
@@ -807,7 +815,7 @@ type UriReference =
     | Uri of Uri
     | Relative of RelativeReference
 
-    static member Mapping =
+    static member internal Mapping =
 
         let uriReferenceP =
             choice [

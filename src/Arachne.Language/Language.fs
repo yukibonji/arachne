@@ -20,8 +20,14 @@
 
 namespace Arachne.Language
 
+open System.Runtime.CompilerServices
 open Arachne.Core
 open FParsec
+
+(* Internals *)
+
+[<assembly:InternalsVisibleTo ("Arachne.Http")>]
+do ()
 
 (* RFC 5646
 
@@ -43,30 +49,30 @@ open FParsec
    they will be implemented. *)
 
 [<AutoOpen>]
-module private Helpers =
+module internal Grammar =
 
-    let alphaDigit i =
-            Grammar.alpha i
-         || Grammar.digit i
+    let isAlphaDigit i =
+            isAlpha i
+         || Grammar.isDigit i
 
     let alphaP min max =
-            manyMinMaxSatisfy min max (int >> Grammar.alpha) 
-       .>>? notFollowedBy (skipSatisfy (int >> Grammar.alpha))
+            manyMinMaxSatisfy min max (int >> isAlpha) 
+       .>>? notFollowedBy (skipSatisfy (int >> isAlpha))
 
     let digitP min max =
-            manyMinMaxSatisfy min max (int >> Grammar.digit) 
-       .>>? notFollowedBy (skipSatisfy (int >> Grammar.digit))
+            manyMinMaxSatisfy min max (int >> isAlpha) 
+       .>>? notFollowedBy (skipSatisfy (int >> isAlpha))
 
     let alphaNumP min max =
-            manyMinMaxSatisfy min max (int >> alphaDigit) 
-       .>>? notFollowedBy (skipSatisfy (int >> alphaDigit))
+            manyMinMaxSatisfy min max (int >> isAlphaDigit) 
+       .>>? notFollowedBy (skipSatisfy (int >> isAlphaDigit))
 
 (* Language *)
 
 type Language =
     | Language of string * string list option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let extP =
             skipChar '-' >>. alphaP 3 3
@@ -113,7 +119,7 @@ type Language =
 type Script =
     | Script of string
 
-    static member Mapping =
+    static member internal Mapping =
 
         let scriptP =
             skipChar '-' >>. alphaP 4 4 |>> Script
@@ -129,7 +135,7 @@ type Script =
 type Region =
     | Region of string
 
-    static member Mapping =
+    static member internal Mapping =
 
         let regionP =
             skipChar '-' >>. (alphaP 2 2 <|> digitP 3 3) |>> Region
@@ -145,7 +151,7 @@ type Region =
 type Variant =
     | Variant of string list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let alphaPrefixVariantP =
             alphaNumP 5 8
@@ -173,7 +179,7 @@ type Variant =
 type LanguageTag =
     | LanguageTag of Language * Script option * Region option * Variant
 
-    static member Mapping =
+    static member internal Mapping =
 
         let languageTagP =
             tuple4 Language.Mapping.Parse 
@@ -219,7 +225,7 @@ type LanguageRange =
     | Range of string list
     | Any
 
-    static member Mapping =
+    static member internal Mapping =
 
         let languageRangeP =
             choice [

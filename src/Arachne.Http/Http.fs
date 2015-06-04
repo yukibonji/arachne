@@ -22,10 +22,16 @@ namespace Arachne.Http
 
 open System
 open System.Globalization
+open System.Runtime.CompilerServices
 open Arachne.Core
 open Arachne.Language
 open Arachne.Uri
 open FParsec
+
+(* Internals *)
+
+[<assembly:InternalsVisibleTo ("Arachne.Http.Cors")>]
+do ()
 
 (* RFC 7230
 
@@ -42,7 +48,7 @@ open FParsec
 type PartialUri =
     | PartialUri of RelativePart * Query option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let partialUriP =
             RelativePart.Mapping.Parse .>>. opt Query.Mapping.Parse
@@ -71,8 +77,8 @@ type PartialUri =
     override x.ToString () =
         PartialUri.Format x
 
-[<RequireQualifiedAccess>]
-module Grammar =
+[<AutoOpen>]
+module internal Grammar =
 
     (* Whitespace
 
@@ -80,16 +86,16 @@ module Grammar =
        See [http://tools.ietf.org/html/rfc7230#section-3.2.3] *)
 
     let owsP = 
-        skipManySatisfy (int >> Grammar.wsp)
+        skipManySatisfy (int >> isWsp)
 
     (* Field Value Components
 
        Taken from RFC 7230, Section 3.2.6. Field Value Components
        See [http://tools.ietf.org/html/rfc7230#section-3.2.6] *)
 
-    let tchar i =
-            Grammar.alpha i
-         || Grammar.digit i
+    let isTchar i =
+            isAlpha i
+         || Grammar.isDigit i
          || i = 0x21 // !
          || i >= 0x23 && i <= 0x26 // # $ % &
          || i = 0x5c // \
@@ -103,34 +109,34 @@ module Grammar =
          || i = 0x7c // |
          || i = 0x7e // ~
 
-    let obstext i =
+    let isObstext i =
             i >= 0x80 && i <= 0xff
 
-    let qdtext i =
-            Grammar.htab i
-         || Grammar.sp i
+    let isQdtext i =
+            isHtab i
+         || isSp i
          || i = 0x21
          || i >= 0x23 && i <= 0x5b
          || i >= 0x5d && i <= 0x7e
-         || obstext i
+         || isObstext i
 
-    let quotedPairChar i =
-            Grammar.htab i
-         || Grammar.sp i
-         || Grammar.vchar i
-         || obstext i
+    let isQuotedPairChar i =
+            isHtab i
+         || isSp i
+         || isVchar i
+         || isObstext i
 
     let tokenP = 
-        many1Satisfy (int >> tchar)
+        many1Satisfy (int >> isTchar)
 
     let quotedPairP : Parser<char, unit> =
             skipChar '\\' 
-        >>. satisfy (int >> quotedPairChar)
+        >>. satisfy (int >> isQuotedPairChar)
 
     let quotedStringP : Parser<string, unit> =
-            skipSatisfy (int >> Grammar.dquote)
-        >>. many (quotedPairP <|> satisfy (int >> qdtext)) |>> (fun x -> string (System.String (List.toArray x)))
-        .>> skipSatisfy (int >> Grammar.dquote)
+            skipSatisfy (int >> isDquote)
+        >>. many (quotedPairP <|> satisfy (int >> isQdtext)) |>> (fun x -> string (System.String (List.toArray x)))
+        .>> skipSatisfy (int >> isDquote)
 
     (* ABNF List Extension: #rule
 
@@ -167,7 +173,7 @@ type HttpVersion =
     | HTTP of float 
     | Custom of string
 
-    static member Mapping =
+    static member internal Mapping =
 
         let httpVersionP =
             choice [
@@ -202,7 +208,7 @@ type HttpVersion =
 type ContentLength =
     | ContentLength of int
 
-    static member Mapping =
+    static member internal Mapping =
 
         let contentLengthP =
             puint32 |>> (int >> ContentLength)
@@ -233,7 +239,7 @@ type ContentLength =
 type Host =
     | Host of Arachne.Uri.Host * Port option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let hostP =
             Arachne.Uri.Host.Mapping.Parse .>>. opt Port.Mapping.Parse |>> Host
@@ -270,10 +276,10 @@ type Host =
 type Connection =
     | Connection of ConnectionOption list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let connectionP =
-            Grammar.infix1P Grammar.tokenP (skipChar ',') |>> (List.map ConnectionOption >> Connection)
+            infix1P tokenP (skipChar ',') |>> (List.map ConnectionOption >> Connection)
 
         let connectionF =
             function | Connection x -> join (fun (ConnectionOption x) -> append x) (append ",") x
@@ -314,10 +320,10 @@ and ConnectionOption =
 type MediaType =
     | MediaType of Type * SubType * Parameters
 
-    static member Mapping =
+    static member internal Mapping =
 
         let mediaTypeP =
-            Grammar.tokenP .>> (skipChar '/') .>>. Grammar.tokenP .>>. Parameters.Mapping.Parse
+            tokenP .>> (skipChar '/') .>>. tokenP .>>. Parameters.Mapping.Parse
             |>> (fun ((x, y), p) -> MediaType (Type x, SubType y, p))
 
         let mediaTypeF =
@@ -356,13 +362,13 @@ type MediaType =
 and Parameters =
     | Parameters of Map<string, string>
 
-    static member Mapping =
+    static member internal Mapping =
 
         let parameterP =
-            Grammar.tokenP .>> skipChar '=' .>>. (Grammar.quotedStringP <|> Grammar.tokenP)
+            tokenP .>> skipChar '=' .>>. (quotedStringP <|> tokenP)
 
         let parametersP =
-            Grammar.prefixP parameterP (skipChar ';') |>> (Map.ofList >> Parameters)
+            prefixP parameterP (skipChar ';') |>> (Map.ofList >> Parameters)
 
         let pairF =
             (<||) (appendf2 "{0}={1}")
@@ -415,7 +421,7 @@ type MediaType with
 type ContentType =
     | ContentType of MediaType
 
-    static member Mapping =
+    static member internal Mapping =
 
         let contentTypeP =
             MediaType.Mapping.Parse |>> ContentType
@@ -453,10 +459,10 @@ type ContentType =
 type ContentEncoding =
     | ContentEncoding of ContentCoding list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let contentEncodingP =
-            Grammar.infix1P Grammar.tokenP (skipChar ',') |>> (List.map ContentCoding >> ContentEncoding)
+            infix1P tokenP (skipChar ',') |>> (List.map ContentCoding >> ContentEncoding)
 
         let contentEncodingF =
             function | ContentEncoding x -> join (fun (ContentCoding x) -> append x) (append ",") x
@@ -503,10 +509,10 @@ type ContentCoding with
 type ContentLanguage =
     | ContentLanguage of LanguageTag list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let contentLanguageP =
-            Grammar.infix1P LanguageTag.Mapping.Parse (skipChar ',') |>> ContentLanguage
+            infix1P LanguageTag.Mapping.Parse (skipChar ',') |>> ContentLanguage
 
         let contentLanguageF =
             function | ContentLanguage xs -> join LanguageTag.Mapping.Format (append ",") xs
@@ -534,7 +540,7 @@ type ContentLanguage =
 type ContentLocation =
     | ContentLocation of ContentLocationUri
 
-    static member Mapping =
+    static member internal Mapping =
 
         let contentLocationP =
             choice [
@@ -580,7 +586,7 @@ type Method =
     | TRACE 
     | Custom of string
 
-    static member Mapping =
+    static member internal Mapping =
 
         let methodP =
             choice [
@@ -625,7 +631,7 @@ type Method =
 type Expect =
     | Expect of Continue
 
-    static member Mapping =
+    static member internal Mapping =
 
         let expectP =
             skipStringCI "100-continue" >>% Expect Continue
@@ -659,7 +665,7 @@ and Continue =
 type MaxForwards =
     | MaxForwards of int
 
-    static member Mapping =
+    static member internal Mapping =
 
         let maxForwardsP =
             puint32 |>> (int >> MaxForwards)
@@ -690,19 +696,19 @@ type MaxForwards =
 type Weight =
     | Weight of float
 
-    static member Mapping =
+    static member internal Mapping =
 
         let valueOrDefault =
             function | Some x -> float (sprintf "0.%s" x)
                      | _ -> 0.
 
         let d3P =
-                manyMinMaxSatisfy 0 3 (int >> Grammar.digit) 
-            .>> notFollowedBy (skipSatisfy (int >> Grammar.digit))
+                manyMinMaxSatisfy 0 3 (int >> Grammar.isDigit) 
+            .>> notFollowedBy (skipSatisfy (int >> Grammar.isDigit))
 
         let d03P =
                 skipManyMinMaxSatisfy 0 3 ((=) '0') 
-            .>> notFollowedBy (skipSatisfy (int >> Grammar.digit))
+            .>> notFollowedBy (skipSatisfy (int >> Grammar.isDigit))
 
         let qvalueP =
             choice [ 
@@ -710,7 +716,7 @@ type Weight =
                 skipChar '1' >>. optional (skipChar '.' >>. d03P) >>% 1. ]
 
         let weightP =
-            (skipChar ';') >>. Grammar.owsP >>. skipStringCI "q=" >>. qvalueP .>> Grammar.owsP |>> Weight
+            (skipChar ';') >>. owsP >>. skipStringCI "q=" >>. qvalueP .>> owsP |>> Weight
 
         let weightF =
             function | Weight x -> appendf1 ";q={0:G4}" x
@@ -726,10 +732,10 @@ type Weight =
 type Accept =
     | Accept of AcceptableMedia list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let acceptP =
-            Grammar.infixP AcceptableMedia.Mapping.Parse (skipChar ',') |>> Accept
+            infixP AcceptableMedia.Mapping.Parse (skipChar ',') |>> Accept
 
         let acceptF =
             function | Accept x -> join AcceptableMedia.Mapping.Format (append ",") x
@@ -752,7 +758,7 @@ type Accept =
 and AcceptableMedia =
     | AcceptableMedia of MediaRange * AcceptParameters option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let acceptableMediaP = 
             MediaRange.Mapping.Parse .>>. opt AcceptParameters.Mapping.Parse
@@ -772,24 +778,24 @@ and MediaRange =
     | Partial of Type * Parameters
     | Open of Parameters
 
-    static member Mapping =
+    static member internal Mapping =
 
         let mediaRangeParameterP =
-            notFollowedBy (Grammar.owsP >>. skipStringCI "q=") >>. Grammar.tokenP .>> skipChar '=' .>>. Grammar.tokenP
+            notFollowedBy (owsP >>. skipStringCI "q=") >>. tokenP .>> skipChar '=' .>>. tokenP
 
         let mediaRangeParametersP =
-            Grammar.prefixP mediaRangeParameterP (skipChar ';') |>> Map.ofList
+            prefixP mediaRangeParameterP (skipChar ';') |>> Map.ofList
 
         let openMediaRangeP = 
-            skipString "*/*" >>. Grammar.owsP >>. mediaRangeParametersP |>> (Parameters >> MediaRange.Open)
+            skipString "*/*" >>. owsP >>. mediaRangeParametersP |>> (Parameters >> MediaRange.Open)
 
         let partialMediaRangeP = 
-            Grammar.tokenP .>> skipString "/*" .>> Grammar.owsP .>>. mediaRangeParametersP
+            tokenP .>> skipString "/*" .>> owsP .>>. mediaRangeParametersP
             |>> fun (x, parameters) -> 
                     MediaRange.Partial (Type x, Parameters parameters)
 
         let closedMediaRangeP = 
-            Grammar.tokenP .>> skipChar '/' .>>. Grammar.tokenP .>> Grammar.owsP .>>. mediaRangeParametersP
+            tokenP .>> skipChar '/' .>>. tokenP .>> owsP .>>. mediaRangeParametersP
             |>> fun ((x, y), parameters) -> 
                     MediaRange.Closed (Type x, SubType y, Parameters parameters)
 
@@ -810,10 +816,10 @@ and MediaRange =
 and AcceptParameters =
     | AcceptParameters of Weight * AcceptExtensions
 
-    static member Mapping =
+    static member internal Mapping =
 
         let acceptParamsP =
-            Weight.Mapping.Parse .>> Grammar.owsP .>>. AcceptExtensions.Mapping.Parse
+            Weight.Mapping.Parse .>> owsP .>>. AcceptExtensions.Mapping.Parse
             |>> AcceptParameters
 
         let acceptParamsF =
@@ -826,13 +832,13 @@ and AcceptParameters =
 and AcceptExtensions =
     | Extensions of Map<string, string option>
 
-    static member Mapping =
+    static member internal Mapping =
 
         let acceptExtP =
-            Grammar.tokenP .>>. opt (skipChar '=' >>. (Grammar.quotedStringP <|> Grammar.tokenP))
+            tokenP .>>. opt (skipChar '=' >>. (quotedStringP <|> tokenP))
 
         let acceptExtsP =
-            Grammar.prefixP acceptExtP (skipChar ';') |>> (Map.ofList >> Extensions)
+            prefixP acceptExtP (skipChar ';') |>> (Map.ofList >> Extensions)
 
         let acceptExtsF =
             function | Extensions (x: Map<string, string option>) when Map.isEmpty x -> id
@@ -849,10 +855,10 @@ and AcceptExtensions =
 type AcceptCharset =
     | AcceptCharset of AcceptableCharset list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let acceptCharsetP =
-            Grammar.infix1P AcceptableCharset.Mapping.Parse (skipChar ',')
+            infix1P AcceptableCharset.Mapping.Parse (skipChar ',')
             |>> AcceptCharset
 
         let acceptCharsetF =
@@ -877,10 +883,10 @@ type AcceptCharset =
 and AcceptableCharset =
     | AcceptableCharset of CharsetRange * Weight option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let acceptableCharsetP =
-            CharsetRange.Mapping.Parse .>> Grammar.owsP .>>. opt Weight.Mapping.Parse
+            CharsetRange.Mapping.Parse .>> owsP .>>. opt Weight.Mapping.Parse
             |>> AcceptableCharset
 
         let acceptableCharsetF =
@@ -896,13 +902,13 @@ and CharsetRange =
     | Charset of Charset
     | Any
 
-    static member Mapping =
+    static member internal Mapping =
 
         let charsetRangeAnyP =
             skipChar '*' >>% CharsetRange.Any
 
         let charsetRangeCharsetP =
-            Grammar.tokenP |>> fun s -> Charset (Charset.Charset s)
+            tokenP |>> fun s -> Charset (Charset.Charset s)
 
         let charsetRangeP = 
             choice [
@@ -943,10 +949,10 @@ type Charset with
 type AcceptEncoding =
     | AcceptEncoding of AcceptableEncoding list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let acceptEncodingP =
-            Grammar.infixP AcceptableEncoding.Mapping.Parse (skipChar ',')
+            infixP AcceptableEncoding.Mapping.Parse (skipChar ',')
             |>> AcceptEncoding
 
         let acceptEncodingF =
@@ -971,10 +977,10 @@ type AcceptEncoding =
 and AcceptableEncoding =
     | AcceptableEncoding of EncodingRange * Weight option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let acceptableEncodingP =
-            EncodingRange.Mapping.Parse .>> Grammar.owsP .>>. opt Weight.Mapping.Parse
+            EncodingRange.Mapping.Parse .>> owsP .>>. opt Weight.Mapping.Parse
             |>> AcceptableEncoding
 
         let acceptableEncodingF =
@@ -991,7 +997,7 @@ and EncodingRange =
     | Identity
     | Any
 
-    static member Mapping =
+    static member internal Mapping =
 
         let encodingRangeAnyP =
             skipChar '*' >>% Any
@@ -1000,7 +1006,7 @@ and EncodingRange =
             skipStringCI "identity" >>% Identity
 
         let encodingRangeCodingP =
-            Grammar.tokenP |>> fun s -> Coding (ContentCoding s)
+            tokenP |>> fun s -> Coding (ContentCoding s)
 
         let encodingRangeP =
             choice [
@@ -1024,10 +1030,10 @@ and EncodingRange =
 type AcceptLanguage =
     | AcceptLanguage of AcceptableLanguage list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let acceptLanguageP =
-            Grammar.infixP AcceptableLanguage.Mapping.Parse (skipChar ',')
+            infixP AcceptableLanguage.Mapping.Parse (skipChar ',')
             |>> AcceptLanguage
 
         let acceptLanguageF =
@@ -1052,10 +1058,10 @@ type AcceptLanguage =
 and AcceptableLanguage =
     | AcceptableLanguage of LanguageRange * Weight option
 
-    static member Mapping =
+    static member internal Mapping =
 
         let acceptableLanguageP =
-            LanguageRange.Mapping.Parse .>> Grammar.owsP .>>. opt Weight.Mapping.Parse
+            LanguageRange.Mapping.Parse .>> owsP .>>. opt Weight.Mapping.Parse
             |>> AcceptableLanguage
 
         let acceptableLanguageF =
@@ -1075,7 +1081,7 @@ and AcceptableLanguage =
 type Referer =
     | Referer of RefererUri
 
-    static member Mapping =
+    static member internal Mapping =
 
         let refererP =
             choice [
@@ -1132,7 +1138,7 @@ module private HttpDate =
 type Date =
     | Date of DateTime
 
-    static member Mapping =
+    static member internal Mapping =
 
         let dateP =
             httpDateP |>> Date.Date
@@ -1163,7 +1169,7 @@ type Date =
 type Location =
     | Location of UriReference
 
-    static member Mapping =
+    static member internal Mapping =
 
         let locationP =
             UriReference.Mapping.Parse |>> Location
@@ -1194,7 +1200,7 @@ type Location =
 type RetryAfter =
     | RetryAfter of RetryAfterChoice
 
-    static member Mapping =
+    static member internal Mapping =
 
         let retryAfterP =
             choice [
@@ -1232,10 +1238,10 @@ and RetryAfterChoice =
 type Allow =
     | Allow of Method list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let allowP =
-            Grammar.infixP Method.Mapping.Parse (skipChar ',') |>> Allow
+            infixP Method.Mapping.Parse (skipChar ',') |>> Allow
 
         let allowF =
             function | Allow x -> join Method.Mapping.Format (append ",") x
@@ -1270,7 +1276,7 @@ type Allow =
 type LastModified =
     | LastModified of DateTime
 
-    static member Mapping =
+    static member internal Mapping =
 
         let lastModifiedP =
             httpDateP |>> LastModified
@@ -1301,7 +1307,7 @@ type LastModified =
 type ETag =
     | ETag of EntityTag
 
-    static member Mapping =
+    static member internal Mapping =
 
         let eTagP =
             EntityTag.Mapping.Parse |>> ETag
@@ -1328,17 +1334,17 @@ and EntityTag =
     | Strong of string
     | Weak of string
 
-    static member Mapping =
+    static member internal Mapping =
 
         let eTagChar i =
                 i = 0x21
              || i >= 0x23 && i <= 0x7e
-             || Grammar.obstext i
+             || isObstext i
 
         let opaqueTagP =
-                skipSatisfy (int >> Grammar.dquote) 
+                skipSatisfy (int >> isDquote) 
             >>. manySatisfy (int >> eTagChar) 
-            .>> skipSatisfy (int >> Grammar.dquote)
+            .>> skipSatisfy (int >> isDquote)
 
         let entityTagP =
             choice [
@@ -1360,12 +1366,12 @@ and EntityTag =
 type IfMatch =
     | IfMatch of IfMatchChoice
 
-    static member Mapping =
+    static member internal Mapping =
 
         let ifMatchP =
             choice [
                 skipChar '*' >>% IfMatch (Any)
-                Grammar.infixP EntityTag.Mapping.Parse (skipChar ',') |>> (EntityTags >> IfMatch) ]
+                infixP EntityTag.Mapping.Parse (skipChar ',') |>> (EntityTags >> IfMatch) ]
 
         let ifMatchF =
             function | IfMatch (EntityTags x) -> join EntityTag.Mapping.Format (append ",") x
@@ -1398,12 +1404,12 @@ and IfMatchChoice =
 type IfNoneMatch =
     | IfNoneMatch of IfNoneMatchChoice
 
-    static member Mapping =
+    static member internal Mapping =
 
         let ifNoneMatchP =
             choice [
                 skipChar '*' >>% IfNoneMatch (Any)
-                Grammar.infixP EntityTag.Mapping.Parse (skipChar ',') |>> (EntityTags >> IfNoneMatch) ]
+                infixP EntityTag.Mapping.Parse (skipChar ',') |>> (EntityTags >> IfNoneMatch) ]
 
         let ifNoneMatchF =
             function | IfNoneMatch (EntityTags x) -> join EntityTag.Mapping.Format (append ",") x
@@ -1436,7 +1442,7 @@ and IfNoneMatchChoice =
 type IfModifiedSince =
     | IfModifiedSince of DateTime
 
-    static member Mapping =
+    static member internal Mapping =
 
         let ifModifiedSinceP =
             httpDateP |>> IfModifiedSince
@@ -1467,7 +1473,7 @@ type IfModifiedSince =
 type IfUnmodifiedSince =
     | IfUnmodifiedSince of DateTime
 
-    static member Mapping =
+    static member internal Mapping =
 
         let ifUnmodifiedSinceP =
             httpDateP |>> IfUnmodifiedSince
@@ -1505,7 +1511,7 @@ type IfUnmodifiedSince =
 type IfRange =
     | IfRange of IfRangeChoice
 
-    static member Mapping =
+    static member internal Mapping =
 
         let ifRangeP =
             (EntityTag.Mapping.Parse |>> (EntityTag >> IfRange)) <|> 
@@ -1549,7 +1555,7 @@ and IfRangeChoice =
 type Age =
     | Age of TimeSpan
 
-    static member Mapping =
+    static member internal Mapping =
 
         let ageP =
             puint32 |>> (float >> TimeSpan.FromSeconds >> Age)
@@ -1585,10 +1591,10 @@ type Age =
 type CacheControl =
     | CacheControl of CacheDirective list
 
-    static member Mapping =
+    static member internal Mapping =
 
         let cacheControlP =
-            Grammar.infix1P CacheDirective.Mapping.Parse (skipChar ',') |>> CacheControl
+            infix1P CacheDirective.Mapping.Parse (skipChar ',') |>> CacheControl
 
         let cacheControlF =
             function | CacheControl x -> join CacheDirective.Mapping.Format (append ",") x
@@ -1623,7 +1629,7 @@ and CacheDirective =
     | SMaxAge of TimeSpan
     | Custom of string * string option
 
-    static member Mapping =
+    static member internal Mapping =
 
         // TODO: Custom Directive Parsing
 
@@ -1669,7 +1675,7 @@ and CacheDirective =
 type Expires =
     | Expires of DateTime
 
-    static member Mapping =
+    static member internal Mapping =
 
         let expiresP =
             httpDateP |>> Expires
