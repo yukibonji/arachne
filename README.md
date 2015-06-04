@@ -1,6 +1,37 @@
-# arachne
+# Arachne
 
 Types for HTTP and related RFCs.
+
+## Overview
+
+```fsharp
+
+open Arachne.Uri
+
+Uri.Parse "http://www.example.com:80/path?query=str#fragment"
+
+// =
+
+Uri
+  (Scheme "http",
+   Authority
+     (Authority (Name (RegName "www.example.com"), Some (Port 80), None),
+      PathAbsoluteOrEmpty ["path"]), Some (Query "query=str"),
+   Some (Fragment "fragment"))
+
+// --
+
+Accept.Parse "text/*, text/html;q=0.7, text/html;level=1, */*"
+
+// =
+
+Accept
+  [ AcceptableMedia (Partial (Type "text", Parameters (map [])), None)
+    AcceptableMedia (Closed (Type "text", SubType "html", Parameters (map [])), Some (AcceptParameters (Weight 0.7, Extensions (map []))))
+    AcceptableMedia (Closed (Type "text", SubType "html", Parameters (map [ ("level", "1") ])), None)
+    AcceptableMedia (Open (Parameters (map [])), None) ]
+
+```
 
 ## Build status
 
