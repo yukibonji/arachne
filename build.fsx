@@ -113,8 +113,7 @@ let solution =
                           Local "Arachne.Core"
                           Local "Arachne.Uri" ] } ]
               Test =
-                [ { Name = "Arachne.Core.Tests" }
-                  { Name = "Arachne.Http.Tests" }
+                [ { Name = "Arachne.Http.Tests" }
                   { Name = "Arachne.Http.Cors.Tests" }
                   { Name = "Arachne.Language.Tests" }
                   { Name = "Arachne.Uri.Tests" }
@@ -236,9 +235,6 @@ Target "Publish.Packages" (fun _ ->
 
 (* Source *)
 
-Target "Source.GitSubmodules" (fun _ ->
-    Git.CommandHelper.gitCommand "." "submodule update --init")
-
 let assemblyInfo (x: SourceProject) =
     sprintf @"src/%s/AssemblyInfo.fs" x.Name
 
@@ -306,7 +302,6 @@ Target "Publish" DoNothing
 (* Source *)
 
 "Source.Clean"
-==> "Source.GitSubmodules"
 ==> "Source.AssemblyInfo"
 ==> "Source.Build"
 ==> "Source.Test"
