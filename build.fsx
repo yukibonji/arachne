@@ -133,11 +133,20 @@ let release =
 let assemblyVersion =
     release.AssemblyVersion
 
+let isAppVeyorBuild =
+    environVar "APPVEYOR" <> null
+
+let majorMinorVersion (version: string) =
+    let parts = version.Split([|'.'|])
+    sprintf "%s.%s" parts.[0] parts.[1]
+
 let nugetVersion =
-    match isLocalBuild, release.NugetVersion.Contains "-" with
-    | false, true -> sprintf "%s-%s" release.NugetVersion buildVersion
-    | false, _ -> sprintf "%s.%s" release.NugetVersion buildVersion
-    | _ -> release.NugetVersion
+    if isAppVeyorBuild then
+        let parts = release.NugetVersion.Split([|'-'|])
+        if Array.length parts = 2 then
+            sprintf "%s.%s-%s" (majorMinorVersion parts.[0]) buildVersion parts.[1]
+        else sprintf "%s.%s" (majorMinorVersion release.NugetVersion) buildVersion
+    else release.NugetVersion
 
 let notes =
     String.concat Environment.NewLine release.Notes
@@ -190,7 +199,7 @@ Target "Publish.Debug" (fun _ ->
 
         git.VerifyChecksums files
         release.VerifyPdbChecksums files
-        release.CreateSrcSrv baseUrl git.Revision (git.Paths files)
+        release.CreateSrcSrv baseUrl git.Commit (git.Paths files)
         
         Pdbstr.exec release.OutputFilePdb release.OutputFilePdbSrcSrv))
 
@@ -245,8 +254,10 @@ Target "Source.AssemblyInfo" (fun _ ->
     solution.Structure.Projects.Source
     |> List.iter (fun project ->
         CreateFSharpAssemblyInfo (assemblyInfo project)
-            [ Attribute.Description solution.Metadata.Summary
+            [ Attribute.Company (String.concat "," solution.Metadata.Authors)
+              Attribute.Description solution.Metadata.Summary
               Attribute.FileVersion assemblyVersion
+              Attribute.InformationalVersion nugetVersion
               Attribute.Product project.Name
               Attribute.Title project.Name
               Attribute.Version assemblyVersion ]))
