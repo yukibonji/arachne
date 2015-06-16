@@ -28,6 +28,7 @@ open FParsec
 
 [<assembly:InternalsVisibleTo ("Arachne.Http")>]
 [<assembly:InternalsVisibleTo ("Arachne.Http.Cors")>]
+[<assembly:InternalsVisibleTo ("Arachne.Http.State")>]
 [<assembly:InternalsVisibleTo ("Arachne.Language")>]
 [<assembly:InternalsVisibleTo ("Arachne.Uri")>]
 [<assembly:InternalsVisibleTo ("Arachne.Uri.Template")>]

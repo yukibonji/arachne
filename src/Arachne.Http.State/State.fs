@@ -38,14 +38,35 @@ open FParsec
    Cookie Pair, as defined for both Set-Cookie and Cookie headers, given
    in 4.1 and 4.2. *)
 
-type CookiePair =
-    | CookiePair of CookieName * CookieValue
-
-and CookieName =
+type CookieName =
     | CookieName of string
+
+    static member internal Mapping =
+
+        let cookieNameP =
+            tokenP |>> CookieName
+
+        let cookieNameF =
+            function | CookieName x -> append x
+
+        { Parse = cookieNameP
+          Format = cookieNameF }
 
 and CookieValue =
     | CookieValue of string
+
+    static member internal Mapping =
+
+        (* TODO: Correct parsing grammar for cookie values. *)
+
+        let cookieValueP =
+            tokenP |>> CookieValue
+
+        let cookieValueF =
+            function | CookieValue x -> append x
+
+        { Parse = cookieValueP
+          Format = cookieValueF }
 
 (* Set-Cookie
 
@@ -53,7 +74,7 @@ and CookieValue =
    See [http://tools.ietf.org/html/rfc6265#section-4.1] *)
 
 type SetCookie =
-    | SetCookie of CookiePair * CookieAttributes
+    | SetCookie of CookieName * CookieValue * CookieAttributes
 
 and CookieAttributes =
     | CookieAttributes of CookieAttribute list
@@ -72,4 +93,27 @@ and CookieAttribute =
    See [http://tools.ietf.org/html/rfc6265#section-4.2] *)
 
 type Cookie =
-    | Cooke of CookiePair
+    | Cookie of CookieName * CookieValue
+
+    static member internal Mapping =
+
+        let cookieP =
+            CookieName.Mapping.Parse .>> skipChar '=' .>>. CookieValue.Mapping.Parse |>> Cookie
+
+        let cookieF =
+            function | Cookie(n, v) -> CookieName.Mapping.Format n >> append "=" >> CookieValue.Mapping.Format v
+
+        { Parse = cookieP
+          Format = cookieF }
+
+    static member Format =
+        Formatting.format Cookie.Mapping.Format
+
+    static member Parse =
+        Parsing.parse Cookie.Mapping.Parse
+
+    static member TryParse =
+        Parsing.tryParse Cookie.Mapping.Parse
+
+    override x.ToString () =
+        Cookie.Format x
