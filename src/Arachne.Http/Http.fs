@@ -31,6 +31,7 @@ open FParsec
 (* Internals *)
 
 [<assembly:InternalsVisibleTo ("Arachne.Http.Cors")>]
+[<assembly:InternalsVisibleTo ("Arachne.Http.State")>]
 do ()
 
 (* RFC 7230
