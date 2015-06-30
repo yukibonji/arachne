@@ -14,3 +14,14 @@ let ``Cookie Formatting/Parsing`` () =
 
     roundTrip (Cookie.Format, Cookie.Parse) [
         cookieTyped, cookieString ]
+
+[<Test>]
+let ``Set-Cookie Formatting/Parsing`` () =
+    let setCookieTyped =
+        SetCookie (CookieName "test", CookieValue "value", CookieAttributes [ Secure ])
+
+    let setCookieString =
+        "test=value; Secure"
+
+    roundTrip (SetCookie.Format, SetCookie.Parse) [
+        setCookieTyped, setCookieString ]

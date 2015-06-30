@@ -33,6 +33,12 @@ open FParsec
 
    Taken from [http://tools.ietf.org/html/rfc6265] *)
 
+[<AutoOpen>]
+module internal Grammar =
+
+    let spP =
+        skipSatisfy (int >> isSp)
+
 (* Cookie Common Types
 
    Cookie Pair, as defined for both Set-Cookie and Cookie headers, given
@@ -76,8 +82,51 @@ and CookieValue =
 type SetCookie =
     | SetCookie of CookieName * CookieValue * CookieAttributes
 
+    static member internal Mapping =
+
+        let setCookieP =
+                CookieName.Mapping.Parse 
+            .>> skipChar '=' 
+           .>>. CookieValue.Mapping.Parse 
+           .>>. CookieAttributes.Mapping.Parse
+            |>> fun ((n, a), v) -> SetCookie (n, a, v)
+
+        let setCookieF =
+            function | SetCookie (n, v, a) ->
+                            CookieName.Mapping.Format n 
+                         >> append "="
+                         >> CookieValue.Mapping.Format v
+                         >> CookieAttributes.Mapping.Format a
+
+        { Parse = setCookieP
+          Format = setCookieF }
+
+    static member Format =
+        Formatting.format SetCookie.Mapping.Format
+
+    static member Parse =
+        Parsing.parse SetCookie.Mapping.Parse
+
+    static member TryParse =
+        Parsing.tryParse SetCookie.Mapping.Parse
+
+    override x.ToString () =
+        SetCookie.Format x
+
 and CookieAttributes =
     | CookieAttributes of CookieAttribute list
+
+    static member internal Mapping =
+
+        let cookieAttributesP =
+                many CookieAttribute.Mapping.Parse
+            |>> CookieAttributes
+
+        let cookieAttributesF =
+            function | CookieAttributes a -> join CookieAttribute.Mapping.Format id a
+
+        { Parse = cookieAttributesP
+          Format = cookieAttributesF }
 
 and CookieAttribute =
     | Expires of DateTime
@@ -86,6 +135,21 @@ and CookieAttribute =
     | Path of string
     | Secure
     | HttpOnly
+
+    static member internal Mapping =
+
+        let cookieAttributeP =
+                skipChar ';'
+            >>. spP
+            >>. choice [
+                    skipString "Secure" >>% Secure ]
+
+        let cookieAttributeF =
+            function | Secure -> append "; Secure"
+                     | _ -> id
+
+        { Parse = cookieAttributeP
+          Format = cookieAttributeF }
 
 (* Cookie
 
@@ -98,10 +162,16 @@ type Cookie =
     static member internal Mapping =
 
         let cookieP =
-            CookieName.Mapping.Parse .>> skipChar '=' .>>. CookieValue.Mapping.Parse |>> Cookie
+                CookieName.Mapping.Parse 
+            .>> skipChar '='
+           .>>. CookieValue.Mapping.Parse
+            |>> Cookie
 
         let cookieF =
-            function | Cookie(n, v) -> CookieName.Mapping.Format n >> append "=" >> CookieValue.Mapping.Format v
+            function | Cookie(n, v) ->
+                            CookieName.Mapping.Format n 
+                         >> append "=" 
+                         >> CookieValue.Mapping.Format v
 
         { Parse = cookieP
           Format = cookieF }
