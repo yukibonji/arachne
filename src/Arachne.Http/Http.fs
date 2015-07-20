@@ -51,14 +51,15 @@ type PartialUri =
     static member internal Mapping =
 
         let partialUriP =
-            RelativePart.Mapping.Parse .>>. opt Query.Mapping.Parse
+            RelativePart.Mapping.Parse .>>. opt (skipChar '?' >>. Query.Mapping.Parse)
             |>> PartialUri
 
         let partialUriF =
             function | PartialUri (r, q) ->
                         let formatters =
                             [ RelativePart.Mapping.Format r
-                              (function | Some q -> Query.Mapping.Format q | _ -> id) q ]
+                              (function | Some q -> append "?" >> Query.Mapping.Format q 
+                                        | _ -> id) q ]
 
                         fun b -> List.fold (|>) b formatters
 

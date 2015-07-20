@@ -529,10 +529,12 @@ type Query =
             PercentEncoding.makeFormatter isQueryChar
 
         let queryP =
-            skipChar '?' >>. parser |>> Query
+            parser |>> Query
+            //skipChar '?' >>. parser |>> Query
 
         let queryF =
-            function | Query x -> append "?" >> formatter x
+            function | Query x -> formatter x
+            //function | Query x -> append "?" >> formatter x
 
         { Parse = queryP
           Format = queryF }
@@ -571,10 +573,12 @@ type Fragment =
             PercentEncoding.makeFormatter isFragmentChar
 
         let fragmentP =
-            skipChar '#' >>. parser |>> Fragment
+            parser |>> Fragment
+            //skipChar '#' >>. parser |>> Fragment
 
         let fragmentF =
-            function | Fragment x -> append "#" >> formatter x
+            function | Fragment x -> formatter x
+            //function | Fragment x -> append "#" >> formatter x
 
         { Parse = fragmentP
           Format = fragmentF }
@@ -619,8 +623,8 @@ type Uri =
         let uriP =
                  Scheme.Mapping.Parse .>> skipChar ':'
             .>>. HierarchyPart.Mapping.Parse 
-            .>>. opt Query.Mapping.Parse
-            .>>. opt Fragment.Mapping.Parse
+            .>>. opt (skipChar '?' >>. Query.Mapping.Parse)
+            .>>. opt (skipChar '#' >>. Fragment.Mapping.Parse)
              |>> fun (((scheme, hierarchy), query), fragment) ->
                 Uri (scheme, hierarchy, query, fragment)
 
@@ -630,9 +634,9 @@ type Uri =
                             [ Scheme.Mapping.Format s
                               append ":"
                               HierarchyPart.Mapping.Format h
-                              (function | Some q -> Query.Mapping.Format q 
+                              (function | Some q -> append "?" >> Query.Mapping.Format q 
                                         | _ -> id) q
-                              (function | Some f -> Fragment.Mapping.Format f 
+                              (function | Some f -> append "#" >> Fragment.Mapping.Format f 
                                         | _ -> id) f ]
 
                         fun b -> List.fold (|>) b formatters
@@ -698,8 +702,8 @@ type RelativeReference =
 
         let relativeReferenceP =
                  RelativePart.Mapping.Parse
-            .>>. opt Query.Mapping.Parse
-            .>>. opt Fragment.Mapping.Parse
+            .>>. opt (skipChar '?' >>. Query.Mapping.Parse)
+            .>>. opt (skipChar '#' >>. Fragment.Mapping.Parse)
              |>> fun ((relative, query), fragment) ->
                 RelativeReference (relative, query, fragment)
 
@@ -707,9 +711,9 @@ type RelativeReference =
             function | RelativeReference (r, q, f) -> 
                         let formatters =
                             [ RelativePart.Mapping.Format r
-                              (function | Some q -> Query.Mapping.Format q
+                              (function | Some q -> append "?" >> Query.Mapping.Format q
                                         | _ -> id) q
-                              (function | Some f -> Fragment.Mapping.Format f
+                              (function | Some f -> append "#" >> Fragment.Mapping.Format f
                                         | _ -> id) f ]
 
                         fun b -> List.fold (|>) b formatters
@@ -776,7 +780,7 @@ type AbsoluteUri =
         let absoluteUriP =
                  Scheme.Mapping.Parse .>> skipChar ':' 
             .>>. HierarchyPart.Mapping.Parse 
-            .>>. opt Query.Mapping.Parse
+            .>>. opt (skipChar '?' >>. Query.Mapping.Parse)
              |>> fun ((scheme, hierarchy), query) ->
                 AbsoluteUri (scheme, hierarchy, query)
 
@@ -786,7 +790,7 @@ type AbsoluteUri =
                             [ Scheme.Mapping.Format s
                               append ":"
                               HierarchyPart.Mapping.Format h
-                              (function | Some q -> Query.Mapping.Format q
+                              (function | Some q -> append "?" >> Query.Mapping.Format q
                                         | _ -> id) q ]
 
                         fun b -> List.fold (|>) b formatters
