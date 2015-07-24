@@ -1,3 +1,6 @@
+### New in 2.2.0 - (Released 2015-07-24)
+* Correction of lens property names to Proprty_ syntax convention for MediaType lenses
+
 ### New in 2.1.0 - (Released 2015-07-24)
 * Addition of complete access lenses for all types in Arachne.Uri, allowing lens based access in to type components
 * Lenses using the <Property>_ syntax convention
