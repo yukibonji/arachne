@@ -616,6 +616,30 @@ type Query =
     static member Query_ =
         (fun (Query q) -> q), (fun q -> Query q)
 
+    static member Pairs_ =
+
+        let isEqualsOrAmpersand i =
+                i = 0x3d // =
+             || i = 0x26 // &
+
+        let pairPartP =
+            many1Satisfy (int >> isEqualsOrAmpersand >> not)
+
+        let pairP =
+            pairPartP .>>. opt (skipChar '=' >>. pairPartP)
+
+        let pairsP =
+            sepBy pairP (skipChar '&')
+
+        let pairF =
+            function | (k, Some v) -> append k >> append "=" >> append v
+                     | (k, None) -> append k
+
+        let pairsF =
+            join pairF (append "&")
+
+        (fun (Query q) -> Parsing.tryParse pairsP q), (fun q -> Query (Formatting.format pairsF q))
+
     (* Common *)
 
     static member Format =
