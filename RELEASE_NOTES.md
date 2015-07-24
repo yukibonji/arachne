@@ -1,3 +1,8 @@
+### New in 2.1.0 - (Released 2015-07-24)
+* Addition of complete access lenses for all types in Arachne.Uri, allowing lens based access in to type components
+* Lenses using the <Property>_ syntax convention
+* Pairs_ lens created for Arachne.Uri Query type, allowing for access to the query string as a list of key value pairs
+
 ### New in 2.0.0 - (Released 2015-07-20)
 * Slight changes to type parsing and rendering for Fragment and Query in URI, and associated changes
 
