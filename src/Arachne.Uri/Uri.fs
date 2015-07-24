@@ -189,6 +189,13 @@ type Scheme =
         { Parse = schemeP
           Format = schemeF }
 
+    (* Lenses *)
+
+    static member Scheme_ =
+        (fun (Scheme s) -> s), (fun s -> Scheme s)
+
+    (* Common *)
+
     static member Format =
         Formatting.format Scheme.Mapping.Format
 
@@ -233,6 +240,19 @@ type Authority =
         { Parse = authorityP
           Format = authorityF }
 
+    (* Lenses *)
+
+    static member Host_ =
+        (fun (Authority (h, _, _)) -> h), (fun h (Authority (_, p, u)) -> Authority (h, p, u))
+
+    static member Port_ =
+        (fun (Authority (_, p, _)) -> p), (fun p (Authority (h, _, u)) -> Authority (h, Some p, u))
+
+    static member UserInfo_ =
+        (fun (Authority (_, _, u)) -> u), (fun u (Authority (h, p, _)) -> Authority (h, p, Some u))
+
+    (* Common *)
+
     static member Format =
         Formatting.format Authority.Mapping.Format
 
@@ -271,6 +291,11 @@ and UserInfo =
 
         { Parse = userInfoP
           Format = userInfoF }
+
+    (* Lenses *)
+
+    static member UserInfo_ =
+        (fun (UserInfo u) -> u), (fun u -> UserInfo u)
 
 (* Section 3.2.2 *)
 
@@ -322,6 +347,17 @@ and Host =
         { Parse = hostP
           Format = hostF }
 
+    (* Lenses *)
+
+    static member IPv4_ =
+        (function | IPv4 i -> Some i | _ -> None), (fun i -> IPv4 i)
+
+    static member IPv6_ =
+        (function | IPv6 i -> Some i | _ -> None), (fun i -> IPv6 i)
+
+    static member Name_ =
+        (function | Name n -> Some n | _ -> None), (fun n -> Name n)
+
 and RegName =
     | RegName of string
 
@@ -346,6 +382,11 @@ and RegName =
         { Parse = regNameP
           Format = regNameF }
 
+    (* Lenses *)
+
+    static member RegName_ =
+        (fun (RegName n) -> n), (fun n -> RegName n)
+
 and Port =
     | Port of int
 
@@ -360,6 +401,11 @@ and Port =
 
         { Parse = portP
           Format = portF }
+
+    (* Lenses *)
+
+    static member Port_ =
+        (fun (Port p) -> p), (fun p -> Port p)
 
 (* Path
 
@@ -405,6 +451,13 @@ type PathAbsoluteOrEmpty =
         { Parse = pathAbsoluteOrEmptyP
           Format = pathAbsoluteOrEmptyF }
 
+    (* Lenses *)
+
+    static member PathAbsoluteOrEmpty_ =
+        (fun (PathAbsoluteOrEmpty p) -> p), (fun p -> PathAbsoluteOrEmpty p)
+
+    (* Common *)
+
     static member Format =
         Formatting.format PathAbsoluteOrEmpty.Mapping.Format
 
@@ -434,6 +487,13 @@ type PathAbsolute =
 
         { Parse = pathAbsoluteP
           Format = pathAbsoluteF }
+
+    (* Lenses *)
+
+    static member PathAbsolute_ =
+        (fun (PathAbsolute p) -> p), (fun p -> PathAbsolute p)
+
+    (* Common *)
 
     static member Format =
         Formatting.format PathAbsolute.Mapping.Format
@@ -465,6 +525,13 @@ type PathNoScheme =
         { Parse = pathNoSchemeP
           Format = pathNoSchemeF }
 
+    (* Lenses *)
+
+    static member PathNoScheme_ =
+        (fun (PathNoScheme p) -> p), (fun p -> PathNoScheme p)
+
+    (* Common *)
+
     static member Format =
         Formatting.format PathNoScheme.Mapping.Format
 
@@ -494,6 +561,13 @@ type PathRootless =
 
         { Parse = pathRootlessP
           Format = pathRootlessF }
+
+    (* Lenses *)
+
+    static member PathRootless_ =
+        (fun (PathRootless p) -> p), (fun p -> PathRootless p)
+
+    (* Common *)
 
     static member Format =
         Formatting.format PathRootless.Mapping.Format
@@ -530,14 +604,19 @@ type Query =
 
         let queryP =
             parser |>> Query
-            //skipChar '?' >>. parser |>> Query
 
         let queryF =
             function | Query x -> formatter x
-            //function | Query x -> append "?" >> formatter x
 
         { Parse = queryP
           Format = queryF }
+
+    (* Lenses *)
+
+    static member Query_ =
+        (fun (Query q) -> q), (fun q -> Query q)
+
+    (* Common *)
 
     static member Format =
         Formatting.format Query.Mapping.Format
@@ -574,14 +653,19 @@ type Fragment =
 
         let fragmentP =
             parser |>> Fragment
-            //skipChar '#' >>. parser |>> Fragment
 
         let fragmentF =
             function | Fragment x -> formatter x
-            //function | Fragment x -> append "#" >> formatter x
 
         { Parse = fragmentP
           Format = fragmentF }
+
+    (* Lenses*)
+
+    static member Fragment_ =
+        (fun (Fragment f) -> f), (fun f -> Fragment f)
+
+    (* Common *)
 
     static member Format =
         Formatting.format Fragment.Mapping.Format
@@ -644,6 +728,22 @@ type Uri =
         { Parse = uriP
           Format = uriF }
 
+    (* Lenses *)
+
+    static member Scheme_ =
+        (fun (Uri (s, _, _, _)) -> s), (fun s (Uri (_, h, q, f)) -> Uri (s, h, q, f))
+
+    static member HierarchyPart_ =
+        (fun (Uri (_, h, _, _)) -> h), (fun h (Uri (s, _, q, f)) -> Uri (s, h, q, f))
+
+    static member Query_ =
+        (fun (Uri (_, _, q, _)) -> q), (fun q (Uri (s, h, _, f)) -> Uri (s, h, Some q, f))
+
+    static member Fragment_ =
+        (fun (Uri (_, _, _, f)) -> f), (fun f (Uri (s, h, q, _)) -> Uri (s, h, q, Some f))
+
+    (* Common *)
+
     static member Format =
         Formatting.format Uri.Mapping.Format
 
@@ -676,7 +776,7 @@ and HierarchyPart =
                 PathRootless.Mapping.Parse |>> Rootless
                 preturn Empty ]
 
-        let authorityF (a, p)=
+        let authorityF (a, p) =
                 append "//" 
              >> Authority.Mapping.Format a 
              >> PathAbsoluteOrEmpty.Mapping.Format p
@@ -689,6 +789,20 @@ and HierarchyPart =
 
         { Parse = hierarchyPartP
           Format = hierarchyPartF }
+
+    (* Lenses *)
+
+    static member Authority_ =
+        (function | Authority (a, p) -> Some (a, p) | _ -> None), (fun (a, p) -> Authority (a, p))
+
+    static member Absolute_ =
+        (function | Absolute p -> Some p | _ -> None), (fun p -> Absolute p)
+
+    static member Rootless_ =
+        (function | Rootless p -> Some p | _ -> None), (fun p -> Rootless p)
+
+    static member Empty_ =
+        (function | Empty -> Some () | _ -> None), (fun () -> Empty)
 
 (* Relative Reference
 
@@ -720,6 +834,19 @@ type RelativeReference =
 
         { Parse = relativeReferenceP
           Format = relativeReferenceF }
+
+    (* Lenses *)
+
+    static member RelativePart_ =
+        (fun (RelativeReference (r, _, _)) -> r), (fun r (RelativeReference (_, q, f)) -> RelativeReference (r, q, f))
+
+    static member Query_ =
+        (fun (RelativeReference (_, q, _)) -> q), (fun q (RelativeReference (r, _, f)) -> RelativeReference (r, Some q, f))
+
+    static member Fragment_ =
+        (fun (RelativeReference (_, _, f)) -> f), (fun f (RelativeReference (r, q, _)) -> RelativeReference (r, q, Some f))
+
+    (* Common *)
 
     static member Format =
         Formatting.format RelativeReference.Mapping.Format
@@ -767,6 +894,20 @@ and RelativePart =
         { Parse = relativePartP
           Format = relativePartF }
 
+    (* Lenses *)
+
+    static member Authority_ =
+        (function | Authority (a, p) -> Some (a, p) | _ -> None), (fun (a, p) -> Authority (a, p))
+
+    static member Absolute_ =
+        (function | Absolute p -> Some p | _ -> None), (fun p -> Absolute p)
+
+    static member NoScheme_ =
+        (function | NoScheme p -> Some p | _ -> None), (fun p -> NoScheme p)
+
+    static member Empty_ =
+        (function | Empty -> Some () | _ -> None), (fun () -> Empty)
+
 (* Absolute URI
 
    Taken from RFC 3986, Section 4.3 Absolute URI
@@ -797,6 +938,19 @@ type AbsoluteUri =
 
         { Parse = absoluteUriP
           Format = absoluteUriF }
+
+    (* Lenses *)
+
+    static member Scheme_ =
+        (fun (AbsoluteUri (s, _, _)) -> s), (fun s (AbsoluteUri (_, h, q)) -> AbsoluteUri (s, h, q))
+
+    static member HierarchyPart_ =
+        (fun (AbsoluteUri (_, h, _)) -> h), (fun h (AbsoluteUri (s, _, q)) -> AbsoluteUri (s, h, q))
+
+    static member Query_ =
+        (fun (AbsoluteUri (_, _, q)) -> q), (fun q (AbsoluteUri (s, h, _)) -> AbsoluteUri (s, h, Some q))
+
+    (* Common *)
 
     static member Format =
         Formatting.format AbsoluteUri.Mapping.Format
@@ -832,6 +986,16 @@ type UriReference =
 
         { Parse = uriReferenceP
           Format = uriReferenceF }
+
+    (* Lenses *)
+
+    static member Uri_ =
+        (function | Uri u -> Some u | _ -> None), (fun u -> Uri u)
+
+    static member Relative_ =
+        (function | Relative r -> Some r | _ -> None), (fun r -> Relative r)
+
+    (* Common *)
 
     static member Format =
         Formatting.format UriReference.Mapping.Format
