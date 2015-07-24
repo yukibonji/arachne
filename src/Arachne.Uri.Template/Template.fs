@@ -33,7 +33,7 @@ open Arachne.Uri
 type UriTemplateData =
     | UriTemplateData of Map<UriTemplateKey, UriTemplateValue>
 
-    static member UriTemplateDataIso =
+    static member UriTemplateData_ =
         (fun (UriTemplateData x) -> x), (fun x -> UriTemplateData x)
 
     static member (+) (UriTemplateData a, UriTemplateData b) =
@@ -47,17 +47,14 @@ and UriTemplateValue =
     | List of string list
     | Keys of (string * string) list
 
-    static member AtomPIso =
-        (function | Atom x -> Some x
-                  | _ -> None), (fun x -> Atom x)
+    static member Atom_ =
+        (function | Atom x -> Some x | _ -> None), (fun x -> Atom x)
 
-    static member ListPIso =
-        (function | List x -> Some x
-                  | _ -> None), (fun x -> List x)
+    static member List_ =
+        (function | List x -> Some x | _ -> None), (fun x -> List x)
 
-    static member KeysPIso =
-        (function | Keys x -> Some x
-                  | _ -> None), (fun x -> Keys x)
+    static member Keys_ =
+        (function | Keys x -> Some x | _ -> None), (fun x -> Keys x)
 
 (* Matching *)
 
