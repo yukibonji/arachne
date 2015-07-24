@@ -381,7 +381,9 @@ and Parameters =
         { Parse = parametersP
           Format = parametersF }
 
-    static member ParametersIso =
+    (* Lenses *)
+
+    static member Parameters_ =
         (fun (Parameters x) -> x), (fun x -> Parameters x)
 
 and Type =
@@ -435,7 +437,7 @@ type ContentType =
 
     (* Lenses *)
 
-    static member MediaTypeIso =
+    static member MediaType_ =
         (fun (ContentType x) -> x), (fun x -> ContentType x)
 
     (* Common *)
