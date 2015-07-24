@@ -336,13 +336,13 @@ type MediaType =
 
     (* Lenses *)
 
-    static member TypeLens =
+    static member Type_ =
         (fun (MediaType (x, _, _)) -> x), (fun x (MediaType (_, y, z)) -> MediaType (x, y, z))
 
-    static member SubTypeLens =
+    static member SubType_ =
         (fun (MediaType (_, y, _)) -> y), (fun y (MediaType (x, _, z)) -> MediaType (x, y, z))
 
-    static member ParametersLens =
+    static member Parameters_ =
         (fun (MediaType (_, _, z)) -> z), (fun z (MediaType (x, y, _)) -> MediaType (x, y, z))
 
     (* Common *)
