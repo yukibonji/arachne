@@ -148,3 +148,10 @@ let ``Uri Formatting/Parsing`` () =
         rootlessTyped,  rootlessString
         absoluteTyped,  absoluteString
         emptyTyped,     emptyString ]
+
+[<Test>]
+let ``Query Pairs``() =
+    let expectedResult = Some ["param", Some("exists");"param1", None]
+    let query = Query.Query("param=exists&param1=")
+    let queryPairs = query |> fst Query.Pairs_
+    Assert.AreEqual(expectedResult, queryPairs)
