@@ -626,7 +626,7 @@ type Query =
             many1Satisfy (int >> isEqualsOrAmpersand >> not)
 
         let pairP =
-            pairPartP .>>. opt (skipChar '=' >>. pairPartP)
+            pairPartP .>>. (skipChar '=' >>. (opt pairPartP))
 
         let pairsP =
             sepBy pairP (skipChar '&')
