@@ -158,7 +158,7 @@ let ``Query Pairs``() =
 
 [<Test>]
 let ``Query Pairs with missing parameter value``() =
-    let expectedResult = Some ["param", Some("exists");"param1", None]
+    let expectedResult = Some ["param", Some("exists");"param1", Some ("")]
     let query = Query.Query("param=exists&param1=")
     let queryPairs = query |> fst Query.Pairs_
     Assert.AreEqual(expectedResult, queryPairs)

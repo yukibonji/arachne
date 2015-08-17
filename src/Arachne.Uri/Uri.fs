@@ -622,11 +622,14 @@ type Query =
                 i = 0x3d // =
              || i = 0x26 // &
 
+        let pairPartV =
+            manySatisfy (int >> isEqualsOrAmpersand >> not)
+
         let pairPartP =
             many1Satisfy (int >> isEqualsOrAmpersand >> not)
 
         let pairP =
-            pairPartP .>>. ((optional( skipChar '=')) >>. (opt pairPartP))
+            pairPartP .>>. opt(( skipChar '=') >>. ( pairPartV))
         
         let pairsP =
             sepBy1 pairP (skipChar '&')
