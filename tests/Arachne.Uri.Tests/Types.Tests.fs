@@ -169,3 +169,10 @@ let ``Query Pairs with missing parameter value and equals sign``() =
     let query = Query.Query("param=exists&param1")
     let queryPairs = query |> fst Query.Pairs_
     Assert.AreEqual(expectedResult, queryPairs)
+
+[<Test>]
+let ``Query Pairs with no query parameters``() =
+    let expectedResult = None
+    let query = Query.Query("")
+    let queryPairs = query |> fst Query.Pairs_
+    Assert.AreEqual(expectedResult, queryPairs)
