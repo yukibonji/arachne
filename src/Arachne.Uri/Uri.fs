@@ -622,14 +622,17 @@ type Query =
                 i = 0x3d // =
              || i = 0x26 // &
 
+        let pairPartV =
+            manySatisfy (int >> isEqualsOrAmpersand >> not)
+
         let pairPartP =
             many1Satisfy (int >> isEqualsOrAmpersand >> not)
 
         let pairP =
-            pairPartP .>>. opt (skipChar '=' >>. pairPartP)
-
+            pairPartP .>>. opt(( skipChar '=') >>. ( pairPartV))
+        
         let pairsP =
-            sepBy pairP (skipChar '&')
+            sepBy1 pairP (skipChar '&')
 
         let pairF =
             function | (k, Some v) -> append k >> append "=" >> append v
