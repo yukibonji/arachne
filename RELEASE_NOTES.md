@@ -1,3 +1,6 @@
+### New in 2.3.0 - (Released 2015-08-19)
+* Added better support for query strings
+
 ### New in 2.2.0 - (Released 2015-07-24)
 * Correction of lens property names to Proprty_ syntax convention for MediaType lenses
 
