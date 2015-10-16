@@ -1,3 +1,6 @@
+### New in 2.3.1 - (Released 2015-10-16)
+* Updated dependencies and removed package dependency on FSharp.Core
+
 ### New in 2.3.0 - (Released 2015-08-19)
 * Added better support for query strings
 
