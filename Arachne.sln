@@ -73,6 +73,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D86C1328
 		tests\Arachne.Uri.Tests\Arachne.Uri.Tests.fsproj.paket.references = tests\Arachne.Uri.Tests\Arachne.Uri.Tests.fsproj.paket.references
 	EndProjectSection
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Console", "tests\Arachne.Console\Arachne.Console.fsproj", "{F5F53125-277F-4F6E-914F-2B42DCB355FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,10 @@ Global
 		{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5F53125-277F-4F6E-914F-2B42DCB355FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5F53125-277F-4F6E-914F-2B42DCB355FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5F53125-277F-4F6E-914F-2B42DCB355FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5F53125-277F-4F6E-914F-2B42DCB355FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -149,5 +155,6 @@ Global
 		{98A74F15-7AAE-46BE-8E94-C5A2B85BD900} = {A430AC63-4200-4222-9A31-6077382E86DD}
 		{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC} = {A430AC63-4200-4222-9A31-6077382E86DD}
 		{D86C1328-50F6-471F-86D0-486389BD9184} = {2C81850E-18B1-4EA3-AB76-81253210EE4D}
+		{F5F53125-277F-4F6E-914F-2B42DCB355FC} = {A430AC63-4200-4222-9A31-6077382E86DD}
 	EndGlobalSection
 EndGlobal
