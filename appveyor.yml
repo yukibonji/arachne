@@ -12,3 +12,6 @@ test: off
 artifacts:
 - path: bin/Arachne.*.nupkg
   name: nuget
+notifications:
+- provider: Webhook
+  url: https://webhooks.gitter.im/e/ccdb5d513093870b72df
