@@ -44,7 +44,49 @@ module internal Grammar =
    Cookie Pair, as defined for both Set-Cookie and Cookie headers, given
    in 4.1 and 4.2. *)
 
-type CookieName =
+type CookiePair =
+    | CookiePair of CookieName * CookieValue
+
+    static member internal Mapping =
+
+        let cookieP =
+                CookieName.Mapping.Parse 
+            .>> skipChar '='
+           .>>. CookieValue.Mapping.Parse
+            |>> CookiePair
+
+        let cookieF =
+            function | CookiePair (n, v) ->
+                            CookieName.Mapping.Format n 
+                         >> append "=" 
+                         >> CookieValue.Mapping.Format v
+
+        { Parse = cookieP
+          Format = cookieF }
+
+    (* Lenses *)
+
+    static member Name_ =
+        (fun (CookiePair (n, _)) -> n), (fun n (CookiePair (_, v)) -> CookiePair (n, v))
+
+    static member Value_ =
+        (fun (CookiePair (_, v)) -> v), (fun v (CookiePair (n, _)) -> CookiePair (n, v))
+
+    (* Common *)
+
+    static member Format =
+        Formatting.format CookiePair.Mapping.Format
+
+    static member Parse =
+        Parsing.parse CookiePair.Mapping.Parse
+
+    static member TryParse =
+        Parsing.tryParse CookiePair.Mapping.Parse
+
+    override x.ToString () =
+        CookiePair.Format x
+
+and CookieName =
     | CookieName of string
 
     static member internal Mapping =
@@ -58,12 +100,17 @@ type CookieName =
         { Parse = cookieNameP
           Format = cookieNameF }
 
+    (* Lenses *)
+
+    static member Name_ =
+        (fun (CookieName n) -> n), (fun n -> CookieName n)
+
 and CookieValue =
     | CookieValue of string
 
     static member internal Mapping =
 
-        (* TODO: Correct parsing grammar for cookie values. *)
+        (* TODO: Full parsing grammar for cookie values. *)
 
         let cookieValueP =
             tokenP |>> CookieValue
@@ -74,32 +121,43 @@ and CookieValue =
         { Parse = cookieValueP
           Format = cookieValueF }
 
+    (* Lenses *)
+
+    static member Value_ =
+        (fun (CookieValue v) -> v), (fun v -> CookieValue v)
+
 (* Set-Cookie
 
    Taken from RFC 6265, Section 4.1 Set-Cookie
    See [http://tools.ietf.org/html/rfc6265#section-4.1] *)
 
 type SetCookie =
-    | SetCookie of CookieName * CookieValue * CookieAttributes
+    | SetCookie of CookiePair * CookieAttributes
 
     static member internal Mapping =
 
         let setCookieP =
-                CookieName.Mapping.Parse 
-            .>> skipChar '=' 
-           .>>. CookieValue.Mapping.Parse 
+                CookiePair.Mapping.Parse
            .>>. CookieAttributes.Mapping.Parse
-            |>> fun ((n, a), v) -> SetCookie (n, a, v)
+            |>> fun (p, v) -> SetCookie (p, v)
 
         let setCookieF =
-            function | SetCookie (n, v, a) ->
-                            CookieName.Mapping.Format n 
-                         >> append "="
-                         >> CookieValue.Mapping.Format v
+            function | SetCookie (p, a) ->
+                            CookiePair.Mapping.Format p
                          >> CookieAttributes.Mapping.Format a
 
         { Parse = setCookieP
           Format = setCookieF }
+
+    (* Lenses *)
+
+    static member Cookie_ =
+        (fun (SetCookie (p, _)) -> p), (fun p (SetCookie (_, a)) -> SetCookie (p, a))
+
+    static member Attributes_ =
+        (fun (SetCookie (_, a)) -> a), (fun a (SetCookie (p, _)) -> SetCookie (p, a))
+
+    (* Common *)
 
     static member Format =
         Formatting.format SetCookie.Mapping.Format
@@ -128,6 +186,11 @@ and CookieAttributes =
         { Parse = cookieAttributesP
           Format = cookieAttributesF }
 
+    (* Lenses *)
+
+    static member Attributes_ =
+        (fun (CookieAttributes a) -> a), (fun a -> CookieAttributes a)
+
 and CookieAttribute =
     | Expires of DateTime
     | MaxAge of int
@@ -138,14 +201,27 @@ and CookieAttribute =
 
     static member internal Mapping =
 
+        let expiresP =
+            skipString "Expires=" >>. (httpDateP (manySatisfy ((<>) ';'))) |>> Expires
+
+        let secureP =
+            skipString "Secure" >>% Secure
+
+        let httpOnlyP =
+            skipString "HttpOnly" >>% HttpOnly
+
         let cookieAttributeP =
                 skipChar ';'
             >>. spP
             >>. choice [
-                    skipString "Secure" >>% Secure ]
+                    expiresP
+                    secureP
+                    httpOnlyP ]
 
         let cookieAttributeF =
-            function | Secure -> append "; Secure"
+            function | Expires x -> append "; Expires=" >> append (x.ToString "r")
+                     | Secure -> append "; Secure"
+                     | HttpOnly -> append "; HttpOnly"
                      | _ -> id
 
         { Parse = cookieAttributeP
@@ -157,24 +233,26 @@ and CookieAttribute =
    See [http://tools.ietf.org/html/rfc6265#section-4.2] *)
 
 type Cookie =
-    | Cookie of CookieName * CookieValue
+    | Cookie of CookiePair
 
     static member internal Mapping =
 
         let cookieP =
-                CookieName.Mapping.Parse 
-            .>> skipChar '='
-           .>>. CookieValue.Mapping.Parse
+                CookiePair.Mapping.Parse
             |>> Cookie
 
         let cookieF =
-            function | Cookie(n, v) ->
-                            CookieName.Mapping.Format n 
-                         >> append "=" 
-                         >> CookieValue.Mapping.Format v
+            function | Cookie c -> CookiePair.Mapping.Format c
 
         { Parse = cookieP
           Format = cookieF }
+
+    (* Lenses *)
+
+    static member Cookie_ =
+        (fun (Cookie c) -> c), (fun c -> Cookie c)
+
+    (* Common *)
 
     static member Format =
         Formatting.format Cookie.Mapping.Format

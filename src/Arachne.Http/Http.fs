@@ -1120,7 +1120,7 @@ and RefererUri =
    Taken from RFC 7231, Section 7.1.1.1 HTTP-Date *)
 
 [<AutoOpen>]
-module private HttpDate =
+module internal HttpDate =
 
     let dateTimeFormat =
         CultureInfo.InvariantCulture.DateTimeFormat
@@ -1128,8 +1128,8 @@ module private HttpDate =
     let dateTimeAdjustment =
         DateTimeStyles.AdjustToUniversal
 
-    let httpDateP : Parser<DateTime, unit> =
-        restOfLine false >>= (fun s ->
+    let httpDateP p : Parser<DateTime, unit> =
+        p >>= (fun s ->
             match DateTime.TryParse (s, dateTimeFormat, dateTimeAdjustment) with
             | true, d -> preturn d
             | _ -> pzero)
@@ -1145,7 +1145,7 @@ type Date =
     static member internal Mapping =
 
         let dateP =
-            httpDateP |>> Date.Date
+            httpDateP (restOfLine false) |>> Date.Date
 
         let dateF =
             function | Date.Date x -> append (x.ToString "r")
@@ -1208,7 +1208,7 @@ type RetryAfter =
 
         let retryAfterP =
             choice [
-                attempt httpDateP |>> (Date >> RetryAfter)
+                attempt (httpDateP (restOfLine false)) |>> (Date >> RetryAfter)
                 puint32 |>> (float >> TimeSpan.FromSeconds >> Delay >> RetryAfter) ]
 
         let retryAfterF =
@@ -1283,7 +1283,7 @@ type LastModified =
     static member internal Mapping =
 
         let lastModifiedP =
-            httpDateP |>> LastModified
+            httpDateP (restOfLine false) |>> LastModified
 
         let lastModifiedF =
             function | LastModified x -> append (x.ToString "r")
@@ -1449,7 +1449,7 @@ type IfModifiedSince =
     static member internal Mapping =
 
         let ifModifiedSinceP =
-            httpDateP |>> IfModifiedSince
+            httpDateP (restOfLine false) |>> IfModifiedSince
 
         let ifModifiedSinceF =
             function | IfModifiedSince x -> append (x.ToString "r")
@@ -1480,7 +1480,7 @@ type IfUnmodifiedSince =
     static member internal Mapping =
 
         let ifUnmodifiedSinceP =
-            httpDateP |>> IfUnmodifiedSince
+            httpDateP (restOfLine false) |>> IfUnmodifiedSince
 
         let ifUnmodifiedSinceF =
             function | IfUnmodifiedSince x -> append (x.ToString "r")
@@ -1519,7 +1519,7 @@ type IfRange =
 
         let ifRangeP =
             (EntityTag.Mapping.Parse |>> (EntityTag >> IfRange)) <|> 
-                                             (httpDateP |>> (Date >> IfRange))
+                                         (httpDateP (restOfLine false) |>> (Date >> IfRange))
 
         let ifRangeF =
             function | IfRange (Date x) -> append (x.ToString "r")
@@ -1682,7 +1682,7 @@ type Expires =
     static member internal Mapping =
 
         let expiresP =
-            httpDateP |>> Expires
+            httpDateP (restOfLine false) |>> Expires
 
         let expiresF =
             function | Expires x -> append (x.ToString "r")
