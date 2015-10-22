@@ -33,7 +33,7 @@ open Arachne.Uri
 type UriTemplateData =
     | UriTemplateData of Map<UriTemplateKey, UriTemplateValue>
 
-    static member UriTemplateDataIso =
+    static member UriTemplateData_ =
         (fun (UriTemplateData x) -> x), (fun x -> UriTemplateData x)
 
     static member (+) (UriTemplateData a, UriTemplateData b) =
@@ -47,17 +47,14 @@ and UriTemplateValue =
     | List of string list
     | Keys of (string * string) list
 
-    static member AtomPIso =
-        (function | Atom x -> Some x
-                  | _ -> None), (fun x -> Atom x)
+    static member Atom_ =
+        (function | Atom x -> Some x | _ -> None), (fun x -> Atom x)
 
-    static member ListPIso =
-        (function | List x -> Some x
-                  | _ -> None), (fun x -> List x)
+    static member List_ =
+        (function | List x -> Some x | _ -> None), (fun x -> List x)
 
-    static member KeysPIso =
-        (function | Keys x -> Some x
-                  | _ -> None), (fun x -> Keys x)
+    static member Keys_ =
+        (function | Keys x -> Some x | _ -> None), (fun x -> Keys x)
 
 (* Matching *)
 
@@ -339,49 +336,64 @@ and Expression =
         let reservedP =
             PercentEncoding.makeParser isReserved
 
+        (* Characters *)
+
+        let commaP =
+            skipChar ','
+
+        let dotP =
+            skipChar '.'
+
+        let hashP =
+            skipChar '#'
+
+        let semicolonP =
+            skipChar ';'
+
+        let slashP =
+            skipChar '/'
+
         (* Values *)
 
         let atomP p key =
             p |>> fun s -> key, Atom s
 
         let listP p sep =
-            sepBy p sep |>> List
+            sepBy1 p sep |>> List
 
         let keysP p sep =
-            sepBy (p .>> skipChar '=' .>>. p) sep |>> Keys
+            sepBy1 (p .>> skipChar '=' .>>. p) sep |>> Keys
 
         let listOrKeysP p sep key =
             attempt (keysP p sep) <|> listP p sep |>> fun v -> key, v
 
         (* Mapping *)
 
-        let mapVariable key =
-            function | None, Some (Level4 Explode) -> listOrKeysP simpleP (skipChar ',') key
-                     | None, _ -> atomP simpleP key
-                     | Some (Level2 _), Some (Level4 Explode) -> listOrKeysP reservedP (skipChar ',') key
+        let mapVar key separator =
+            function | Some (Level2 _), Some (Level4 Explode) -> listOrKeysP reservedP separator key
+                     | _, Some (Level4 Explode) -> listOrKeysP simpleP separator key
                      | Some (Level2 _), _ -> atomP reservedP key
-                     | Some (Level3 Label), Some (Level4 Explode) -> listOrKeysP simpleP (skipChar '.') key
-                     | Some (Level3 Label), _ -> atomP simpleP key
-                     | Some (Level3 Segment), Some (Level4 Explode) -> listOrKeysP simpleP (skipChar '/') key
-                     | Some (Level3 Segment), _ -> atomP simpleP key
-                     | _ -> failwith ""
+                     | _ -> atomP simpleP key
 
-        let mapVariables o (VariableList vs) =
-            List.map (fun (VariableSpec (VariableName n, m)) ->
-                mapVariable (Key n) (o, m)) vs
+        let mapVars operator separator (VariableList vars) =
+            multiSepBy (List.map (fun (VariableSpec (VariableName name, modifier)) ->
+                mapVar (Key name) separator (operator, modifier)) vars) separator
 
         let mapExpression =
-                function | Expression (None, vs) -> idP, mapVariables None vs, skipChar ','
-                         | Expression (Some (Level2 Reserved), vs) -> idP, mapVariables (Some (Level2 Reserved)) vs, skipChar ','
-                         | Expression (Some (Level2 Fragment), vs) -> skipChar '#', mapVariables (Some (Level2 Fragment)) vs, skipChar ','
-                         | Expression (Some (Level3 Label), vs) -> skipChar '.', mapVariables (Some (Level3 Label)) vs, skipChar '.'
-                         | Expression (Some (Level3 Segment), vs) -> skipChar '/', mapVariables (Some (Level3 Segment)) vs, skipChar '/'
+                function | Expression (None, vars) -> idP, mapVars None commaP vars
+                         | Expression (Some (Level2 Reserved), vars) -> idP, mapVars (Some (Level2 Reserved)) commaP vars
+                         | Expression (Some (Level2 Fragment), vars) -> hashP, mapVars (Some (Level2 Fragment)) commaP vars
+                         | Expression (Some (Level3 Label), vars) -> dotP, mapVars (Some (Level3 Label)) dotP vars
+                         | Expression (Some (Level3 Segment), vars) -> slashP, mapVars (Some (Level3 Segment)) slashP vars
+                         | Expression (Some (Level3 Parameter), vars) -> semicolonP, mapVars (Some (Level3 Parameter)) semicolonP vars
+                         | Expression (Some (Level3 Query), vars) -> failwith ""
+                         | Expression (Some (Level3 QueryContinuation), vars) -> failwith ""
                          | _ -> failwith ""
-             >> fun (prefix, keyValuePair, sep) -> prefix >>. multiSepBy keyValuePair sep
+             >> fun (prefixP, valuesP) -> opt (prefixP >>. valuesP)
 
         let expressionM e =
-            mapExpression e |>> fun vs -> UriTemplateData (Map.ofList vs)
-
+            mapExpression e |>> function | Some vars -> UriTemplateData (Map.ofList vars)
+                                         | _ -> UriTemplateData (Map.empty)
         { Match = expressionM }
 
     static member Rendering =
