@@ -80,36 +80,30 @@ let solution =
             { Source =
                 [ { Name = "Arachne.Core"
                     Dependencies =
-                        [ Package "FSharp.Core"
-                          Package "FParsec" ] }
+                        [ Package "FParsec" ] }
                   { Name = "Arachne.Http"
                     Dependencies =
-                        [ Package "FSharp.Core"
-                          Package "FParsec"
+                        [ Package "FParsec"
                           Local "Arachne.Core"
                           Local "Arachne.Language"
                           Local "Arachne.Uri" ] }
                   { Name = "Arachne.Http.Cors"
                     Dependencies =
-                        [ Package "FSharp.Core"
-                          Package "FParsec"
+                        [ Package "FParsec"
                           Local "Arachne.Core"
                           Local "Arachne.Http"
                           Local "Arachne.Uri" ] }
                   { Name = "Arachne.Language"
                     Dependencies =
-                        [ Package "FSharp.Core"
-                          Package "FParsec"
+                        [ Package "FParsec"
                           Local "Arachne.Core" ] }
                   { Name = "Arachne.Uri"
                     Dependencies =
-                        [ Package "FSharp.Core"
-                          Package "FParsec"
+                        [ Package "FParsec"
                           Local "Arachne.Core" ] }
                   { Name = "Arachne.Uri.Template"
                     Dependencies =
-                        [ Package "FSharp.Core"
-                          Package "FParsec"
+                        [ Package "FParsec"
                           Local "Arachne.Core"
                           Local "Arachne.Uri" ] } ]
               Test =

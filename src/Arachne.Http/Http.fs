@@ -52,14 +52,15 @@ type PartialUri =
     static member internal Mapping =
 
         let partialUriP =
-            RelativePart.Mapping.Parse .>>. opt Query.Mapping.Parse
+            RelativePart.Mapping.Parse .>>. opt (skipChar '?' >>. Query.Mapping.Parse)
             |>> PartialUri
 
         let partialUriF =
             function | PartialUri (r, q) ->
                         let formatters =
                             [ RelativePart.Mapping.Format r
-                              (function | Some q -> Query.Mapping.Format q | _ -> id) q ]
+                              (function | Some q -> append "?" >> Query.Mapping.Format q 
+                                        | _ -> id) q ]
 
                         fun b -> List.fold (|>) b formatters
 
@@ -336,13 +337,13 @@ type MediaType =
 
     (* Lenses *)
 
-    static member TypeLens =
+    static member Type_ =
         (fun (MediaType (x, _, _)) -> x), (fun x (MediaType (_, y, z)) -> MediaType (x, y, z))
 
-    static member SubTypeLens =
+    static member SubType_ =
         (fun (MediaType (_, y, _)) -> y), (fun y (MediaType (x, _, z)) -> MediaType (x, y, z))
 
-    static member ParametersLens =
+    static member Parameters_ =
         (fun (MediaType (_, _, z)) -> z), (fun z (MediaType (x, y, _)) -> MediaType (x, y, z))
 
     (* Common *)
@@ -381,7 +382,9 @@ and Parameters =
         { Parse = parametersP
           Format = parametersF }
 
-    static member ParametersIso =
+    (* Lenses *)
+
+    static member Parameters_ =
         (fun (Parameters x) -> x), (fun x -> Parameters x)
 
 and Type =
@@ -435,7 +438,7 @@ type ContentType =
 
     (* Lenses *)
 
-    static member MediaTypeIso =
+    static member MediaType_ =
         (fun (ContentType x) -> x), (fun x -> ContentType x)
 
     (* Common *)
