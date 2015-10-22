@@ -1,0 +1,13 @@
+type project
+owners
+    kolektiv
+    panesofglass
+language en-US
+iconUrl https://raw.githubusercontent.com/freya-fs/arachne/master/docs/files/img/logo.png
+licenseUrl https://raw.githubusercontent.com/freya-fs/arachne/master/LICENSE.txt
+projectUrl https://github.com/freya-fs/arachne
+tags
+    web
+    http
+    f#
+    fsharp

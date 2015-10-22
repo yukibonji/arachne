@@ -1,0 +1,28 @@
+type file
+id Arachne
+title Arachne
+owners
+    kolektiv
+    panesofglass
+authors
+    Andrew Cherry (@kolektiv)
+    Ryan Riley (@panesofglass)
+summary
+    Arachne - Types for HTTP and related RFCs.
+description
+    Arachne - Types for HTTP and related RFCs.
+dependencies
+    Arachne.Http.Cors
+    Arachne.Uri.Template
+language en-US
+iconUrl
+    https://raw.githubusercontent.com/freya-fs/arachne/master/docs/files/img/logo.png
+licenseUrl
+    https://raw.githubusercontent.com/freya-fs/arachne/master/LICENSE.txt
+projectUrl
+    https://github.com/freya-fs/arachne
+tags
+    web
+    http
+    f#
+    fsharp

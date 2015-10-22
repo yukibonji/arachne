@@ -1,11 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
+# Visual Studio 2012
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Core", "src\Arachne.Core\Arachne.Core.fsproj", "{4D459379-2B7E-463B-8635-1FB18F97727D}"
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Core", "src\Arachne.Core\Arachne.Core.fsproj", "{4D459379-2B7E-463B-8635-1FB18F97727D}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Language", "src\Arachne.Language\Arachne.Language.fsproj", "{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Uri", "src\Arachne.Uri\Arachne.Uri.fsproj", "{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Uri.Template", "src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj", "{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Http", "src\Arachne.Http\Arachne.Http.fsproj", "{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Http.Cors", "src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj", "{15087E9E-3D42-4516-9BED-B5C52953C190}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sln", "sln", "{E063EC87-F350-4433-97DF-BA98EA3E7177}"
 	ProjectSection(SolutionItems) = preProject
@@ -32,37 +42,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{44DC96C8-E1D
 		src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references = src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Language", "src\Arachne.Language\Arachne.Language.fsproj", "{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri", "src\Arachne.Uri\Arachne.Uri.fsproj", "{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri.Template", "src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj", "{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Http", "src\Arachne.Http\Arachne.Http.fsproj", "{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Http.Cors", "src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj", "{15087E9E-3D42-4516-9BED-B5C52953C190}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{85452D60-BFFB-47E7-82C1-8FA6134455C8}"
-	ProjectSection(SolutionItems) = preProject
-		build.cmd = build.cmd
-		build.fsx = build.fsx
-		build.sh = build.sh
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A430AC63-4200-4222-9A31-6077382E86DD}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Core.Tests", "tests\Arachne.Core.Tests\Arachne.Core.Tests.fsproj", "{D39640C6-2258-4571-830E-7028E19DB6BA}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Language.Tests", "tests\Arachne.Language.Tests\Arachne.Language.Tests.fsproj", "{7B6F727E-24C4-4D9E-9759-81D0105004D1}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri.Tests", "tests\Arachne.Uri.Tests\Arachne.Uri.Tests.fsproj", "{35CF4E6B-8257-4A0A-9CEC-EF98915E2455}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri.Template.Tests", "tests\Arachne.Uri.Template.Tests\Arachne.Uri.Template.Tests.fsproj", "{069C35A0-A4C7-423C-87F6-0A4EF964F95A}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Http.Cors.Tests", "tests\Arachne.Http.Cors.Tests\Arachne.Http.Cors.Tests.fsproj", "{98A74F15-7AAE-46BE-8E94-C5A2B85BD900}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Http.Tests", "tests\Arachne.Http.Tests\Arachne.Http.Tests.fsproj", "{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D86C1328-50F6-471F-86D0-486389BD9184}"
 	ProjectSection(SolutionItems) = preProject
 		tests\Arachne.Core.Tests\Arachne.Core.Tests.fsproj.paket.references = tests\Arachne.Core.Tests\Arachne.Core.Tests.fsproj.paket.references
@@ -73,81 +52,114 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D86C1328
 		tests\Arachne.Uri.Tests\Arachne.Uri.Tests.fsproj.paket.references = tests\Arachne.Uri.Tests\Arachne.Uri.Tests.fsproj.paket.references
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{442F25D4-7692-4A3D-AB29-34035CB12628}"
+	ProjectSection(SolutionItems) = preProject
+		src\Arachne.Core\Arachne.Core.fsproj.paket.template = src\Arachne.Core\Arachne.Core.fsproj.paket.template
+		src\Arachne.Http\Arachne.Http.fsproj.paket.template = src\Arachne.Http\Arachne.Http.fsproj.paket.template
+		src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj.paket.template = src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj.paket.template
+		src\Arachne.Uri\Arachne.Uri.fsproj.paket.template = src\Arachne.Uri\Arachne.Uri.fsproj.paket.template
+		src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.template = src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.template
+		src\Arachne.Language\Arachne.Language.fsproj.paket.template = src\Arachne.Language\Arachne.Language.fsproj.paket.template
+		paket.template = paket.template
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{85452D60-BFFB-47E7-82C1-8FA6134455C8}"
+	ProjectSection(SolutionItems) = preProject
+		build.cmd = build.cmd
+		build.fsx = build.fsx
+		build.sh = build.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A430AC63-4200-4222-9A31-6077382E86DD}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Core.Tests", "tests\Arachne.Core.Tests\Arachne.Core.Tests.fsproj", "{D39640C6-2258-4571-830E-7028E19DB6BA}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Language.Tests", "tests\Arachne.Language.Tests\Arachne.Language.Tests.fsproj", "{7B6F727E-24C4-4D9E-9759-81D0105004D1}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Uri.Tests", "tests\Arachne.Uri.Tests\Arachne.Uri.Tests.fsproj", "{35CF4E6B-8257-4A0A-9CEC-EF98915E2455}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Uri.Template.Tests", "tests\Arachne.Uri.Template.Tests\Arachne.Uri.Template.Tests.fsproj", "{069C35A0-A4C7-423C-87F6-0A4EF964F95A}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Http.Cors.Tests", "tests\Arachne.Http.Cors.Tests\Arachne.Http.Cors.Tests.fsproj", "{98A74F15-7AAE-46BE-8E94-C5A2B85BD900}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Http.Tests", "tests\Arachne.Http.Tests\Arachne.Http.Tests.fsproj", "{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4D459379-2B7E-463B-8635-1FB18F97727D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D459379-2B7E-463B-8635-1FB18F97727D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D459379-2B7E-463B-8635-1FB18F97727D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D459379-2B7E-463B-8635-1FB18F97727D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{15087E9E-3D42-4516-9BED-B5C52953C190}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{15087E9E-3D42-4516-9BED-B5C52953C190}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{15087E9E-3D42-4516-9BED-B5C52953C190}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{15087E9E-3D42-4516-9BED-B5C52953C190}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D39640C6-2258-4571-830E-7028E19DB6BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D39640C6-2258-4571-830E-7028E19DB6BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D39640C6-2258-4571-830E-7028E19DB6BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D39640C6-2258-4571-830E-7028E19DB6BA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B6F727E-24C4-4D9E-9759-81D0105004D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B6F727E-24C4-4D9E-9759-81D0105004D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B6F727E-24C4-4D9E-9759-81D0105004D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B6F727E-24C4-4D9E-9759-81D0105004D1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{35CF4E6B-8257-4A0A-9CEC-EF98915E2455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{35CF4E6B-8257-4A0A-9CEC-EF98915E2455}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{35CF4E6B-8257-4A0A-9CEC-EF98915E2455}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{35CF4E6B-8257-4A0A-9CEC-EF98915E2455}.Release|Any CPU.Build.0 = Release|Any CPU
 		{069C35A0-A4C7-423C-87F6-0A4EF964F95A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{069C35A0-A4C7-423C-87F6-0A4EF964F95A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{069C35A0-A4C7-423C-87F6-0A4EF964F95A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{069C35A0-A4C7-423C-87F6-0A4EF964F95A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{98A74F15-7AAE-46BE-8E94-C5A2B85BD900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{98A74F15-7AAE-46BE-8E94-C5A2B85BD900}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{98A74F15-7AAE-46BE-8E94-C5A2B85BD900}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{98A74F15-7AAE-46BE-8E94-C5A2B85BD900}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15087E9E-3D42-4516-9BED-B5C52953C190}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15087E9E-3D42-4516-9BED-B5C52953C190}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15087E9E-3D42-4516-9BED-B5C52953C190}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15087E9E-3D42-4516-9BED-B5C52953C190}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35CF4E6B-8257-4A0A-9CEC-EF98915E2455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35CF4E6B-8257-4A0A-9CEC-EF98915E2455}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35CF4E6B-8257-4A0A-9CEC-EF98915E2455}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35CF4E6B-8257-4A0A-9CEC-EF98915E2455}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D459379-2B7E-463B-8635-1FB18F97727D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D459379-2B7E-463B-8635-1FB18F97727D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D459379-2B7E-463B-8635-1FB18F97727D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D459379-2B7E-463B-8635-1FB18F97727D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
+		{7B6F727E-24C4-4D9E-9759-81D0105004D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B6F727E-24C4-4D9E-9759-81D0105004D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B6F727E-24C4-4D9E-9759-81D0105004D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B6F727E-24C4-4D9E-9759-81D0105004D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98A74F15-7AAE-46BE-8E94-C5A2B85BD900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98A74F15-7AAE-46BE-8E94-C5A2B85BD900}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98A74F15-7AAE-46BE-8E94-C5A2B85BD900}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98A74F15-7AAE-46BE-8E94-C5A2B85BD900}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D39640C6-2258-4571-830E-7028E19DB6BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D39640C6-2258-4571-830E-7028E19DB6BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D39640C6-2258-4571-830E-7028E19DB6BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D39640C6-2258-4571-830E-7028E19DB6BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4D459379-2B7E-463B-8635-1FB18F97727D} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
-		{C50437D5-0453-40A3-98CB-12276735904A} = {E063EC87-F350-4433-97DF-BA98EA3E7177}
-		{2C81850E-18B1-4EA3-AB76-81253210EE4D} = {C50437D5-0453-40A3-98CB-12276735904A}
-		{44DC96C8-E1DF-4444-ACF2-701D29412FEC} = {2C81850E-18B1-4EA3-AB76-81253210EE4D}
 		{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
 		{C45C7991-1168-4BED-AFF6-3538E0D1B5E6} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
 		{6070ADFC-F163-4B97-BB6B-2234E26BBEC4} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
 		{9B0CC1A9-6F06-4950-BA20-0E6644738DD3} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
 		{15087E9E-3D42-4516-9BED-B5C52953C190} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
+		{C50437D5-0453-40A3-98CB-12276735904A} = {E063EC87-F350-4433-97DF-BA98EA3E7177}
 		{85452D60-BFFB-47E7-82C1-8FA6134455C8} = {E063EC87-F350-4433-97DF-BA98EA3E7177}
+		{2C81850E-18B1-4EA3-AB76-81253210EE4D} = {C50437D5-0453-40A3-98CB-12276735904A}
+		{442F25D4-7692-4A3D-AB29-34035CB12628} = {C50437D5-0453-40A3-98CB-12276735904A}
+		{44DC96C8-E1DF-4444-ACF2-701D29412FEC} = {2C81850E-18B1-4EA3-AB76-81253210EE4D}
+		{D86C1328-50F6-471F-86D0-486389BD9184} = {2C81850E-18B1-4EA3-AB76-81253210EE4D}
 		{D39640C6-2258-4571-830E-7028E19DB6BA} = {A430AC63-4200-4222-9A31-6077382E86DD}
 		{7B6F727E-24C4-4D9E-9759-81D0105004D1} = {A430AC63-4200-4222-9A31-6077382E86DD}
 		{35CF4E6B-8257-4A0A-9CEC-EF98915E2455} = {A430AC63-4200-4222-9A31-6077382E86DD}
 		{069C35A0-A4C7-423C-87F6-0A4EF964F95A} = {A430AC63-4200-4222-9A31-6077382E86DD}
 		{98A74F15-7AAE-46BE-8E94-C5A2B85BD900} = {A430AC63-4200-4222-9A31-6077382E86DD}
 		{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC} = {A430AC63-4200-4222-9A31-6077382E86DD}
-		{D86C1328-50F6-471F-86D0-486389BD9184} = {2C81850E-18B1-4EA3-AB76-81253210EE4D}
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
