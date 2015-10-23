@@ -246,10 +246,28 @@ and Domain =
 
     static member internal Mapping =
 
-        // TODO: Proper SubDomain Parser
+        let isLetDig i =
+                isAlpha i
+             || Grammar.isDigit i
+
+        let isLetDigHyp i =
+                isLetDig i
+             || i = 0x2d // -
+
+        let letDigP =
+            satisfy (int >> isLetDig)
+
+        let letDigHypP =
+            satisfy (int >> isLetDigHyp)
+
+        let labelP =
+                letDigP .>>. opt (manyCharsTill letDigHypP (next2CharsSatisfyNot (fun _ c -> isLetDig (int c))) .>>. letDigP)
+            |>> function | a, Some (b, c) -> string a + b + string c
+                         | a, _ -> string a
 
         let subDomainP =
-            anyString 15 |>> SubDomain
+                sepBy1 labelP (skipChar '.')
+            |>> (fun x -> SubDomain (String.Join (".", x)))
 
         let domainP =
             choice [
