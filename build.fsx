@@ -77,7 +77,7 @@ let solution =
               "http" ]
           Info =
             { ReadMe = "README.md"
-              License = "LICENSE.txt"
+              License = "LICENSE.md"
               Notes = "RELEASE_NOTES.md"
               IconUrl = "docs/files/img/logo.png" } }
       Structure =
@@ -178,8 +178,8 @@ let generatePaketTemplate (project : SourceProject) =
 let generateMetaPaketTemplate (projects : SourceProject list) =
     let lines =
         [|  yield "type file"
-            yield "id Freya"
-            yield "title Freya"
+            yield "id " + solution.Name
+            yield "title " + solution.Name
             yield "owners"
             for owner in solution.Metadata.Owners do
                 yield "    " + owner
