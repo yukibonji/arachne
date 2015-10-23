@@ -1,11 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
+# Visual Studio 2012
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Core", "src\Arachne.Core\Arachne.Core.fsproj", "{4D459379-2B7E-463B-8635-1FB18F97727D}"
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Core", "src\Arachne.Core\Arachne.Core.fsproj", "{4D459379-2B7E-463B-8635-1FB18F97727D}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Language", "src\Arachne.Language\Arachne.Language.fsproj", "{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Uri", "src\Arachne.Uri\Arachne.Uri.fsproj", "{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Uri.Template", "src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj", "{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Http", "src\Arachne.Http\Arachne.Http.fsproj", "{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Http.Cors", "src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj", "{15087E9E-3D42-4516-9BED-B5C52953C190}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sln", "sln", "{E063EC87-F350-4433-97DF-BA98EA3E7177}"
 	ProjectSection(SolutionItems) = preProject
@@ -31,16 +41,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{44DC96C8-E1D
 		src\Arachne.Uri\Arachne.Uri.fsproj.paket.references = src\Arachne.Uri\Arachne.Uri.fsproj.paket.references
 		src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references = src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references
 	EndProjectSection
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Language", "src\Arachne.Language\Arachne.Language.fsproj", "{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri", "src\Arachne.Uri\Arachne.Uri.fsproj", "{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri.Template", "src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj", "{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Http", "src\Arachne.Http\Arachne.Http.fsproj", "{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Http.Cors", "src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj", "{15087E9E-3D42-4516-9BED-B5C52953C190}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{85452D60-BFFB-47E7-82C1-8FA6134455C8}"
 	ProjectSection(SolutionItems) = preProject
