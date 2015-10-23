@@ -57,6 +57,11 @@
       <Project>{9b0cc1a9-6f06-4950-ba20-0e6644738dd3}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\Arachne.Uri\Arachne.Uri.fsproj">
+      <Name>Arachne.Uri</Name>
+      <Project>{c45c7991-1168-4bed-aff6-3538e0d1b5e6}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Core" />

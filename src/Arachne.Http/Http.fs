@@ -1640,7 +1640,7 @@ and CacheDirective =
         let cacheDirectiveP =
             choice [
                 attempt (skipStringCI "max-age=" >>. puint32 |>> (float >> TimeSpan.FromSeconds >> MaxAge))
-                attempt (skipStringCI "max-stake=" >>. puint32 |>> (float >> TimeSpan.FromSeconds >> MaxStale))
+                attempt (skipStringCI "max-stale=" >>. puint32 |>> (float >> TimeSpan.FromSeconds >> MaxStale))
                 attempt (skipStringCI "min-fresh=" >>. puint32 |>> (float >> TimeSpan.FromSeconds >> MinFresh))
                 attempt (skipStringCI "must-revalidate" >>% MustRevalidate)
                 attempt (skipStringCI "no-cache" >>% NoCache)

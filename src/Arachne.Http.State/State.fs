@@ -21,8 +21,10 @@
 namespace Arachne.Http.State
 
 open System
+open System.Net
 open Arachne.Core
 open Arachne.Http
+open Arachne.Uri
 open FParsec
 
 (* RFC 6265
@@ -110,7 +112,7 @@ and CookieValue =
 
     static member internal Mapping =
 
-        (* TODO: Full parsing grammar for cookie values. *)
+        // TODO: Full parsing grammar for cookie values
 
         let cookieValueP =
             tokenP |>> CookieValue
@@ -193,8 +195,8 @@ and CookieAttributes =
 
 and CookieAttribute =
     | Expires of DateTime
-    | MaxAge of int
-    | Domain of string
+    | MaxAge of TimeSpan
+    | Domain of Domain
     | Path of string
     | Secure
     | HttpOnly
@@ -203,6 +205,12 @@ and CookieAttribute =
 
         let expiresP =
             skipString "Expires=" >>. (httpDateP (manySatisfy ((<>) ';'))) |>> Expires
+
+        let maxAgeP =
+            skipString "Max-Age=" >>. puint32 |>> (float >> TimeSpan.FromSeconds >> MaxAge)
+
+        let domainP =
+            skipString "Domain=" >>. Domain.Mapping.Parse |>> Domain
 
         let secureP =
             skipString "Secure" >>% Secure
@@ -215,17 +223,72 @@ and CookieAttribute =
             >>. spP
             >>. choice [
                     expiresP
+                    maxAgeP
+                    domainP
                     secureP
                     httpOnlyP ]
 
         let cookieAttributeF =
-            function | Expires x -> append "; Expires=" >> append (x.ToString "r")
+            function | Expires x -> appendf1 "; Expires={0}" (x.ToString "r")
+                     | MaxAge x -> appendf1 "; Max-Age={0}" (int x.TotalSeconds)
+                     | Domain x -> appendf1 "; Domain={0}" (string x)
                      | Secure -> append "; Secure"
                      | HttpOnly -> append "; HttpOnly"
                      | _ -> id
 
         { Parse = cookieAttributeP
           Format = cookieAttributeF }
+
+and Domain =
+    | IPv4 of IPAddress
+    | IPv6 of IPAddress
+    | SubDomain of string
+
+    static member internal Mapping =
+
+        // TODO: Proper SubDomain Parser
+
+        let subDomainP =
+            anyString 15 |>> SubDomain
+
+        let domainP =
+            choice [
+                ipv6AddressP |>> IPv6
+                ipv4AddressP |>> IPv4
+                subDomainP ]
+
+        let domainF =
+            function | IPv4 x -> ipv4AddressF x
+                     | IPv6 x -> ipv6AddressF x
+                     | SubDomain x -> append x
+
+        { Parse = domainP
+          Format = domainF }
+
+    (* Lenses *)
+
+    static member IPv4_ =
+        (function | IPv4 i -> Some i | _ -> None), (fun i -> IPv4 i)
+
+    static member IPv6_ =
+        (function | IPv6 i -> Some i | _ -> None), (fun i -> IPv6 i)
+
+    static member SubDomain_ =
+        (function | SubDomain s -> Some s | _ -> None), (fun s -> SubDomain s)
+
+    (* Common *)
+
+    static member Format =
+        Formatting.format Domain.Mapping.Format
+
+    static member Parse =
+        Parsing.parse Domain.Mapping.Parse
+    
+    static member TryParse =
+        Parsing.tryParse Domain.Mapping.Parse
+
+    override x.ToString () =
+        Domain.Format x
 
 (* Cookie
 

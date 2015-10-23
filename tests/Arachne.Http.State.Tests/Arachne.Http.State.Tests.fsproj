@@ -169,6 +169,11 @@
       <Project>{9b0cc1a9-6f06-4950-ba20-0e6644738dd3}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Arachne.Uri\Arachne.Uri.fsproj">
+      <Name>Arachne.Uri</Name>
+      <Project>{c45c7991-1168-4bed-aff6-3538e0d1b5e6}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\Arachne.Core.Tests\Arachne.Core.Tests.fsproj">
       <Name>Arachne.Core.Tests</Name>
       <Project>{d39640c6-2258-4571-830e-7028e19db6ba}</Project>
