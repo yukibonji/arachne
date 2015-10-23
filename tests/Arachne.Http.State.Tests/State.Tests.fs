@@ -31,11 +31,12 @@ let ``Set-Cookie Formatting/Parsing`` () =
                 Expires (DateTime.Parse "1994/10/29 19:43:31")
                 MaxAge (TimeSpan.FromSeconds 42.)
                 Domain (SubDomain "www.example.com")
+                CookieAttribute.Path (Path "/hello")
                 Secure
                 HttpOnly ])
 
     let setCookieString =
-        "test=value; Expires=Sat, 29 Oct 1994 19:43:31 GMT; Max-Age=42; Domain=www.example.com; Secure; HttpOnly"
+        "test=value; Expires=Sat, 29 Oct 1994 19:43:31 GMT; Max-Age=42; Domain=www.example.com; Path=/hello; Secure; HttpOnly"
 
     roundTrip (SetCookie.Format, SetCookie.Parse) [
         setCookieTyped, setCookieString ]

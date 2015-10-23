@@ -112,7 +112,7 @@ and CookieValue =
 
     static member internal Mapping =
 
-        // TODO: Full parsing grammar for cookie values
+        // TODO: Full value parser
 
         let cookieValueP =
             tokenP |>> CookieValue
@@ -197,7 +197,7 @@ and CookieAttribute =
     | Expires of DateTime
     | MaxAge of TimeSpan
     | Domain of Domain
-    | Path of string
+    | Path of Path
     | Secure
     | HttpOnly
 
@@ -212,6 +212,9 @@ and CookieAttribute =
         let domainP =
             skipString "Domain=" >>. Domain.Mapping.Parse |>> Domain
 
+        let pathP =
+            skipString "Path=" >>. Path.Mapping.Parse |>> Path
+
         let secureP =
             skipString "Secure" >>% Secure
 
@@ -225,6 +228,7 @@ and CookieAttribute =
                     expiresP
                     maxAgeP
                     domainP
+                    pathP
                     secureP
                     httpOnlyP ]
 
@@ -232,9 +236,9 @@ and CookieAttribute =
             function | Expires x -> appendf1 "; Expires={0}" (x.ToString "r")
                      | MaxAge x -> appendf1 "; Max-Age={0}" (int x.TotalSeconds)
                      | Domain x -> appendf1 "; Domain={0}" (string x)
+                     | Path x -> appendf1 "; Path={0}" (string x)
                      | Secure -> append "; Secure"
                      | HttpOnly -> append "; HttpOnly"
-                     | _ -> id
 
         { Parse = cookieAttributeP
           Format = cookieAttributeF }
@@ -245,6 +249,15 @@ and Domain =
     | SubDomain of string
 
     static member internal Mapping =
+
+        (* RFC 1034/1123
+
+           Domain and Subdomain syntax is taken from RFC 1034 and updated by RFC 1123 (allowing
+           the Domain to be an IP Address, and loosening the constraints on subdomains to
+           allow the initial character to be numeric.
+
+           This implementation is as simplistic as possible while still remaining consistent.
+           Refactoring/reimplementation is welcomed. *)
 
         let isLetDig i =
                 isAlpha i
@@ -260,8 +273,11 @@ and Domain =
         let letDigHypP =
             satisfy (int >> isLetDigHyp)
 
+        let endP =
+            next2CharsSatisfyNot (fun _ c -> isLetDig (int c))
+
         let labelP =
-                letDigP .>>. opt (manyCharsTill letDigHypP (next2CharsSatisfyNot (fun _ c -> isLetDig (int c))) .>>. letDigP)
+                letDigP .>>. opt (manyCharsTill letDigHypP endP .>>. letDigP)
             |>> function | a, Some (b, c) -> string a + b + string c
                          | a, _ -> string a
 
@@ -307,6 +323,41 @@ and Domain =
 
     override x.ToString () =
         Domain.Format x
+
+and Path =
+    | Path of string
+
+    static member internal Mapping =
+
+        // TODO: Full path parser
+
+        let pathP =
+            anyString 6 |>> Path
+
+        let pathF =
+            function | Path p -> append p
+
+        { Parse = pathP
+          Format = pathF }
+
+    (* Lenses *)
+
+    static member Path_ =
+        (fun (Path p) -> p), (fun p -> Path p)
+
+    (* Common *)
+
+    static member Format =
+        Formatting.format Path.Mapping.Format
+
+    static member Parse =
+        Parsing.parse Path.Mapping.Parse
+    
+    static member TryParse =
+        Parsing.tryParse Path.Mapping.Parse
+
+    override x.ToString () =
+        Path.Format x
 
 (* Cookie
 
