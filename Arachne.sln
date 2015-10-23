@@ -42,17 +42,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{44DC96C8-E1D
 		src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references = src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{442F25D4-7692-4A3D-AB29-34035CB12628}"
-	ProjectSection(SolutionItems) = preProject
-		src\Arachne.Core\Arachne.Core.fsproj.paket.template = src\Arachne.Core\Arachne.Core.fsproj.paket.template
-		src\Arachne.Http\Arachne.Http.fsproj.paket.template = src\Arachne.Http\Arachne.Http.fsproj.paket.template
-		src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj.paket.template = src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj.paket.template
-		src\Arachne.Uri\Arachne.Uri.fsproj.paket.template = src\Arachne.Uri\Arachne.Uri.fsproj.paket.template
-		src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.template = src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.template
-		src\Arachne.Language\Arachne.Language.fsproj.paket.template = src\Arachne.Language\Arachne.Language.fsproj.paket.template
-		paket.template = paket.template
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{85452D60-BFFB-47E7-82C1-8FA6134455C8}"
 	ProjectSection(SolutionItems) = preProject
 		build.cmd = build.cmd
@@ -146,7 +135,6 @@ Global
 		{4D459379-2B7E-463B-8635-1FB18F97727D} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
 		{C50437D5-0453-40A3-98CB-12276735904A} = {E063EC87-F350-4433-97DF-BA98EA3E7177}
 		{2C81850E-18B1-4EA3-AB76-81253210EE4D} = {C50437D5-0453-40A3-98CB-12276735904A}
-		{442F25D4-7692-4A3D-AB29-34035CB12628} = {C50437D5-0453-40A3-98CB-12276735904A}
 		{44DC96C8-E1DF-4444-ACF2-701D29412FEC} = {2C81850E-18B1-4EA3-AB76-81253210EE4D}
 		{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
 		{C45C7991-1168-4BED-AFF6-3538E0D1B5E6} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}

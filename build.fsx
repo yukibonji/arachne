@@ -21,6 +21,7 @@ type Solution =
 and Metadata =
     { Summary: string
       Description: string
+      Owners: string list
       Authors: string list
       Keywords: string list
       Info: Info }
@@ -28,7 +29,8 @@ and Metadata =
 and Info =
     { ReadMe: string
       License: string
-      Notes: string }
+      Notes: string
+      IconUrl: string }
 
 and Structure =
     { Solution: string
@@ -63,6 +65,9 @@ let solution =
       Metadata =
         { Summary = "Arachne - Types for HTTP and related RFCs."
           Description = "Arachne - Types for HTTP and related RFCs."
+          Owners =
+            [ "kolektiv"
+              "panesofglass" ]
           Authors =
             [ "Andrew Cherry (@kolektiv)"
               "Ryan Riley (@panesofglass)"]
@@ -73,7 +78,8 @@ let solution =
           Info =
             { ReadMe = "README.md"
               License = "LICENSE.txt"
-              Notes = "RELEASE_NOTES.md" } }
+              Notes = "RELEASE_NOTES.md"
+              IconUrl = "docs/files/img/logo.png" } }
       Structure =
         { Solution = "Arachne.sln"
           Projects =
@@ -114,7 +120,7 @@ let solution =
                   { Name = "Arachne.Uri.Template.Tests" } ] } }
       VersionControl =
         { Source = "https://github.com/freya-fs/arachne"
-          Raw = "https://raw.github.com/freya-fs" } }
+          Raw = "https://raw.githubusercontent.com/freya-fs" } }
 
 (* Properties
 
@@ -145,6 +151,64 @@ let nugetVersion =
 let notes =
     String.concat Environment.NewLine release.Notes
 
+let githubRawUrl branch path =
+    sprintf "%s/%s/%s/%s" solution.VersionControl.Raw "arachne" branch path
+
+let paketTemplateFile (x: SourceProject) =
+    sprintf "src/%s/%s.fsproj.paket.template" x.Name x.Name
+
+let generatePaketTemplate (project : SourceProject) =
+    let lines =
+        [|  yield "type project"
+            yield "owners"
+            for owner in solution.Metadata.Owners do
+                yield "    " + owner
+            yield "language en-US"
+            yield "iconUrl " + (githubRawUrl "master" solution.Metadata.Info.IconUrl)
+            yield "licenseUrl " + (githubRawUrl "master" solution.Metadata.Info.License)
+            yield "projectUrl " + solution.VersionControl.Source
+            yield "tags"
+            for tag in solution.Metadata.Keywords do
+                yield "    " + tag |]
+    let text =
+        lines
+        |> Array.fold (fun (sb : Text.StringBuilder) line -> sb.AppendLine line) (Text.StringBuilder())
+    File.WriteAllText(paketTemplateFile project, text.ToString())
+
+let generateMetaPaketTemplate (projects : SourceProject list) =
+    let lines =
+        [|  yield "type file"
+            yield "id Freya"
+            yield "title Freya"
+            yield "owners"
+            for owner in solution.Metadata.Owners do
+                yield "    " + owner
+            yield "authors"
+            for author in solution.Metadata.Authors do
+                yield "    " + author
+            yield "summary " + solution.Metadata.Summary
+            yield "description"
+            yield "    " + solution.Metadata.Description
+            yield "dependencies"
+            for project in projects do
+                yield (sprintf "    %s >= %s" project.Name nugetVersion)
+            yield "language en-US"
+            yield "iconUrl " + (githubRawUrl "master" solution.Metadata.Info.IconUrl)
+            yield "licenseUrl " + (githubRawUrl "master" solution.Metadata.Info.License)
+            yield "projectUrl " + solution.VersionControl.Source
+            yield "tags"
+            for tag in solution.Metadata.Keywords do
+                yield "    " + tag |]
+    let text =
+        lines
+        |> Array.fold (fun (sb : Text.StringBuilder) line -> sb.AppendLine line) (Text.StringBuilder())
+    File.WriteAllText("paket.template", text.ToString())
+
+let generatePaketTemplates (projects : SourceProject list) =
+    for project in projects do
+        generatePaketTemplate project
+    generateMetaPaketTemplate projects
+
 (* Targets
 
    FAKE targets expressing the components of a Arachne build, to be assembled
@@ -157,23 +221,8 @@ let dependencies (x: SourceProject) =
     |> List.map (function | Package x -> x, GetPackageVersion "packages" x
                           | Local x -> x, nugetVersion)
 
-let extensions =
-    [ "dll"
-      "pdb"
-      "xml" ]
-
-let files (x: SourceProject) =
-    extensions
-    |> List.map (fun ext ->
-         sprintf @"..\src\%s\bin\Release\%s.%s" x.Name x.Name ext,
-         Some "lib/net45", 
-         None)
-
 let projectFile (x: SourceProject) =
-    sprintf @"src/%s/%s.fsproj" x.Name x.Name
-
-let tags (s: Solution) =
-    String.concat " " s.Metadata.Keywords
+    sprintf "src/%s/%s.fsproj" x.Name x.Name
 
 #if MONO
 #else
@@ -192,6 +241,7 @@ Target "Publish.Debug" (fun _ ->
 #endif
 
 Target "Publish.Pack" (fun _ ->
+    generatePaketTemplates solution.Structure.Projects.Source
     Paket.Pack (fun x ->
         { x with
             OutputPath = "bin"
