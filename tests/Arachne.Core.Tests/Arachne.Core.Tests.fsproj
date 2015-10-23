@@ -59,11 +59,11 @@
     <Compile Include="Prelude.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <Reference Include="FSharp.Core" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Arachne.Core\Arachne.Core.fsproj">
