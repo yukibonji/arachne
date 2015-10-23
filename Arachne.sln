@@ -42,16 +42,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{44DC96C8-E1D
 		src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references = src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D86C1328-50F6-471F-86D0-486389BD9184}"
-	ProjectSection(SolutionItems) = preProject
-		tests\Arachne.Core.Tests\Arachne.Core.Tests.fsproj.paket.references = tests\Arachne.Core.Tests\Arachne.Core.Tests.fsproj.paket.references
-		tests\Arachne.Http.Cors.Tests\Arachne.Http.Cors.Tests.fsproj.paket.references = tests\Arachne.Http.Cors.Tests\Arachne.Http.Cors.Tests.fsproj.paket.references
-		tests\Arachne.Http.Tests\Arachne.Http.Tests.fsproj.paket.references = tests\Arachne.Http.Tests\Arachne.Http.Tests.fsproj.paket.references
-		tests\Arachne.Language.Tests\Arachne.Language.Tests.fsproj.paket.references = tests\Arachne.Language.Tests\Arachne.Language.Tests.fsproj.paket.references
-		tests\Arachne.Uri.Template.Tests\Arachne.Uri.Template.Tests.fsproj.paket.references = tests\Arachne.Uri.Template.Tests\Arachne.Uri.Template.Tests.fsproj.paket.references
-		tests\Arachne.Uri.Tests\Arachne.Uri.Tests.fsproj.paket.references = tests\Arachne.Uri.Tests\Arachne.Uri.Tests.fsproj.paket.references
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{442F25D4-7692-4A3D-AB29-34035CB12628}"
 	ProjectSection(SolutionItems) = preProject
 		src\Arachne.Core\Arachne.Core.fsproj.paket.template = src\Arachne.Core\Arachne.Core.fsproj.paket.template
