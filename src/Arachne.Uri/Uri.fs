@@ -631,8 +631,10 @@ type Query =
         let pairP =
             pairPartP .>>. opt(( skipChar '=') >>. ( pairPartV))
         
+        let skipAmp = (skipChar '&')
+
         let pairsP =
-            sepBy1 pairP (skipChar '&')
+            sepBy1 pairP (skipMany1 skipAmp)
 
         let pairF =
             function | (k, Some v) -> append k >> append "=" >> append v
