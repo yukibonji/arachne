@@ -16,7 +16,6 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <Tailcalls>false</Tailcalls>
     <OutputPath>bin\Debug\</OutputPath>
@@ -30,6 +29,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
@@ -52,7 +52,7 @@
     <Content Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="FSharp.Core, Version=4.3.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -68,33 +68,27 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Arachne.Core\Arachne.Core.fsproj">
       <Name>Arachne.Core</Name>
-      <Project>{4d459379-2b7e-463b-8635-1fb18f97727d}</Project>
-      <Private>True</Private>
+      <Project>{4D459379-2B7E-463B-8635-1FB18F97727D}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj">
       <Name>Arachne.Http.Cors</Name>
-      <Project>{15087e9e-3d42-4516-9bed-b5c52953c190}</Project>
-      <Private>True</Private>
+      <Project>{15087E9E-3D42-4516-9BED-B5C52953C190}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Arachne.Http\Arachne.Http.fsproj">
       <Name>Arachne.Http</Name>
-      <Project>{9b0cc1a9-6f06-4950-ba20-0e6644738dd3}</Project>
-      <Private>True</Private>
+      <Project>{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Arachne.Language\Arachne.Language.fsproj">
       <Name>Arachne.Language</Name>
-      <Project>{8c5fd979-8ba7-4ca1-a6a8-1f21d81db8e9}</Project>
-      <Private>True</Private>
+      <Project>{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Arachne.Uri\Arachne.Uri.fsproj">
       <Name>Arachne.Uri</Name>
-      <Project>{c45c7991-1168-4bed-aff6-3538e0d1b5e6}</Project>
-      <Private>True</Private>
+      <Project>{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Arachne.Core.Tests\Arachne.Core.Tests.fsproj">
       <Name>Arachne.Core.Tests</Name>
-      <Project>{d39640c6-2258-4571-830e-7028e19db6ba}</Project>
-      <Private>True</Private>
+      <Project>{D39640C6-2258-4571-830E-7028E19DB6BA}</Project>
     </ProjectReference>
   </ItemGroup>
   <Choose>
@@ -130,7 +124,6 @@
   <ItemGroup>
     <Reference Include="nunit.framework">
       <HintPath>..\..\packages\NUnit\lib\nunit.framework.dll</HintPath>
-      <Private>True</Private>
       <Paket>True</Paket>
     </Reference>
   </ItemGroup>
