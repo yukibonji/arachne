@@ -9,13 +9,30 @@ open Arachne.Uri
 [<Test>]
 let ``Cookie Formatting/Parsing`` () =
     let cookieTyped =
-        Cookie (
+        Cookie [
             CookiePair (
                 CookieName "test",
-                CookieValue "value"))
+                CookieValue "value")]
 
     let cookieString =
         "test=value"
+
+    roundTrip (Cookie.Format, Cookie.Parse) [
+        cookieTyped, cookieString ]
+
+[<Test>]
+let ``Multiple Cookie Formatting/Parsing`` () =
+    let cookieTyped =
+        Cookie [
+            CookiePair (
+                CookieName "cookie1",
+                CookieValue "foo")
+            CookiePair (
+                CookieName "cookie2",
+                CookieValue "bar")]
+
+    let cookieString =
+        "cookie1=foo; cookie2=bar"
 
     roundTrip (Cookie.Format, Cookie.Parse) [
         cookieTyped, cookieString ]
