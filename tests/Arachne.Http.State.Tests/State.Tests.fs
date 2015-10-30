@@ -4,15 +4,14 @@ open System
 open NUnit.Framework
 open Arachne.Core.Tests
 open Arachne.Http.State
-open Arachne.Uri
 
 [<Test>]
 let ``Cookie Formatting/Parsing`` () =
     let cookieTyped =
-        Cookie [
+        Cookies [
             CookiePair (
                 CookieName "test",
-                CookieValue "value")]
+                CookieValue "value") ]
 
     let cookieString =
         "test=value"
@@ -23,13 +22,13 @@ let ``Cookie Formatting/Parsing`` () =
 [<Test>]
 let ``Multiple Cookie Formatting/Parsing`` () =
     let cookieTyped =
-        Cookie [
+        Cookies [
             CookiePair (
                 CookieName "cookie1",
                 CookieValue "foo")
             CookiePair (
                 CookieName "cookie2",
-                CookieValue "bar")]
+                CookieValue "bar") ]
 
     let cookieString =
         "cookie1=foo; cookie2=bar"
@@ -48,7 +47,7 @@ let ``Set-Cookie Formatting/Parsing`` () =
                 Expires (DateTime.Parse "1994/10/29 19:43:31")
                 MaxAge (TimeSpan.FromSeconds 42.)
                 Domain (SubDomain "www.example.com")
-                CookieAttribute.Path (Path "/hello")
+                Path ("/hello")
                 Secure
                 HttpOnly ])
 

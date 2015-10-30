@@ -75,7 +75,7 @@ module internal Formatting =
         let rec join values (b: StringBuilder) =
             match values with
             | [] -> b
-            | h :: [] -> f h b
+            | [v] -> f v b
             | h :: t -> (f h >> s >> join t) b
 
         join
@@ -93,7 +93,7 @@ module internal Parsing =
     let tryParse (p: Parse<'a>) s =
         match run p s with
         | Success (x, _, _) -> Some x
-        | Failure (_, _, _) -> None
+        | Failure (_) -> None
 
 [<AutoOpen>]
 module internal Grammar =
