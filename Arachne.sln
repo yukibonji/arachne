@@ -1,11 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
+# Visual Studio 2012
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Core", "src\Arachne.Core\Arachne.Core.fsproj", "{4D459379-2B7E-463B-8635-1FB18F97727D}"
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Core", "src\Arachne.Core\Arachne.Core.fsproj", "{4D459379-2B7E-463B-8635-1FB18F97727D}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Language", "src\Arachne.Language\Arachne.Language.fsproj", "{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Uri", "src\Arachne.Uri\Arachne.Uri.fsproj", "{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Uri.Template", "src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj", "{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Http", "src\Arachne.Http\Arachne.Http.fsproj", "{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}"
+EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Arachne.Http.Cors", "src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj", "{15087E9E-3D42-4516-9BED-B5C52953C190}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sln", "sln", "{E063EC87-F350-4433-97DF-BA98EA3E7177}"
 	ProjectSection(SolutionItems) = preProject
@@ -27,20 +37,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{44DC96C8-E1D
 		src\Arachne.Core\Arachne.Core.fsproj.paket.references = src\Arachne.Core\Arachne.Core.fsproj.paket.references
 		src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj.paket.references = src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj.paket.references
 		src\Arachne.Http\Arachne.Http.fsproj.paket.references = src\Arachne.Http\Arachne.Http.fsproj.paket.references
+		src\Arachne.Http.State\Arachne.Http.State.fsproj.paket.references = src\Arachne.Http.State\Arachne.Http.State.fsproj.paket.references
 		src\Arachne.Language\Arachne.Language.fsproj.paket.references = src\Arachne.Language\Arachne.Language.fsproj.paket.references
 		src\Arachne.Uri\Arachne.Uri.fsproj.paket.references = src\Arachne.Uri\Arachne.Uri.fsproj.paket.references
 		src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references = src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references
 	EndProjectSection
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Language", "src\Arachne.Language\Arachne.Language.fsproj", "{8C5FD979-8BA7-4CA1-A6A8-1F21D81DB8E9}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri", "src\Arachne.Uri\Arachne.Uri.fsproj", "{C45C7991-1168-4BED-AFF6-3538E0D1B5E6}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri.Template", "src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj", "{6070ADFC-F163-4B97-BB6B-2234E26BBEC4}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Http", "src\Arachne.Http\Arachne.Http.fsproj", "{9B0CC1A9-6F06-4950-BA20-0E6644738DD3}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Http.Cors", "src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj", "{15087E9E-3D42-4516-9BED-B5C52953C190}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{85452D60-BFFB-47E7-82C1-8FA6134455C8}"
 	ProjectSection(SolutionItems) = preProject
@@ -67,6 +68,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D86C1328
 	ProjectSection(SolutionItems) = preProject
 		tests\Arachne.Core.Tests\Arachne.Core.Tests.fsproj.paket.references = tests\Arachne.Core.Tests\Arachne.Core.Tests.fsproj.paket.references
 		tests\Arachne.Http.Cors.Tests\Arachne.Http.Cors.Tests.fsproj.paket.references = tests\Arachne.Http.Cors.Tests\Arachne.Http.Cors.Tests.fsproj.paket.references
+		tests\Arachne.Http.State.Tests\Arachne.Http.State.Tests.fsproj.paket.references = tests\Arachne.Http.State.Tests\Arachne.Http.State.Tests.fsproj.paket.references
 		tests\Arachne.Http.Tests\Arachne.Http.Tests.fsproj.paket.references = tests\Arachne.Http.Tests\Arachne.Http.Tests.fsproj.paket.references
 		tests\Arachne.Language.Tests\Arachne.Language.Tests.fsproj.paket.references = tests\Arachne.Language.Tests\Arachne.Language.Tests.fsproj.paket.references
 		tests\Arachne.Uri.Template.Tests\Arachne.Uri.Template.Tests.fsproj.paket.references = tests\Arachne.Uri.Template.Tests\Arachne.Uri.Template.Tests.fsproj.paket.references
@@ -74,6 +76,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D86C1328
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Console", "tests\Arachne.Console\Arachne.Console.fsproj", "{F5F53125-277F-4F6E-914F-2B42DCB355FC}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Http.State", "src\Arachne.Http.State\Arachne.Http.State.fsproj", "{A9E2A55F-7D8C-4257-886F-E5E94E7F136B}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Http.State.Tests", "tests\Arachne.Http.State.Tests\Arachne.Http.State.Tests.fsproj", "{08A02191-F2FB-473E-BB87-4A47813E1C00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -133,6 +138,14 @@ Global
 		{F5F53125-277F-4F6E-914F-2B42DCB355FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5F53125-277F-4F6E-914F-2B42DCB355FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5F53125-277F-4F6E-914F-2B42DCB355FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9E2A55F-7D8C-4257-886F-E5E94E7F136B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9E2A55F-7D8C-4257-886F-E5E94E7F136B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9E2A55F-7D8C-4257-886F-E5E94E7F136B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9E2A55F-7D8C-4257-886F-E5E94E7F136B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08A02191-F2FB-473E-BB87-4A47813E1C00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08A02191-F2FB-473E-BB87-4A47813E1C00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08A02191-F2FB-473E-BB87-4A47813E1C00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08A02191-F2FB-473E-BB87-4A47813E1C00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -156,5 +169,7 @@ Global
 		{638DEDA1-514A-43F5-A3AA-1D3345FD0BDC} = {A430AC63-4200-4222-9A31-6077382E86DD}
 		{D86C1328-50F6-471F-86D0-486389BD9184} = {2C81850E-18B1-4EA3-AB76-81253210EE4D}
 		{F5F53125-277F-4F6E-914F-2B42DCB355FC} = {A430AC63-4200-4222-9A31-6077382E86DD}
+		{A9E2A55F-7D8C-4257-886F-E5E94E7F136B} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
+		{08A02191-F2FB-473E-BB87-4A47813E1C00} = {A430AC63-4200-4222-9A31-6077382E86DD}
 	EndGlobalSection
 EndGlobal

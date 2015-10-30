@@ -32,6 +32,7 @@ open FParsec
 
 [<assembly:InternalsVisibleTo ("Arachne.Http")>]
 [<assembly:InternalsVisibleTo ("Arachne.Http.Cors")>]
+[<assembly:InternalsVisibleTo ("Arachne.Http.State")>]
 [<assembly:InternalsVisibleTo ("Arachne.Uri.Template")>]
 do ()
 
@@ -159,6 +160,37 @@ module PercentEncoding =
 
     let makeFormatter res =
         toBytes >> format res >> toString >> append
+
+(* IP Address Parsing and Formatting *)
+
+[<AutoOpen>]
+module internal IPAddress =
+
+    let private isIpv6Char i =
+            isHexdig i
+            || i = 0x3a // :
+
+    let ipv6AddressP =
+        skipChar '[' >>. (many1Satisfy (int >> isIpv6Char) >>= (fun x ->
+            match IPAddress.TryParse x with
+            | true, x when x.AddressFamily = AddressFamily.InterNetworkV6 -> preturn x
+            | _ -> pzero)) .>> skipChar ']'
+
+    let ipv6AddressF (x: IPAddress) =
+        append "[" >> append (string x) >> append "]"
+
+    let private isIpv4Char i =
+            Grammar.isDigit i
+            || i = 0x2e // .
+
+    let ipv4AddressP =
+        many1Satisfy (int >> isIpv4Char) >>= (fun x ->
+            match IPAddress.TryParse x with
+            | true, x when x.AddressFamily = AddressFamily.InterNetwork -> preturn x
+            | _ -> pzero)
+
+    let ipv4AddressF (x: IPAddress) =
+        append (string x)
 
 (* Scheme
 
@@ -313,35 +345,15 @@ and Host =
 
     static member internal Mapping =
 
-        let isIpv6Char i =
-                isHexdig i
-             || i = 0x3a // :
-
-        let ipv6AddressP =
-            skipChar '[' >>. (many1Satisfy (int >> isIpv6Char) >>= (fun x ->
-                match IPAddress.TryParse x with
-                | true, x when x.AddressFamily = AddressFamily.InterNetworkV6 -> preturn (IPv6 x)
-                | _ -> pzero)) .>> skipChar ']'
-
-        let isIpv4Char i =
-                Grammar.isDigit i
-             || i = 0x2e // .
-
-        let ipv4AddressP =
-            many1Satisfy (int >> isIpv4Char) >>= (fun x ->
-                match IPAddress.TryParse x with
-                | true, x when x.AddressFamily = AddressFamily.InterNetwork -> preturn (IPv4 x)
-                | _ -> pzero)
-
         let hostP =
             choice [
-                attempt ipv6AddressP
-                attempt ipv4AddressP
+                ipv6AddressP |>> IPv6
+                ipv4AddressP |>> IPv4
                 RegName.Mapping.Parse |>> Name ]
 
         let hostF =
-            function | IPv4 x -> append (string x)
-                     | IPv6 x -> append "[" >> append (string x) >> append "]"
+            function | IPv4 x -> ipv4AddressF x
+                     | IPv6 x -> ipv6AddressF x
                      | Name x -> RegName.Mapping.Format x
 
         { Parse = hostP

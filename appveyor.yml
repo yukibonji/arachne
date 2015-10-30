@@ -1,9 +1,12 @@
 version: '{build}'
+clone_depth: 10
 install:
-- git submodule update --init --recursive
+- cmd: git submodule update --init --recursive
 nuget:
   project_feed: true
   disable_publish_on_pr: true
+build:
+  verbosity: minimal
 build_script:
 - build.cmd Default
 test: off
@@ -12,4 +15,9 @@ artifacts:
   name: nuget
 notifications:
 - provider: Webhook
-  url: https://webhooks.gitter.im/e/483150f6f9c28934e89b
+  url: https://webhooks.gitter.im/e/ccdb5d513093870b72df
+deploy:
+- provider: Environment
+  name: NuGet
+  on:
+    branch: master
