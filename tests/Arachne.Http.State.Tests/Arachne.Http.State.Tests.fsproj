@@ -49,7 +49,7 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <ItemGroup>
-    <Compile Include="State.Tests.fs" />
+    <Compile Include="Http.State.Tests.fs" />
     <Content Include="App.config" />
   </ItemGroup>
   <ItemGroup>
