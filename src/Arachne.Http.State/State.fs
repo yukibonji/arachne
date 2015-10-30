@@ -365,16 +365,28 @@ and Path =
    See [http://tools.ietf.org/html/rfc6265#section-4.2] *)
 
 type Cookie =
-    | Cookie of CookiePair
+    | Cookie of CookiePair list
 
     static member internal Mapping =
 
         let cookieP =
-                CookiePair.Mapping.Parse
+                sepBy1 CookiePair.Mapping.Parse (pchar ';' .>>. spaces)
             |>> Cookie
 
+        let rec join f = function
+            | [] -> f
+            | [c] ->
+                f >> CookiePair.Mapping.Format c
+            | c::cs ->
+                let f' =
+                    f
+                 >> CookiePair.Mapping.Format c
+                 >> append "; "
+                join f' cs
+
         let cookieF =
-            function | Cookie c -> CookiePair.Mapping.Format c
+            function | Cookie pairs ->
+                        join id pairs
 
         { Parse = cookieP
           Format = cookieF }

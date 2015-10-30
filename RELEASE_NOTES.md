@@ -1,4 +1,7 @@
-### New in 2.3.1 - (Released 2015-10-16)
+### New in 2.3.27 - (Released TBD)
+* Arachne.Http.State introduced to support Cookie parsing.
+
+### New in 2.3.26 - (Released 2015-10-16)
 * Updated dependencies and removed package dependency on FSharp.Core
 
 ### New in 2.3.0 - (Released 2015-08-19)
