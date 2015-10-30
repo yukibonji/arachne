@@ -345,15 +345,15 @@ and Domain =
    See [http://tools.ietf.org/html/rfc6265#section-4.2] *)
 
 type Cookie =
-    | Cookies of Pair list
+    | Cookie of Pair list
 
     static member internal Mapping =
 
         let cookieP =
-            sepBy1 Pair.Mapping.Parse (skipString "; ") |>> Cookies
+            sepBy1 Pair.Mapping.Parse (skipString "; ") |>> Cookie
 
         let cookieF =
-            function | Cookies pairs -> join Pair.Mapping.Format (append "; ") pairs
+            function | Cookie pairs -> join Pair.Mapping.Format (append "; ") pairs
 
         { Parse = cookieP
           Format = cookieF }
@@ -361,7 +361,7 @@ type Cookie =
     (* Lenses *)
 
     static member Pairs_ =
-        (fun (Cookies c) -> c), (fun c -> Cookies c)
+        (fun (Cookie c) -> c), (fun c -> Cookie c)
 
     (* Common *)
 

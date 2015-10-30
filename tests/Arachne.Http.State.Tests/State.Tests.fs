@@ -8,7 +8,7 @@ open Arachne.Http.State
 [<Test>]
 let ``Cookie Formatting/Parsing`` () =
     let cookieTyped =
-        Cookies [
+        Cookie [
             Pair (Name "test", Value "value") ]
 
     let cookieString =
@@ -20,7 +20,7 @@ let ``Cookie Formatting/Parsing`` () =
 [<Test>]
 let ``Multiple Cookie Formatting/Parsing`` () =
     let cookieTyped =
-        Cookies [
+        Cookie [
             Pair (Name "cookie1", Value "foo")
             Pair (Name "cookie2", Value "bar") ]
 
