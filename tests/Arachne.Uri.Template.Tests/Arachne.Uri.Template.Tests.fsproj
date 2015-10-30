@@ -46,7 +46,7 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <ItemGroup>
-    <Compile Include="Types.Tests.fs" />
+    <Compile Include="Uri.Template.Tests.fs" />
     <Content Include="App.config" />
   </ItemGroup>
   <ItemGroup>

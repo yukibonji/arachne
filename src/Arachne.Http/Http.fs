@@ -606,12 +606,12 @@ type Method =
 
         let methodF =
             function | CONNECT -> append "CONNECT"
-                     | DELETE -> append "DELETE" 
-                     | HEAD -> append "HEAD" 
-                     | GET -> append "GET" 
+                     | DELETE -> append "DELETE"
+                     | HEAD -> append "HEAD"
+                     | GET -> append "GET"
                      | OPTIONS -> append "OPTIONS"
-                     | POST -> append "POST" 
-                     | PUT -> append "PUT"  
+                     | POST -> append "POST"
+                     | PUT -> append "PUT"
                      | TRACE -> append "TRACE"
                      | Method.Custom x -> append x
 
@@ -912,7 +912,7 @@ and CharsetRange =
             skipChar '*' >>% CharsetRange.Any
 
         let charsetRangeCharsetP =
-            tokenP |>> fun s -> Charset (Charset.Charset s)
+            tokenP |>> (Charset.Charset >> Charset)
 
         let charsetRangeP = 
             choice [
@@ -1010,7 +1010,7 @@ and EncodingRange =
             skipStringCI "identity" >>% Identity
 
         let encodingRangeCodingP =
-            tokenP |>> fun s -> Coding (ContentCoding s)
+            tokenP |>> (ContentCoding >> Coding)
 
         let encodingRangeP =
             choice [

@@ -76,7 +76,7 @@ module internal Formatting =
             match values with
             | [] -> b
             | [v] -> f v b
-            | h :: t -> (f h >> s >> join t) b
+            | v :: vs -> (f v >> s >> join vs) b
 
         join
 

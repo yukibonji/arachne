@@ -9,9 +9,7 @@ open Arachne.Http.State
 let ``Cookie Formatting/Parsing`` () =
     let cookieTyped =
         Cookies [
-            CookiePair (
-                CookieName "test",
-                CookieValue "value") ]
+            Pair (Name "test", Value "value") ]
 
     let cookieString =
         "test=value"
@@ -23,12 +21,8 @@ let ``Cookie Formatting/Parsing`` () =
 let ``Multiple Cookie Formatting/Parsing`` () =
     let cookieTyped =
         Cookies [
-            CookiePair (
-                CookieName "cookie1",
-                CookieValue "foo")
-            CookiePair (
-                CookieName "cookie2",
-                CookieValue "bar") ]
+            Pair (Name "cookie1", Value "foo")
+            Pair (Name "cookie2", Value "bar") ]
 
     let cookieString =
         "cookie1=foo; cookie2=bar"
@@ -40,19 +34,17 @@ let ``Multiple Cookie Formatting/Parsing`` () =
 let ``Set-Cookie Formatting/Parsing`` () =
     let setCookieTyped =
         SetCookie (
-            CookiePair (
-                CookieName "test",
-                CookieValue "value"),
-            CookieAttributes [
+            Pair (Name "test", Value "value"),
+            Attributes [
                 Expires (DateTime.Parse "1994/10/29 19:43:31")
                 MaxAge (TimeSpan.FromSeconds 42.)
                 Domain (SubDomain "www.example.com")
-                Path ("/hello")
+                Path ("/some/path")
                 Secure
                 HttpOnly ])
 
     let setCookieString =
-        "test=value; Expires=Sat, 29 Oct 1994 19:43:31 GMT; Max-Age=42; Domain=www.example.com; Path=/hello; Secure; HttpOnly"
+        "test=value; Expires=Sat, 29 Oct 1994 19:43:31 GMT; Max-Age=42; Domain=www.example.com; Path=/some/path; Secure; HttpOnly"
 
     roundTrip (SetCookie.Format, SetCookie.Parse) [
         setCookieTyped, setCookieString ]
