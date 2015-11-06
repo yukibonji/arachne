@@ -1,7 +1,6 @@
 ﻿module Arachne.Uri.Templates.Tests
 
 open NUnit.Framework
-open Swensen.Unquote
 open Arachne.Uri.Template
 open Arachne.Core.Tests
 
@@ -30,7 +29,7 @@ let data =
             Key "empty",      Atom ""
             Key "empty_keys", Keys [] ])
 
-let testMatch uri path data =
+let matches uri path data =
     UriTemplate.Parse(uri).Match(path) =? UriTemplateData (Map.ofList data)
 
 let (=?) str1 str2 =
@@ -94,9 +93,11 @@ let ``Simple Expansion Renders Correctly`` () =
 
 [<Test>]
 let ``Simple Matching Matches Correctly`` () =
-    testMatch "/test/{atom}" "/test/one" [ Key "atom", Atom "one" ]
-    testMatch "/test/{list*}" "/test/one,two,three" [ Key "list", List [ "one"; "two"; "three" ] ]
-    testMatch "/test/{keys*}" "/test/one=a,two=b" [ Key "keys", Keys [ ("one", "a"); ("two", "b") ] ]
+    matches "/test/{atom}" "/test/one" [ Key "atom", Atom "one" ]
+    matches "/test/{atom}" "/test/" [ Key "atom", Atom "" ]
+    matches "/test/{one}/{two}" "/test//two" [ Key "one", Atom ""; Key "two", Atom "two" ]
+    matches "/test/{list*}" "/test/one,two,three" [ Key "list", List [ "one"; "two"; "three" ] ]
+    matches "/test/{keys*}" "/test/one=a,two=b" [ Key "keys", Keys [ "one", "a"; "two", "b" ] ]
 
 [<Test>]
 let ``Reserved Expansion Renders Correctly`` () =
@@ -123,9 +124,11 @@ let ``Reserved Expansion Renders Correctly`` () =
 
 [<Test>]
 let ``Reserved Matching Matches Correctly`` () =
-    testMatch "/test/{+atom}" "/test/one!" [ Key "atom", Atom "one!" ]
-    testMatch "/test/{+list*}" "/test/one,two,three" [ Key "list", List [ "one,two,three" ] ]
-    testMatch "/test/{+keys*}" "/test/one=a,two=b" [ Key "keys", List [ "one=a,two=b" ] ]
+    matches "/test/{+atom}" "/test/one!" [ Key "atom", Atom "one!" ]
+    matches "/test/{+atom}" "/test//one!" [ Key "atom", Atom "/one!" ]
+    matches "/test/{+atom}" "/test/" [ Key "atom", Atom "" ]
+    matches "/test/{+list*}" "/test/one,two,three" [ Key "list", List [ "one,two,three" ] ]
+    matches "/test/{+keys*}" "/test/one=a,two=b" [ Key "keys", List [ "one=a,two=b" ] ]
 
 [<Test>]
 let ``Fragment Expansion Renders Correctly`` () =
@@ -147,9 +150,13 @@ let ``Fragment Expansion Renders Correctly`` () =
 
 [<Test>]
 let ``Fragment Matching Matches Correctly`` () =
-    testMatch "/test{#atom}" "/test#one!" [ Key "atom", Atom "one!" ]
-    testMatch "/test{#list*}" "/test#one,two,three" [ Key "list", List [ "one,two,three" ] ]
-    testMatch "/test{#keys*}" "/test#one=a,two=b" [ Key "keys", List [ "one=a,two=b" ] ]
+    matches "/test{#atom}" "/test#one!" [ Key "atom", Atom "one!" ]
+    matches "/test{#atom}" "/test#" [ Key "atom", Atom "" ]
+    matches "/test{#atom}" "/test" []
+    matches "/test{#list*}" "/test#one,two,three" [ Key "list", List [ "one,two,three" ] ]
+    matches "/test{#list*}" "/test#" [ Key "list", List [ "" ] ]
+    matches "/test{#list*}" "/test" []
+    matches "/test{#keys*}" "/test#one=a,two=b" [ Key "keys", List [ "one=a,two=b" ] ]
 
 [<Test>]
 let ``Label Expansion with Dot-Prefix Renders Correctly`` () =
@@ -173,9 +180,13 @@ let ``Label Expansion with Dot-Prefix Renders Correctly`` () =
 
 [<Test>]
 let ``Label Matching Matches Correctly`` () =
-    testMatch "/test{.atom}" "/test.one%21" [ Key "atom", Atom "one!" ]
-    testMatch "/test{.list*}" "/test.one.two.three" [ Key "list", List [ "one.two.three" ] ]
-    testMatch "/test{.keys*}" "/test.one=a.two=b" [ Key "keys", Keys [ "one", "a.two" ] ]
+    matches "/test{.atom}" "/test.one%21" [ Key "atom", Atom "one!" ]
+    matches "/test{.atom}" "/test." [ Key "atom", Atom "" ]
+    matches "/test{.atom}" "/test" []
+    matches "/test{.list*}" "/test.one.two.three" [ Key "list", List [ "one.two.three" ] ]
+    matches "/test{.list*}" "/test." [ Key "list", List [ "" ] ]
+    matches "/test{.list*}" "/test" []
+    matches "/test{.keys*}" "/test.one=a.two=b" [ Key "keys", Keys [ "one", "a.two" ] ]
 
 [<Test>]
 let ``Path Segment Expansion Renders Correctly`` () =
@@ -196,9 +207,13 @@ let ``Path Segment Expansion Renders Correctly`` () =
 
 [<Test>]
 let ``Path Segment Matching Matches Correctly`` () =
-    testMatch "/test{/atom}" "/test/one%21" [ Key "atom", Atom "one!" ]
-    testMatch "/test{/list*}" "/test/one/two/three" [ Key "list", List [ "one"; "two"; "three" ] ]
-    testMatch "/test{/keys*}" "/test/one=a/two=b" [ Key "keys", Keys [ "one", "a"; "two", "b" ] ]
+    matches "/test{/atom}" "/test/one%21" [ Key "atom", Atom "one!" ]
+    matches "/test{/atom}" "/test/" [ Key "atom", Atom "" ]
+    matches "/test{/atom}" "/test" []
+    matches "/test{/list*}" "/test/one/two/three" [ Key "list", List [ "one"; "two"; "three" ] ]
+    matches "/test{/list*}" "/test/" [ Key "list", List [ "" ] ]
+    matches "/test{/list*}" "/test" []
+    matches "/test{/keys*}" "/test/one=a/two=b" [ Key "keys", Keys [ "one", "a"; "two", "b" ] ]
 
 [<Test>]
 let ``Parameter Expansion Renders Correctly`` () =
@@ -215,6 +230,14 @@ let ``Parameter Expansion Renders Correctly`` () =
     "{;list*}" =? ";list=red;list=green;list=blue"
     "{;keys}" =? ";keys=semi,%3B,dot,.,comma,%2C"
     "{;keys*}" =? ";semi=%3B;dot=.;comma=%2C"
+
+[<Test>]
+let ``Parameter Matching Matches Correctly`` () =
+    matches "/test{;atom}" "/test;one" [ Key "atom", Atom "one" ]
+    matches "/test{;atom}" "/test;" [ Key "atom", Atom "" ]
+    matches "/test{;atom}" "/test" []
+    matches "/test{;list*}" "/test;" [ Key "list", List [ "" ] ]
+    matches "/test{;keys*}" "/test;one=two" [ Key "keys", Keys [ "one", "two" ] ]
 
 [<Test>]
 let ``Query Expansion Renders Correctly`` () =
