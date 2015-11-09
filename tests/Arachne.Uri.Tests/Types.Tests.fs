@@ -179,7 +179,7 @@ let ``Query Pairs with no query parameters``() =
 
 [<Test>]
 let ``Query Pairs with more than 1 & can be parsed``() =
-    let expectedResult = Some ["param", Some("exists");"param1", Some("alsoexists")]
+    let expectedResult = Some ["param", Some("exists"); "", None; "param1", Some("alsoexists")]
     let query = Query.Query("param=exists&&param1=alsoexists")
     let queryPairs = query |> fst Query.Pairs_
     Assert.AreEqual(expectedResult, queryPairs)

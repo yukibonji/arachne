@@ -626,16 +626,16 @@ type Query =
             manySatisfy (int >> isEqualsOrAmpersand >> not)
 
         let pairPartP =
-            many1Satisfy (int >> isEqualsOrAmpersand >> not)
+            manySatisfy (int >> isEqualsOrAmpersand >> not)
 
         let pairP =
             pairPartP .>>. opt(( skipChar '=') >>. ( pairPartV))
         
-        let skipAmp = (skipChar '&')
+        let skipAmp = skipChar '&'
 
         let pairsP =
-            sepBy1 pairP (skipMany1 skipAmp)
-
+            sepBy1 pairP skipAmp
+        
         let pairF =
             function | (k, Some v) -> append k >> append "=" >> append v
                      | (k, None) -> append k
@@ -643,7 +643,7 @@ type Query =
         let pairsF =
             join pairF (append "&")
 
-        (fun (Query q) -> Parsing.tryParse pairsP q), (fun q -> Query (Formatting.format pairsF q))
+        (fun (Query q) -> if String.IsNullOrWhiteSpace q then None else Parsing.tryParse pairsP q), (fun q -> Query (Formatting.format pairsF q))
 
     (* Common *)
 
