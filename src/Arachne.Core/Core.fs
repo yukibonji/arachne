@@ -28,6 +28,7 @@ open FParsec
 
 [<assembly:InternalsVisibleTo ("Arachne.Http")>]
 [<assembly:InternalsVisibleTo ("Arachne.Http.Cors")>]
+[<assembly:InternalsVisibleTo ("Arachne.Http.State")>]
 [<assembly:InternalsVisibleTo ("Arachne.Language")>]
 [<assembly:InternalsVisibleTo ("Arachne.Uri")>]
 [<assembly:InternalsVisibleTo ("Arachne.Uri.Template")>]
@@ -74,8 +75,8 @@ module internal Formatting =
         let rec join values (b: StringBuilder) =
             match values with
             | [] -> b
-            | h :: [] -> f h b
-            | h :: t -> (f h >> s >> join t) b
+            | [v] -> f v b
+            | v :: vs -> (f v >> s >> join vs) b
 
         join
 
@@ -92,7 +93,7 @@ module internal Parsing =
     let tryParse (p: Parse<'a>) s =
         match run p s with
         | Success (x, _, _) -> Some x
-        | Failure (_, _, _) -> None
+        | Failure (_) -> None
 
 [<AutoOpen>]
 module internal Grammar =

@@ -31,6 +31,7 @@ open FParsec
 (* Internals *)
 
 [<assembly:InternalsVisibleTo ("Arachne.Http.Cors")>]
+[<assembly:InternalsVisibleTo ("Arachne.Http.State")>]
 do ()
 
 (* RFC 7230
@@ -605,12 +606,12 @@ type Method =
 
         let methodF =
             function | CONNECT -> append "CONNECT"
-                     | DELETE -> append "DELETE" 
-                     | HEAD -> append "HEAD" 
-                     | GET -> append "GET" 
+                     | DELETE -> append "DELETE"
+                     | HEAD -> append "HEAD"
+                     | GET -> append "GET"
                      | OPTIONS -> append "OPTIONS"
-                     | POST -> append "POST" 
-                     | PUT -> append "PUT"  
+                     | POST -> append "POST"
+                     | PUT -> append "PUT"
                      | TRACE -> append "TRACE"
                      | Method.Custom x -> append x
 
@@ -911,7 +912,7 @@ and CharsetRange =
             skipChar '*' >>% CharsetRange.Any
 
         let charsetRangeCharsetP =
-            tokenP |>> fun s -> Charset (Charset.Charset s)
+            tokenP |>> (Charset.Charset >> Charset)
 
         let charsetRangeP = 
             choice [
@@ -1009,7 +1010,7 @@ and EncodingRange =
             skipStringCI "identity" >>% Identity
 
         let encodingRangeCodingP =
-            tokenP |>> fun s -> Coding (ContentCoding s)
+            tokenP |>> (ContentCoding >> Coding)
 
         let encodingRangeP =
             choice [
@@ -1119,7 +1120,7 @@ and RefererUri =
    Taken from RFC 7231, Section 7.1.1.1 HTTP-Date *)
 
 [<AutoOpen>]
-module private HttpDate =
+module internal HttpDate =
 
     let dateTimeFormat =
         CultureInfo.InvariantCulture.DateTimeFormat
@@ -1127,8 +1128,8 @@ module private HttpDate =
     let dateTimeAdjustment =
         DateTimeStyles.AdjustToUniversal
 
-    let httpDateP : Parser<DateTime, unit> =
-        restOfLine false >>= (fun s ->
+    let httpDateP p : Parser<DateTime, unit> =
+        p >>= (fun s ->
             match DateTime.TryParse (s, dateTimeFormat, dateTimeAdjustment) with
             | true, d -> preturn d
             | _ -> pzero)
@@ -1144,7 +1145,7 @@ type Date =
     static member internal Mapping =
 
         let dateP =
-            httpDateP |>> Date.Date
+            httpDateP (restOfLine false) |>> Date.Date
 
         let dateF =
             function | Date.Date x -> append (x.ToString "r")
@@ -1207,7 +1208,7 @@ type RetryAfter =
 
         let retryAfterP =
             choice [
-                attempt httpDateP |>> (Date >> RetryAfter)
+                attempt (httpDateP (restOfLine false)) |>> (Date >> RetryAfter)
                 puint32 |>> (float >> TimeSpan.FromSeconds >> Delay >> RetryAfter) ]
 
         let retryAfterF =
@@ -1282,7 +1283,7 @@ type LastModified =
     static member internal Mapping =
 
         let lastModifiedP =
-            httpDateP |>> LastModified
+            httpDateP (restOfLine false) |>> LastModified
 
         let lastModifiedF =
             function | LastModified x -> append (x.ToString "r")
@@ -1448,7 +1449,7 @@ type IfModifiedSince =
     static member internal Mapping =
 
         let ifModifiedSinceP =
-            httpDateP |>> IfModifiedSince
+            httpDateP (restOfLine false) |>> IfModifiedSince
 
         let ifModifiedSinceF =
             function | IfModifiedSince x -> append (x.ToString "r")
@@ -1479,7 +1480,7 @@ type IfUnmodifiedSince =
     static member internal Mapping =
 
         let ifUnmodifiedSinceP =
-            httpDateP |>> IfUnmodifiedSince
+            httpDateP (restOfLine false) |>> IfUnmodifiedSince
 
         let ifUnmodifiedSinceF =
             function | IfUnmodifiedSince x -> append (x.ToString "r")
@@ -1518,7 +1519,7 @@ type IfRange =
 
         let ifRangeP =
             (EntityTag.Mapping.Parse |>> (EntityTag >> IfRange)) <|> 
-                                             (httpDateP |>> (Date >> IfRange))
+                                         (httpDateP (restOfLine false) |>> (Date >> IfRange))
 
         let ifRangeF =
             function | IfRange (Date x) -> append (x.ToString "r")
@@ -1639,7 +1640,7 @@ and CacheDirective =
         let cacheDirectiveP =
             choice [
                 attempt (skipStringCI "max-age=" >>. puint32 |>> (float >> TimeSpan.FromSeconds >> MaxAge))
-                attempt (skipStringCI "max-stake=" >>. puint32 |>> (float >> TimeSpan.FromSeconds >> MaxStale))
+                attempt (skipStringCI "max-stale=" >>. puint32 |>> (float >> TimeSpan.FromSeconds >> MaxStale))
                 attempt (skipStringCI "min-fresh=" >>. puint32 |>> (float >> TimeSpan.FromSeconds >> MinFresh))
                 attempt (skipStringCI "must-revalidate" >>% MustRevalidate)
                 attempt (skipStringCI "no-cache" >>% NoCache)
@@ -1681,7 +1682,7 @@ type Expires =
     static member internal Mapping =
 
         let expiresP =
-            httpDateP |>> Expires
+            httpDateP (restOfLine false) |>> Expires
 
         let expiresF =
             function | Expires x -> append (x.ToString "r")

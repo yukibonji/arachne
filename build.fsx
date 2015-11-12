@@ -99,6 +99,12 @@ let solution =
                           Local "Arachne.Core"
                           Local "Arachne.Http"
                           Local "Arachne.Uri" ] }
+                  { Name = "Arachne.Http.State"
+                    Dependencies =
+                        [ Package "FParsec"
+                          Local "Arachne.Core"
+                          Local "Arachne.Http"
+                          Local "Arachne.Uri" ] }
                   { Name = "Arachne.Language"
                     Dependencies =
                         [ Package "FParsec"
@@ -115,6 +121,7 @@ let solution =
               Test =
                 [ { Name = "Arachne.Http.Tests" }
                   { Name = "Arachne.Http.Cors.Tests" }
+                  { Name = "Arachne.Http.State.Tests" }
                   { Name = "Arachne.Language.Tests" }
                   { Name = "Arachne.Uri.Tests" }
                   { Name = "Arachne.Uri.Template.Tests" } ] } }
