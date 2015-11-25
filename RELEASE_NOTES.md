@@ -1,4 +1,7 @@
-### New in 2.3.27 - (Released TBD)
+### New in 2.3.28 - (Released TBD)
+* 
+
+### New in 2.3.27 - (Released 2015-11-25)
 * Arachne.Http.State introduced to support Cookie parsing.
 
 ### New in 2.3.26 - (Released 2015-10-16)
