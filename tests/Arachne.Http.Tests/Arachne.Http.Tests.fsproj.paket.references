@@ -1,3 +1,6 @@
 FParsec
-NUnit
-Unquote
+
+group Test
+
+  NUnit
+  Unquote

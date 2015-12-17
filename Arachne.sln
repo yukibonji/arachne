@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}"
 EndProject
@@ -43,7 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{44DC96C8-E1D
 		src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references = src\Arachne.Uri.Template\Arachne.Uri.Template.fsproj.paket.references
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{85452D60-BFFB-47E7-82C1-8FA6134455C8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fake", "fake", "{85452D60-BFFB-47E7-82C1-8FA6134455C8}"
 	ProjectSection(SolutionItems) = preProject
 		build.cmd = build.cmd
 		build.fsx = build.fsx
