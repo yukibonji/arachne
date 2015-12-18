@@ -6,6 +6,7 @@ open System.IO
 open Fake
 open Fake.AssemblyInfoFile
 open Fake.ReleaseNotesHelper
+open Fake.Testing
 
 (* Types
 
@@ -295,17 +296,13 @@ Target "Source.Clean" (fun _ ->
         "bin"
         "temp" ])
 
-Target "Source.Test" (fun _ ->
-    try
-        solution.Structure.Projects.Test
-        |> List.map (fun project -> testAssembly project)
-        |> NUnit (fun x ->
-            { x with
-                DisableShadowCopy = true
-                TimeOut = TimeSpan.FromMinutes 20.
-                OutputFile = "bin/TestResults.xml" })
-    finally
-        AppVeyor.UploadTestResultsXml AppVeyor.TestResultsType.NUnit "bin")
+Target "Source.Test" <| fun _ ->
+    solution.Structure.Projects.Test
+    |> List.map (fun project -> testAssembly project)
+    |> xUnit2 (fun p ->
+        { p with
+            TimeOut = TimeSpan.FromMinutes 20.
+            Parallel = All })
 
 (* Builds
 

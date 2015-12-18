@@ -1,10 +1,10 @@
 ﻿module Arachne.Language.Tests
 
-open NUnit.Framework
-open Arachne.Language
 open Arachne.Core.Tests
+open Arachne.Language
+open Xunit
 
-[<Test>]
+[<Fact>]
 let ``LanguageTag Formatting/Parsing`` () =
 
     (* Language *)

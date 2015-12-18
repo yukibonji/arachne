@@ -2,5 +2,5 @@ FParsec
 
 group Test
 
-  NUnit
   Unquote
+  xunit

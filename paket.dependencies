@@ -7,7 +7,6 @@ group Build
   source http://nuget.org/api/v2
 
   nuget FAKE
-  nuget Nuget.CommandLine
   nuget SourceLink.Fake
 
 group Test
@@ -15,6 +14,5 @@ group Test
   framework: >= net45
   source http://nuget.org/api/v2
 
-  nuget NUnit
-  nuget NUnit.Runners
   nuget Unquote
+  nuget xunit

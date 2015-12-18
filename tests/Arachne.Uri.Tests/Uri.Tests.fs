@@ -1,10 +1,10 @@
 ﻿module Arachne.Uri.Tests
 
-open NUnit.Framework
-open Arachne.Uri
 open Arachne.Core.Tests
+open Arachne.Uri
+open Xunit
 
-[<Test>]
+[<Fact>]
 let ``Scheme Formatting/Parsing`` () =
     let schemeTyped =
         Scheme "http"
@@ -15,7 +15,7 @@ let ``Scheme Formatting/Parsing`` () =
     roundTrip (Scheme.Format, Scheme.Parse) [
         schemeTyped, schemeString ]
 
-[<Test>]
+[<Fact>]
 let ``Authority Formatting/Parsing`` () =
     
     (* Host Only *)
@@ -49,7 +49,7 @@ let ``Authority Formatting/Parsing`` () =
         hostPortTyped,     hostPortString
         hostPortUserTyped, hostPortUserString ]
 
-[<Test>]
+[<Fact>]
 let ``PathAbsoluteOrEmpty Formatting/Parsing`` () =
 
     let pathAbEmptyFullTyped = 
@@ -68,7 +68,7 @@ let ``PathAbsoluteOrEmpty Formatting/Parsing`` () =
         pathAbEmptyFullTyped,  pathAbEmptyFullString
         pathAbEmptyEmptyTyped, pathAbEmptyEmptyString ]
 
-[<Test>]
+[<Fact>]
 let ``PathAbsolute Formatting/Parsing`` () =
 
     let pathAbsoluteFullTyped = 
@@ -87,7 +87,7 @@ let ``PathAbsolute Formatting/Parsing`` () =
         pathAbsoluteFullTyped,  pathAbsoluteFullString
         pathAbsoluteEmptyTyped, pathAbsoluteEmptyString ]
 
-[<Test>]
+[<Fact>]
 let ``Uri Formatting/Parsing`` () =
 
     (* Authority Hierarchy *)
@@ -148,37 +148,37 @@ let ``Uri Formatting/Parsing`` () =
         absoluteTyped,  absoluteString
         emptyTyped,     emptyString ]
 
-[<Test>]
+[<Fact>]
 let ``Query Pairs``() =
     let expectedResult = Some ["param", Some("exists");"param1", Some("alsoexists")]
     let query = Query.Query("param=exists&param1=alsoexists")
     let queryPairs = query |> fst Query.Pairs_
-    Assert.AreEqual(expectedResult, queryPairs)
+    Assert.Equal (expectedResult, queryPairs)
 
-[<Test>]
+[<Fact>]
 let ``Query Pairs with missing parameter value``() =
     let expectedResult = Some ["param", Some("exists");"param1", Some ("")]
     let query = Query.Query("param=exists&param1=")
     let queryPairs = query |> fst Query.Pairs_
-    Assert.AreEqual(expectedResult, queryPairs)
+    Assert.Equal (expectedResult, queryPairs)
 
-[<Test>]
+[<Fact>]
 let ``Query Pairs with missing parameter value and equals sign``() =
     let expectedResult = Some ["param", Some("exists");"param1", None]
     let query = Query.Query("param=exists&param1")
     let queryPairs = query |> fst Query.Pairs_
-    Assert.AreEqual(expectedResult, queryPairs)
+    Assert.Equal (expectedResult, queryPairs)
 
-[<Test>]
+[<Fact>]
 let ``Query Pairs with no query parameters``() =
     let expectedResult = None
     let query = Query.Query("")
     let queryPairs = query |> fst Query.Pairs_
-    Assert.AreEqual(expectedResult, queryPairs)
+    Assert.Equal (expectedResult, queryPairs)
 
-[<Test>]
+[<Fact>]
 let ``Query Pairs with more than 1 & can be parsed``() =
     let expectedResult = Some ["param", Some("exists"); "", None; "param1", Some("alsoexists")]
     let query = Query.Query("param=exists&&param1=alsoexists")
     let queryPairs = query |> fst Query.Pairs_
-    Assert.AreEqual(expectedResult, queryPairs)
+    Assert.Equal (expectedResult, queryPairs)

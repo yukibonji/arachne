@@ -1,8 +1,8 @@
 ﻿module Arachne.Uri.Templates.Tests
 
-open NUnit.Framework
-open Arachne.Uri.Template
 open Arachne.Core.Tests
+open Arachne.Uri.Template
+open Xunit
 
 (* Data
 
@@ -42,7 +42,7 @@ let (=?) str1 str2 =
    giving a non-exhaustive flavour of URI Template expansion
    and variables/operators/modifiers. *)
 
-[<Test>]
+[<Fact>]
 let ``Level 1 Examples Render Correctly`` () =
 
     (* Simple String Expansion *)
@@ -50,7 +50,7 @@ let ``Level 1 Examples Render Correctly`` () =
     "{var}" =? "value"
     "{he.llo}" =? "Hello%20World%21"
 
-[<Test>]
+[<Fact>]
 let ``Level 2 Examples Render Correctly`` () =
 
     (* Reserved String Expansion *)
@@ -72,7 +72,7 @@ let ``Level 2 Examples Render Correctly`` () =
    a specification by example in addition to the grammars and
    behaviours given as part of the specification. *)
 
-[<Test>]
+[<Fact>]
 let ``Simple Expansion Renders Correctly`` () =
     "{var}" =? "value"
     "{he.llo}" =? "Hello%20World%21"
@@ -91,7 +91,7 @@ let ``Simple Expansion Renders Correctly`` () =
     "{keys}" =? "semi,%3B,dot,.,comma,%2C"
     "{keys*}" =? "semi=%3B,dot=.,comma=%2C"
 
-[<Test>]
+[<Fact>]
 let ``Simple Matching Matches Correctly`` () =
     matches "/test/{atom}" "/test/one" [ Key "atom", Atom "one" ]
     matches "/test/{atom}" "/test/" [ Key "atom", Atom "" ]
@@ -99,7 +99,7 @@ let ``Simple Matching Matches Correctly`` () =
     matches "/test/{list*}" "/test/one,two,three" [ Key "list", List [ "one"; "two"; "three" ] ]
     matches "/test/{keys*}" "/test/one=a,two=b" [ Key "keys", Keys [ "one", "a"; "two", "b" ] ]
 
-[<Test>]
+[<Fact>]
 let ``Reserved Expansion Renders Correctly`` () =
     "{+var}" =? "value"
     "{+he.llo}" =? "Hello%20World!"
@@ -122,7 +122,7 @@ let ``Reserved Expansion Renders Correctly`` () =
 // Note - this may seem incorrect, but is actually expected behaviour.
 // These are not ideal operators to use for matching complex data!
 
-[<Test>]
+[<Fact>]
 let ``Reserved Matching Matches Correctly`` () =
     matches "/test/{+atom}" "/test/one!" [ Key "atom", Atom "one!" ]
     matches "/test/{+atom}" "/test//one!" [ Key "atom", Atom "/one!" ]
@@ -130,7 +130,7 @@ let ``Reserved Matching Matches Correctly`` () =
     matches "/test/{+list*}" "/test/one,two,three" [ Key "list", List [ "one,two,three" ] ]
     matches "/test/{+keys*}" "/test/one=a,two=b" [ Key "keys", List [ "one=a,two=b" ] ]
 
-[<Test>]
+[<Fact>]
 let ``Fragment Expansion Renders Correctly`` () =
     "{#var}" =? "#value"
     "{#he.llo}" =? "#Hello%20World!"
@@ -148,7 +148,7 @@ let ``Fragment Expansion Renders Correctly`` () =
 // Note - this may seem incorrect, but is actually expected behaviour.
 // These are not ideal operators to use for matching complex data!
 
-[<Test>]
+[<Fact>]
 let ``Fragment Matching Matches Correctly`` () =
     matches "/test{#atom}" "/test#one!" [ Key "atom", Atom "one!" ]
     matches "/test{#atom}" "/test#" [ Key "atom", Atom "" ]
@@ -158,7 +158,7 @@ let ``Fragment Matching Matches Correctly`` () =
     matches "/test{#list*}" "/test" []
     matches "/test{#keys*}" "/test#one=a,two=b" [ Key "keys", List [ "one=a,two=b" ] ]
 
-[<Test>]
+[<Fact>]
 let ``Label Expansion with Dot-Prefix Renders Correctly`` () =
     "{.who}" =? ".fred"
     "{.who,who}" =? ".fred.fred"
@@ -178,7 +178,7 @@ let ``Label Expansion with Dot-Prefix Renders Correctly`` () =
 // Note - this may seem incorrect, but is actually expected behaviour.
 // These are not ideal operators to use for matching complex data!
 
-[<Test>]
+[<Fact>]
 let ``Label Matching Matches Correctly`` () =
     matches "/test{.atom}" "/test.one%21" [ Key "atom", Atom "one!" ]
     matches "/test{.atom}" "/test." [ Key "atom", Atom "" ]
@@ -188,7 +188,7 @@ let ``Label Matching Matches Correctly`` () =
     matches "/test{.list*}" "/test" []
     matches "/test{.keys*}" "/test.one=a.two=b" [ Key "keys", Keys [ "one", "a.two" ] ]
 
-[<Test>]
+[<Fact>]
 let ``Path Segment Expansion Renders Correctly`` () =
     "{/who}" =? "/fred"
     "{/who,who}" =? "/fred/fred"
@@ -205,7 +205,7 @@ let ``Path Segment Expansion Renders Correctly`` () =
     "{/keys}" =? "/semi,%3B,dot,.,comma,%2C"
     "{/keys*}" =? "/semi=%3B/dot=./comma=%2C"
 
-[<Test>]
+[<Fact>]
 let ``Path Segment Matching Matches Correctly`` () =
     matches "/test{/atom}" "/test/one%21" [ Key "atom", Atom "one!" ]
     matches "/test{/atom}" "/test/" [ Key "atom", Atom "" ]
@@ -215,7 +215,7 @@ let ``Path Segment Matching Matches Correctly`` () =
     matches "/test{/list*}" "/test" []
     matches "/test{/keys*}" "/test/one=a/two=b" [ Key "keys", Keys [ "one", "a"; "two", "b" ] ]
 
-[<Test>]
+[<Fact>]
 let ``Parameter Expansion Renders Correctly`` () =
     "{;who}" =? ";who=fred"
     "{;half}" =? ";half=50%25"
@@ -231,7 +231,7 @@ let ``Parameter Expansion Renders Correctly`` () =
     "{;keys}" =? ";keys=semi,%3B,dot,.,comma,%2C"
     "{;keys*}" =? ";semi=%3B;dot=.;comma=%2C"
 
-[<Test>]
+[<Fact>]
 let ``Parameter Matching Matches Correctly`` () =
     matches "/test{;atom}" "/test;one" [ Key "atom", Atom "one" ]
     matches "/test{;atom}" "/test;" [ Key "atom", Atom "" ]
@@ -239,7 +239,7 @@ let ``Parameter Matching Matches Correctly`` () =
     matches "/test{;list*}" "/test;" [ Key "list", List [ "" ] ]
     matches "/test{;keys*}" "/test;one=two" [ Key "keys", Keys [ "one", "two" ] ]
 
-[<Test>]
+[<Fact>]
 let ``Query Expansion Renders Correctly`` () =
     "{?who}" =? "?who=fred"
     "{?half}" =? "?half=50%25"
@@ -252,7 +252,7 @@ let ``Query Expansion Renders Correctly`` () =
     "{?keys}" =? "?keys=semi,%3B,dot,.,comma,%2C"
     "{?keys*}" =? "?semi=%3B&dot=.&comma=%2C"
 
-[<Test>]
+[<Fact>]
 let ``Query Continuation Expansion Renders Correctly`` () =
     "{&who}" =? "&who=fred"
     "{&half}" =? "&half=50%25"

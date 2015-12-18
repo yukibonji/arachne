@@ -1,15 +1,15 @@
 ﻿module Arachne.Http.Tests
 
 open System
-open NUnit.Framework
+open Arachne.Core.Tests
 open Arachne.Http
 open Arachne.Language
 open Arachne.Uri
-open Arachne.Core.Tests
+open Xunit
 
 (* RFC 7230 *)
 
-[<Test>]
+[<Fact>]
 let ``PartialUri Formatting/Parsing`` () =
 
     let partialUriTyped : PartialUri =
@@ -23,7 +23,7 @@ let ``PartialUri Formatting/Parsing`` () =
     roundTrip (PartialUri.Format, PartialUri.Parse) [
         partialUriTyped, partialUriString ]
 
-[<Test>]
+[<Fact>]
 let ``HttpVersion Formatting/Parsing`` () =
     
     let httpVersionTyped = HTTP 1.1
@@ -32,7 +32,7 @@ let ``HttpVersion Formatting/Parsing`` () =
     roundTrip (HttpVersion.Format, HttpVersion.Parse) [
         httpVersionTyped, httpVersionString ]
 
-[<Test>]
+[<Fact>]
 let ``ContentLength Formatting/Parsing`` () =
     
     let contentLengthTyped = ContentLength 1024
@@ -41,7 +41,7 @@ let ``ContentLength Formatting/Parsing`` () =
     roundTrip (ContentLength.Format, ContentLength.Parse) [
         contentLengthTyped, contentLengthString ]
 
-[<Test>]
+[<Fact>]
 let ``Host Formatting/Parsing`` () =
 
     let hostTyped = Host (Name (RegName "www.example.com"), Some (Port 8080))
@@ -50,7 +50,7 @@ let ``Host Formatting/Parsing`` () =
     roundTrip (Host.Format, Host.Parse) [
         hostTyped, hostString ]
 
-[<Test>]
+[<Fact>]
 let ``Connection Formatting/Parsing`` () =
 
     let connectionTyped = Connection ([ ConnectionOption "close"; ConnectionOption "test" ])
@@ -61,7 +61,7 @@ let ``Connection Formatting/Parsing`` () =
 
 (* RFC 7231 *)
 
-[<Test>]
+[<Fact>]
 let ``MediaType Formatting/Parsing`` () =
 
     let mediaTypeTyped =
@@ -76,7 +76,7 @@ let ``MediaType Formatting/Parsing`` () =
     roundTrip (MediaType.Format, MediaType.Parse) [
         mediaTypeTyped, mediaTypeString ]
 
-[<Test>]
+[<Fact>]
 let ``ContentType Formatting/Parsing`` () =
 
     let contentTypeTyped =
@@ -92,7 +92,7 @@ let ``ContentType Formatting/Parsing`` () =
     roundTrip (ContentType.Format, ContentType.Parse) [
         contentTypeTyped, contentTypeString ]
 
-[<Test>]
+[<Fact>]
 let ``ContentEncoding Formatting/Parsing`` () =
 
     let contentEncodingTyped =
@@ -106,7 +106,7 @@ let ``ContentEncoding Formatting/Parsing`` () =
     roundTrip (ContentEncoding.Format, ContentEncoding.Parse) [
         contentEncodingTyped, contentEncodingString ]
 
-[<Test>]
+[<Fact>]
 let ``ContentLanguage Formatting/Parsing`` () =
 
     let contentLanguageTyped =
@@ -128,7 +128,7 @@ let ``ContentLanguage Formatting/Parsing`` () =
     roundTrip (ContentLanguage.Format, ContentLanguage.Parse) [
         contentLanguageTyped, contentLanguageString ]
 
-[<Test>]
+[<Fact>]
 let ``ContentLocation Formatting/Parsing`` () =
     
     let contentLocationTyped =
@@ -145,26 +145,26 @@ let ``ContentLocation Formatting/Parsing`` () =
     roundTrip (ContentLocation.Format, ContentLocation.Parse) [
         contentLocationTyped, contentLocationString ]
 
-[<Test>]
+[<Fact>]
 let ``Method Formatting/Parsing`` () =
 
     roundTrip (Method.Format, Method.Parse) [
         Method.GET, "GET"
         Method.Custom "PATCH", "PATCH" ]
 
-[<Test>]
+[<Fact>]
 let ``Expect Formatting/Parsing`` () =
 
     roundTrip (Expect.Format, Expect.Parse) [
         Expect (Continue), "100-continue" ]
 
-[<Test>]
+[<Fact>]
 let ``MaxForwards Formatting/Parsing`` () =
     
     roundTrip (MaxForwards.Format, MaxForwards.Parse) [
         MaxForwards 10, "10" ]
 
-[<Test>]
+[<Fact>]
 let ``Accept Formatting/Parsing`` () =
 
     let acceptTyped =
@@ -185,7 +185,7 @@ let ``Accept Formatting/Parsing`` () =
     roundTrip (Accept.Format, Accept.Parse) [
         acceptTyped, acceptString ]
 
-[<Test>]
+[<Fact>]
 let ``AcceptCharset Formatting/Parsing`` () =
     
     let acceptCharsetTyped =
@@ -203,7 +203,7 @@ let ``AcceptCharset Formatting/Parsing`` () =
     roundTrip (AcceptCharset.Format, AcceptCharset.Parse) [
         acceptCharsetTyped, acceptCharsetString ]
 
-[<Test>]
+[<Fact>]
 let ``AcceptEncoding Formatting/Parsing`` () =
 
     let acceptEncodingTyped =
@@ -224,7 +224,7 @@ let ``AcceptEncoding Formatting/Parsing`` () =
     roundTrip (AcceptEncoding.Format, AcceptEncoding.Parse) [
         acceptEncodingTyped, acceptEncodingString ]
 
-[<Test>]
+[<Fact>]
 let ``AcceptLanguage Formatting/Parsing`` () =
 
     let acceptLanguageTyped =
@@ -242,7 +242,7 @@ let ``AcceptLanguage Formatting/Parsing`` () =
     roundTrip (AcceptLanguage.Format, AcceptLanguage.Parse) [
         acceptLanguageTyped, acceptLanguageString ]
 
-[<Test>]
+[<Fact>]
 let ``Referer Formatting/Parsing`` () =
 
     let refererTyped =
@@ -258,7 +258,7 @@ let ``Referer Formatting/Parsing`` () =
     roundTrip (Referer.Format, Referer.Parse) [
         refererTyped, refererString ]
 
-[<Test>]
+[<Fact>]
 let ``Date Formatting/Parsing`` () =
 
     let dateTyped =
@@ -270,7 +270,7 @@ let ``Date Formatting/Parsing`` () =
     roundTrip (Date.Format, Date.Parse) [
         dateTyped, dateString ]
 
-[<Test>]
+[<Fact>]
 let ``Location Formatting/Parsing`` () =
 
     let locationTyped =
@@ -288,7 +288,7 @@ let ``Location Formatting/Parsing`` () =
     roundTrip (Location.Format, Location.Parse) [
         locationTyped, locationString ]
 
-[<Test>]
+[<Fact>]
 let ``RetryAfter Formatting/Parsing`` () =
 
     let retryAfterTyped =
@@ -300,7 +300,7 @@ let ``RetryAfter Formatting/Parsing`` () =
     roundTrip (RetryAfter.Format, RetryAfter.Parse) [
         retryAfterTyped, retryAfterString ]
 
-[<Test>]
+[<Fact>]
 let ``Allow Formatting/Parsing`` () =
 
     let allowTyped =
@@ -314,7 +314,7 @@ let ``Allow Formatting/Parsing`` () =
 
 (* RFC 7232 *)
 
-[<Test>]
+[<Fact>]
 let ``LastModified Formatting/Parsing`` () =
 
     let lastModifiedTyped =
@@ -326,7 +326,7 @@ let ``LastModified Formatting/Parsing`` () =
     roundTrip (LastModified.Format, LastModified.Parse) [
         lastModifiedTyped, lastModifiedString ]
 
-[<Test>]
+[<Fact>]
 let ``ETag Formatting/Parsing`` () =
 
     let eTagTyped =
@@ -338,7 +338,7 @@ let ``ETag Formatting/Parsing`` () =
     roundTrip (ETag.Format, ETag.Parse) [
         eTagTyped, eTagString ]
 
-[<Test>]
+[<Fact>]
 let ``IfMatch Formatting/Parsing`` () =
 
     let ifMatchTyped =
@@ -350,7 +350,7 @@ let ``IfMatch Formatting/Parsing`` () =
     roundTrip (IfMatch.Format, IfMatch.Parse) [
         ifMatchTyped, ifMatchString ]
 
-[<Test>]
+[<Fact>]
 let ``IfNoneMatch Formatting/Parsing`` () =
 
     let ifNoneMatchTyped =
@@ -362,7 +362,7 @@ let ``IfNoneMatch Formatting/Parsing`` () =
     roundTrip (IfNoneMatch.Format, IfNoneMatch.Parse) [
         ifNoneMatchTyped, ifNoneMatchString ]
 
-[<Test>]
+[<Fact>]
 let ``IfModifiedSince Formatting/Parsing`` () =
 
     let ifModifiedSinceTyped =
@@ -374,7 +374,7 @@ let ``IfModifiedSince Formatting/Parsing`` () =
     roundTrip (IfModifiedSince.Format, IfModifiedSince.Parse) [
         ifModifiedSinceTyped, ifModifiedSinceString ]
 
-[<Test>]
+[<Fact>]
 let ``IfUnmodifiedSince Formatting/Parsing`` () =
 
     let ifUnmodifiedSinceTyped =
@@ -388,7 +388,7 @@ let ``IfUnmodifiedSince Formatting/Parsing`` () =
 
 (* RFC 7233 *)
 
-[<Test>]
+[<Fact>]
 let ``IfRange Formatting/Parsing`` () =
 
     let ifRangeTyped =
@@ -402,7 +402,7 @@ let ``IfRange Formatting/Parsing`` () =
 
 (* RFC 7234 *)
 
-[<Test>]
+[<Fact>]
 let ``Age Formatting/Parsing`` () =
 
     let ageTyped =
@@ -414,7 +414,7 @@ let ``Age Formatting/Parsing`` () =
     roundTrip (Age.Format, Age.Parse) [
         ageTyped, ageString ]
 
-[<Test>]
+[<Fact>]
 let ``CacheControl Formatting/Parsing`` () =
 
     let cacheControlTyped =
@@ -429,7 +429,7 @@ let ``CacheControl Formatting/Parsing`` () =
     roundTrip (CacheControl.Format, CacheControl.Parse) [
         cacheControlTyped, cacheControlString ]
 
-[<Test>]
+[<Fact>]
 let ``Expires Formatting/Parsing`` () =
 
     let expiresTyped =
