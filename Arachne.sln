@@ -58,10 +58,6 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Core.Profile259", "targets\Arachne.Core.Profile259\Arachne.Core.Profile259.fsproj", "{9828B067-3AB0-4314-B23E-DF14F45F3B5C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "targets", "targets", "{805B3D74-521F-4EA1-A8AC-5824170A8042}"
-	ProjectSection(SolutionItems) = preProject
-		targets\Arachne.Core.Profile259\Arachne.Core.Profile259.fsproj.paket.references = targets\Arachne.Core.Profile259\Arachne.Core.Profile259.fsproj.paket.references
-		targets\Arachne.Language.Profile259\Arachne.Language.Profile259.fsproj.paket.references = targets\Arachne.Language.Profile259\Arachne.Language.Profile259.fsproj.paket.references
-	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Language", "src\Arachne.Language\Arachne.Language.fsproj", "{AD464231-BE65-4905-A491-13B6BC0BCF79}"
 EndProject
@@ -90,6 +86,20 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri.Template.Tests", "tests\Arachne.Uri.Template.Tests\Arachne.Uri.Template.Tests.fsproj", "{6EE7280A-3E64-4012-AA20-37E188082604}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri.Tests", "src\Arachne.Uri.Tests\Arachne.Uri.Tests.fsproj", "{06064F8A-CE00-47F6-AB0C-31AA909CDD91}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "profile259", "profile259", "{ECFBB608-C745-43E5-9E08-60DFB38E7981}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri.Profile259", "targets\Arachne.Uri.Profile259\Arachne.Uri.Profile259.fsproj", "{FA883D60-0C1D-4218-A44D-2EA7F71F1714}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "profile259", "profile259", "{35C8DC4A-DC3D-46D0-99C2-00519D26DDF7}"
+	ProjectSection(SolutionItems) = preProject
+		targets\Arachne.Core.Profile259\Arachne.Core.Profile259.fsproj.paket.references = targets\Arachne.Core.Profile259\Arachne.Core.Profile259.fsproj.paket.references
+		targets\Arachne.Language.Profile259\Arachne.Language.Profile259.fsproj.paket.references = targets\Arachne.Language.Profile259\Arachne.Language.Profile259.fsproj.paket.references
+		targets\Arachne.Uri.Profile259\Arachne.Uri.Profile259.fsproj.paket.references = targets\Arachne.Uri.Profile259\Arachne.Uri.Profile259.fsproj.paket.references
+		targets\Arachne.Uri.Template.Profile259\Arachne.Uri.Template.Profile259.fsproj.paket.references = targets\Arachne.Uri.Template.Profile259\Arachne.Uri.Template.Profile259.fsproj.paket.references
+	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Arachne.Uri.Template.Profile259", "targets\Arachne.Uri.Template.Profile259\Arachne.Uri.Template.Profile259.fsproj", "{48B5B68B-C98B-4253-A79B-339CA9AEA632}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -161,6 +171,14 @@ Global
 		{06064F8A-CE00-47F6-AB0C-31AA909CDD91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06064F8A-CE00-47F6-AB0C-31AA909CDD91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06064F8A-CE00-47F6-AB0C-31AA909CDD91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA883D60-0C1D-4218-A44D-2EA7F71F1714}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA883D60-0C1D-4218-A44D-2EA7F71F1714}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA883D60-0C1D-4218-A44D-2EA7F71F1714}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA883D60-0C1D-4218-A44D-2EA7F71F1714}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48B5B68B-C98B-4253-A79B-339CA9AEA632}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48B5B68B-C98B-4253-A79B-339CA9AEA632}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48B5B68B-C98B-4253-A79B-339CA9AEA632}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48B5B68B-C98B-4253-A79B-339CA9AEA632}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -172,10 +190,10 @@ Global
 		{85452D60-BFFB-47E7-82C1-8FA6134455C8} = {E063EC87-F350-4433-97DF-BA98EA3E7177}
 		{D86C1328-50F6-471F-86D0-486389BD9184} = {2C81850E-18B1-4EA3-AB76-81253210EE4D}
 		{7CF420BE-13A1-4AD1-AE20-3DD855DEA83F} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
-		{9828B067-3AB0-4314-B23E-DF14F45F3B5C} = {7AD28056-ACBF-49AF-90BB-618856A82CE4}
+		{9828B067-3AB0-4314-B23E-DF14F45F3B5C} = {ECFBB608-C745-43E5-9E08-60DFB38E7981}
 		{805B3D74-521F-4EA1-A8AC-5824170A8042} = {2C81850E-18B1-4EA3-AB76-81253210EE4D}
 		{AD464231-BE65-4905-A491-13B6BC0BCF79} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
-		{752CAF34-EECD-49BE-B5C3-AB8D33A1C849} = {7AD28056-ACBF-49AF-90BB-618856A82CE4}
+		{752CAF34-EECD-49BE-B5C3-AB8D33A1C849} = {ECFBB608-C745-43E5-9E08-60DFB38E7981}
 		{29C6CF05-2B38-4A50-BE15-EB2595029D5C} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
 		{86F19EE3-1413-4A44-A6A8-969554DAEDD2} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
 		{91DB0E82-30D1-4074-BE15-88A4FB823539} = {7BCF4F62-6D03-4CA3-9D9F-56D4F5136F47}
@@ -188,5 +206,9 @@ Global
 		{C94C284C-100D-4CD5-9122-3F350667DE14} = {A430AC63-4200-4222-9A31-6077382E86DD}
 		{6EE7280A-3E64-4012-AA20-37E188082604} = {A430AC63-4200-4222-9A31-6077382E86DD}
 		{06064F8A-CE00-47F6-AB0C-31AA909CDD91} = {A430AC63-4200-4222-9A31-6077382E86DD}
+		{ECFBB608-C745-43E5-9E08-60DFB38E7981} = {7AD28056-ACBF-49AF-90BB-618856A82CE4}
+		{FA883D60-0C1D-4218-A44D-2EA7F71F1714} = {ECFBB608-C745-43E5-9E08-60DFB38E7981}
+		{35C8DC4A-DC3D-46D0-99C2-00519D26DDF7} = {805B3D74-521F-4EA1-A8AC-5824170A8042}
+		{48B5B68B-C98B-4253-A79B-339CA9AEA632} = {ECFBB608-C745-43E5-9E08-60DFB38E7981}
 	EndGlobalSection
 EndGlobal

@@ -259,8 +259,8 @@ and Attribute =
           Format = attributeF }
 
 and Domain =
-    | IPv4 of IPAddress
-    | IPv6 of IPAddress
+    | IPv4 of string
+    | IPv6 of string
     | SubDomain of string
 
     static member internal Mapping =

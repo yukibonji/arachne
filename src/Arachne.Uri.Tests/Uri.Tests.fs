@@ -1,6 +1,5 @@
 ﻿module Arachne.Uri.Tests
 
-open System.Net
 open NUnit.Framework
 open Arachne.Uri
 open Arachne.Core.Tests
@@ -22,7 +21,7 @@ let ``Authority Formatting/Parsing`` () =
     (* Host Only *)
 
     let hostTyped =
-        Authority.Authority (IPv4 (IPAddress.Parse "192.168.0.1"), None, None)
+        Authority.Authority (IPv4 "192.168.0.1", None, None)
 
     let hostString =
         "192.168.0.1"
@@ -30,7 +29,7 @@ let ``Authority Formatting/Parsing`` () =
     (* Host and Port *)
 
     let hostPortTyped =
-        Authority.Authority (IPv6 (IPAddress.Parse "2001:db8::ff00:42:8329"), Some (Port 8080), None)
+        Authority.Authority (IPv6 "2001:db8::ff00:42:8329", Some (Port 8080), None)
 
     let hostPortString =
         "[2001:db8::ff00:42:8329]:8080"

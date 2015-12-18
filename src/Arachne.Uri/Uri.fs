@@ -21,8 +21,6 @@
 namespace Arachne.Uri
 
 open System
-open System.Net
-open System.Net.Sockets
 open System.Runtime.CompilerServices
 open System.Text
 open Arachne.Core
@@ -99,7 +97,7 @@ module PercentEncoding =
         Encoding.UTF8.GetBytes >> List.ofArray
 
     let private toString : byte list -> string =
-        List.toArray >> Encoding.UTF8.GetString
+        List.toArray >> fun x -> Encoding.UTF8.GetString (x, 0, x.Length)
 
     (* Indices
 
@@ -172,12 +170,12 @@ module internal IPAddress =
 
     let ipv6AddressP =
         skipChar '[' >>. (many1Satisfy (int >> isIpv6Char) >>= (fun x ->
-            match IPAddress.TryParse x with
-            | true, x when x.AddressFamily = AddressFamily.InterNetworkV6 -> preturn x
+            match Uri.CheckHostName x with
+            | UriHostNameType.IPv6 -> preturn x
             | _ -> pzero)) .>> skipChar ']'
 
-    let ipv6AddressF (x: IPAddress) =
-        append "[" >> append (string x) >> append "]"
+    let ipv6AddressF x =
+        append "[" >> append x >> append "]"
 
     let private isIpv4Char i =
             Grammar.isDigit i
@@ -185,12 +183,12 @@ module internal IPAddress =
 
     let ipv4AddressP =
         many1Satisfy (int >> isIpv4Char) >>= (fun x ->
-            match IPAddress.TryParse x with
-            | true, x when x.AddressFamily = AddressFamily.InterNetwork -> preturn x
+            match Uri.CheckHostName x with
+            | UriHostNameType.IPv4 -> preturn x
             | _ -> pzero)
 
-    let ipv4AddressF (x: IPAddress) =
-        append (string x)
+    let ipv4AddressF x =
+        append x
 
 (* Scheme
 
@@ -339,8 +337,8 @@ and UserInfo =
    it stands, that's unlikely to be an issue, but could perhaps be revisited. *)
 
 and Host =
-    | IPv4 of IPAddress
-    | IPv6 of IPAddress
+    | IPv4 of string
+    | IPv6 of string
     | Name of RegName
 
     static member internal Mapping =
