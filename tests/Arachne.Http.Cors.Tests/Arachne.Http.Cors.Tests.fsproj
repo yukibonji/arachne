@@ -49,45 +49,6 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
-  <ItemGroup>
-    <Compile Include="Http.Cors.Tests.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Arachne.Core\Arachne.Core.fsproj">
-      <Name>Arachne.Core</Name>
-      <Project>{7cf420be-13a1-4ad1-ae20-3dd855dea83f}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj">
-      <Name>Arachne.Http.Cors</Name>
-      <Project>{86f19ee3-1413-4a44-a6a8-969554daedd2}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\Arachne.Http\Arachne.Http.fsproj">
-      <Name>Arachne.Http</Name>
-      <Project>{29c6cf05-2b38-4a50-be15-eb2595029d5c}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\Arachne.Uri\Arachne.Uri.fsproj">
-      <Name>Arachne.Uri</Name>
-      <Project>{529c0e46-3192-4e6f-8895-58f3227e4980}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Arachne.Core.Tests\Arachne.Core.Tests.fsproj">
-      <Name>Arachne.Core.Tests</Name>
-      <Project>{1bf336fc-964f-42b0-9ab2-46553d29a2d1}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -180,4 +141,42 @@
       </ItemGroup>
     </When>
   </Choose>
+  <ItemGroup>
+    <Compile Include="Http.Cors.Tests.fs" />
+    <Content Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <ProjectReference Include="..\..\src\Arachne.Core\Arachne.Core.fsproj">
+      <Name>Arachne.Core</Name>
+      <Project>{7cf420be-13a1-4ad1-ae20-3dd855dea83f}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Arachne.Http.Cors\Arachne.Http.Cors.fsproj">
+      <Name>Arachne.Http.Cors</Name>
+      <Project>{86f19ee3-1413-4a44-a6a8-969554daedd2}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Arachne.Http\Arachne.Http.fsproj">
+      <Name>Arachne.Http</Name>
+      <Project>{29c6cf05-2b38-4a50-be15-eb2595029d5c}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Arachne.Uri\Arachne.Uri.fsproj">
+      <Name>Arachne.Uri</Name>
+      <Project>{529c0e46-3192-4e6f-8895-58f3227e4980}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Arachne.Core.Tests\Arachne.Core.Tests.fsproj">
+      <Name>Arachne.Core.Tests</Name>
+      <Project>{1bf336fc-964f-42b0-9ab2-46553d29a2d1}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
