@@ -21,7 +21,6 @@
 namespace Arachne.Http.State
 
 open System
-open System.Net
 open Arachne.Core
 open Arachne.Http
 open Arachne.Uri
@@ -29,7 +28,7 @@ open FParsec
 
 (* RFC 6265
 
-   Types, parsers and formatters implemented to mirror the specification of 
+   Types, parsers and formatters implemented to mirror the specification of
    HTTP State Management Mechanism semantics (commonly known as cookies) as
    defined in RFC 6265.
 

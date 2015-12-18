@@ -21,9 +21,9 @@
 namespace Arachne.Uri.Template
 
 open System.Text
-open FParsec
 open Arachne.Core
 open Arachne.Uri
+open FParsec
 
 (* Data
 
