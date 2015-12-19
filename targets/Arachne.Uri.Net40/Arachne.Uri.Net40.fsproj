@@ -44,6 +44,9 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\src\Arachne.Uri\AssemblyInfo.fs" Condition="Exists('..\..\src\Arachne.Uri\AssemblyInfo.fs')">
+      <Link>AssemblyInfo.fs</Link>
+    </Compile>
     <Compile Include="..\..\src\Arachne.Uri\Uri.fs">
       <Link>Uri.fs</Link>
     </Compile>

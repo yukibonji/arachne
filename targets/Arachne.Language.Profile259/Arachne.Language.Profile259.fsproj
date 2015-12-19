@@ -43,6 +43,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\src\Arachne.Language\AssemblyInfo.fs" Condition="Exists('..\..\src\Arachne.Language\AssemblyInfo.fs')">
+      <Link>AssemblyInfo.fs</Link>
+    </Compile>
     <Compile Include="..\..\src\Arachne.Language\Language.fs">
       <Link>Language.fs</Link>
     </Compile>

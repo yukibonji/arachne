@@ -165,7 +165,7 @@ let githubRawUrl branch path =
 let paketTemplateFile (x: SourceProject) =
     sprintf "src/%s/%s.fsproj.paket.template" x.Name x.Name
 
-let generatePaketTemplate (project : SourceProject) =
+let generatePaketTemplate (project: SourceProject) =
     let lines =
         [|  yield "type project"
             yield "owners"
@@ -177,7 +177,18 @@ let generatePaketTemplate (project : SourceProject) =
             yield "projectUrl " + solution.VersionControl.Source
             yield "tags"
             for tag in solution.Metadata.Keywords do
-                yield "    " + tag |]
+                yield "    " + tag
+            yield "files"
+            yield "    !./bin/*.*"
+            for target in
+                [ "Net40", "lib/net40"
+                  "Profile259", "lib/portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1" ] do
+                for suffix in [ "dll"; "pdb"; "xml" ] do
+                    let name = project.Name
+                    let profile = fst target
+                    let moniker = snd target
+                    let file = sprintf "../../targets/%s.%s/bin/%s.%s ==> %s" name profile name suffix moniker
+                    yield "    " + file |]
     let text =
         lines
         |> Array.fold (fun (sb : Text.StringBuilder) line -> sb.AppendLine line) (Text.StringBuilder())
@@ -322,7 +333,7 @@ Target "Publish" DoNothing
 (* Default *)
 
 "Source"
-=?> ("Publish.Debug", not isMono)
+// =?> ("Publish.Debug", not isMono)
 ==> "Publish.Pack"
 ==> "Default"
 

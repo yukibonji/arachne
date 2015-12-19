@@ -44,6 +44,9 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\src\Arachne.Http.State\AssemblyInfo.fs" Condition="Exists('..\..\src\Arachne.Http.State\AssemblyInfo.fs')">
+      <Link>AssemblyInfo.fs</Link>
+    </Compile>
     <Compile Include="..\..\src\Arachne.Http.State\Http.State.fs">
       <Link>Http.State.fs</Link>
     </Compile>
