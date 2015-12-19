@@ -1,4 +1,4 @@
-#I "packages/FAKE/tools"
+#I "packages/build/FAKE/tools"
 #r "FakeLib.dll"
 
 open System
@@ -6,6 +6,7 @@ open System.IO
 open Fake
 open Fake.AssemblyInfoFile
 open Fake.ReleaseNotesHelper
+open Fake.Testing
 
 (* Types
 
@@ -164,7 +165,7 @@ let githubRawUrl branch path =
 let paketTemplateFile (x: SourceProject) =
     sprintf "src/%s/%s.fsproj.paket.template" x.Name x.Name
 
-let generatePaketTemplate (project : SourceProject) =
+let generatePaketTemplate (project: SourceProject) =
     let lines =
         [|  yield "type project"
             yield "owners"
@@ -176,7 +177,18 @@ let generatePaketTemplate (project : SourceProject) =
             yield "projectUrl " + solution.VersionControl.Source
             yield "tags"
             for tag in solution.Metadata.Keywords do
-                yield "    " + tag |]
+                yield "    " + tag
+            yield "files"
+            yield "    !./bin/*.*"
+            for target in
+                [ "Net40", "lib/net40"
+                  "Profile259", "lib/portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1" ] do
+                for suffix in [ "dll"; "pdb"; "xml" ] do
+                    let name = project.Name
+                    let profile = fst target
+                    let moniker = snd target
+                    let file = sprintf "../../targets/%s.%s/bin/%s.%s ==> %s" name profile name suffix moniker
+                    yield "    " + file |]
     let text =
         lines
         |> Array.fold (fun (sb : Text.StringBuilder) line -> sb.AppendLine line) (Text.StringBuilder())
@@ -233,7 +245,7 @@ let projectFile (x: SourceProject) =
 
 #if MONO
 #else
-#load "packages/SourceLink.Fake/tools/SourceLink.fsx"
+#load "packages/build/SourceLink.Fake/tools/SourceLink.fsx"
 
 open SourceLink
 
@@ -295,17 +307,13 @@ Target "Source.Clean" (fun _ ->
         "bin"
         "temp" ])
 
-Target "Source.Test" (fun _ ->
-    try
-        solution.Structure.Projects.Test
-        |> List.map (fun project -> testAssembly project)
-        |> NUnit (fun x ->
-            { x with
-                DisableShadowCopy = true
-                TimeOut = TimeSpan.FromMinutes 20.
-                OutputFile = "bin/TestResults.xml" })
-    finally
-        AppVeyor.UploadTestResultsXml AppVeyor.TestResultsType.NUnit "bin")
+Target "Source.Test" <| fun _ ->
+    solution.Structure.Projects.Test
+    |> List.map (fun project -> testAssembly project)
+    |> xUnit2 (fun p ->
+        { p with
+            TimeOut = TimeSpan.FromMinutes 20.
+            Parallel = All })
 
 (* Builds
 
@@ -325,7 +333,7 @@ Target "Publish" DoNothing
 (* Default *)
 
 "Source"
-=?> ("Publish.Debug", not isMono)
+// =?> ("Publish.Debug", not isMono)
 ==> "Publish.Pack"
 ==> "Default"
 

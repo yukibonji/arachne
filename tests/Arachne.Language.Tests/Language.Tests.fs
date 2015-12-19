@@ -1,10 +1,10 @@
 ﻿module Arachne.Language.Tests
 
-open NUnit.Framework
-open Arachne.Language
 open Arachne.Core.Tests
+open Arachne.Language
+open Xunit
 
-[<Test>]
+[<Fact>]
 let ``LanguageTag Formatting/Parsing`` () =
 
     (* Language *)
@@ -93,7 +93,7 @@ let ``LanguageTag Formatting/Parsing`` () =
 
     (* Round trip *)
 
-    roundTrip (LanguageTag.Format, LanguageTag.Parse) [
+    roundTrip (LanguageTag.format, LanguageTag.parse) [
         langTyped,                    langString
         langScriptTyped,              langScriptString
         langScriptRegionTyped,        langScriptRegionString

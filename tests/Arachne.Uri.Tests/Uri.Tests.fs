@@ -1,11 +1,10 @@
 ﻿module Arachne.Uri.Tests
 
-open System.Net
-open NUnit.Framework
-open Arachne.Uri
 open Arachne.Core.Tests
+open Arachne.Uri
+open Xunit
 
-[<Test>]
+[<Fact>]
 let ``Scheme Formatting/Parsing`` () =
     let schemeTyped =
         Scheme "http"
@@ -13,16 +12,16 @@ let ``Scheme Formatting/Parsing`` () =
     let schemeString =
         "http"
 
-    roundTrip (Scheme.Format, Scheme.Parse) [
+    roundTrip (Scheme.format, Scheme.parse) [
         schemeTyped, schemeString ]
 
-[<Test>]
+[<Fact>]
 let ``Authority Formatting/Parsing`` () =
     
     (* Host Only *)
 
     let hostTyped =
-        Authority.Authority (IPv4 (IPAddress.Parse "192.168.0.1"), None, None)
+        Authority.Authority (IPv4 "192.168.0.1", None, None)
 
     let hostString =
         "192.168.0.1"
@@ -30,7 +29,7 @@ let ``Authority Formatting/Parsing`` () =
     (* Host and Port *)
 
     let hostPortTyped =
-        Authority.Authority (IPv6 (IPAddress.Parse "2001:db8::ff00:42:8329"), Some (Port 8080), None)
+        Authority.Authority (IPv6 "2001:db8::ff00:42:8329", Some (Port 8080), None)
 
     let hostPortString =
         "[2001:db8::ff00:42:8329]:8080"
@@ -45,12 +44,12 @@ let ``Authority Formatting/Parsing`` () =
 
     (* Round Trip *)
 
-    roundTrip (Authority.Format, Authority.Parse) [
+    roundTrip (Authority.format, Authority.parse) [
         hostTyped,         hostString
         hostPortTyped,     hostPortString
         hostPortUserTyped, hostPortUserString ]
 
-[<Test>]
+[<Fact>]
 let ``PathAbsoluteOrEmpty Formatting/Parsing`` () =
 
     let pathAbEmptyFullTyped = 
@@ -65,11 +64,11 @@ let ``PathAbsoluteOrEmpty Formatting/Parsing`` () =
     let pathAbEmptyEmptyString =
         ""
 
-    roundTrip (PathAbsoluteOrEmpty.Format, PathAbsoluteOrEmpty.Parse) [
+    roundTrip (PathAbsoluteOrEmpty.format, PathAbsoluteOrEmpty.parse) [
         pathAbEmptyFullTyped,  pathAbEmptyFullString
         pathAbEmptyEmptyTyped, pathAbEmptyEmptyString ]
 
-[<Test>]
+[<Fact>]
 let ``PathAbsolute Formatting/Parsing`` () =
 
     let pathAbsoluteFullTyped = 
@@ -84,11 +83,11 @@ let ``PathAbsolute Formatting/Parsing`` () =
     let pathAbsoluteEmptyString =
         "/"
 
-    roundTrip (PathAbsolute.Format, PathAbsolute.Parse) [
+    roundTrip (PathAbsolute.format, PathAbsolute.parse) [
         pathAbsoluteFullTyped,  pathAbsoluteFullString
         pathAbsoluteEmptyTyped, pathAbsoluteEmptyString ]
 
-[<Test>]
+[<Fact>]
 let ``Uri Formatting/Parsing`` () =
 
     (* Authority Hierarchy *)
@@ -143,43 +142,43 @@ let ``Uri Formatting/Parsing`` () =
 
     (* Round Trip *)
 
-    roundTrip (Uri.Format, Uri.Parse) [ 
+    roundTrip (Uri.format, Uri.parse) [ 
         authorityTyped, authorityString
         rootlessTyped,  rootlessString
         absoluteTyped,  absoluteString
         emptyTyped,     emptyString ]
 
-[<Test>]
+[<Fact>]
 let ``Query Pairs``() =
     let expectedResult = Some ["param", Some("exists");"param1", Some("alsoexists")]
     let query = Query.Query("param=exists&param1=alsoexists")
-    let queryPairs = query |> fst Query.Pairs_
-    Assert.AreEqual(expectedResult, queryPairs)
+    let queryPairs = query |> fst Query.pairs_
+    Assert.Equal (expectedResult, queryPairs)
 
-[<Test>]
+[<Fact>]
 let ``Query Pairs with missing parameter value``() =
     let expectedResult = Some ["param", Some("exists");"param1", Some ("")]
     let query = Query.Query("param=exists&param1=")
-    let queryPairs = query |> fst Query.Pairs_
-    Assert.AreEqual(expectedResult, queryPairs)
+    let queryPairs = query |> fst Query.pairs_
+    Assert.Equal (expectedResult, queryPairs)
 
-[<Test>]
+[<Fact>]
 let ``Query Pairs with missing parameter value and equals sign``() =
     let expectedResult = Some ["param", Some("exists");"param1", None]
     let query = Query.Query("param=exists&param1")
-    let queryPairs = query |> fst Query.Pairs_
-    Assert.AreEqual(expectedResult, queryPairs)
+    let queryPairs = query |> fst Query.pairs_
+    Assert.Equal (expectedResult, queryPairs)
 
-[<Test>]
+[<Fact>]
 let ``Query Pairs with no query parameters``() =
     let expectedResult = None
     let query = Query.Query("")
-    let queryPairs = query |> fst Query.Pairs_
-    Assert.AreEqual(expectedResult, queryPairs)
+    let queryPairs = query |> fst Query.pairs_
+    Assert.Equal (expectedResult, queryPairs)
 
-[<Test>]
+[<Fact>]
 let ``Query Pairs with more than 1 & can be parsed``() =
     let expectedResult = Some ["param", Some("exists"); "", None; "param1", Some("alsoexists")]
     let query = Query.Query("param=exists&&param1=alsoexists")
-    let queryPairs = query |> fst Query.Pairs_
-    Assert.AreEqual(expectedResult, queryPairs)
+    let queryPairs = query |> fst Query.pairs_
+    Assert.Equal (expectedResult, queryPairs)

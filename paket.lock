@@ -1,11 +1,31 @@
-FRAMEWORK: NET45
 NUGET
   remote: https://nuget.org/api/v2
   specs:
-    FAKE (4.7.1)
     FParsec (1.0.2)
-    NuGet.CommandLine (2.8.6)
-    NUnit (2.6.4)
-    NUnit.Runners (2.6.4)
+
+GROUP Build
+NUGET
+  remote: http://nuget.org/api/v2
+  specs:
+    FAKE (4.10.5)
     SourceLink.Fake (1.1.0)
+
+GROUP Test
+FRAMEWORK: >= NET45
+NUGET
+  remote: http://nuget.org/api/v2
+  specs:
     Unquote (3.1.0)
+    xunit (2.1.0)
+      xunit.assert (2.1.0)
+      xunit.core (2.1.0)
+    xunit.abstractions (2.0.0)
+    xunit.assert (2.1.0)
+    xunit.core (2.1.0)
+      xunit.extensibility.core (2.1.0)
+      xunit.extensibility.execution (2.1.0)
+    xunit.extensibility.core (2.1.0)
+      xunit.abstractions (2.0.0)
+    xunit.extensibility.execution (2.1.0)
+      xunit.extensibility.core (2.1.0)
+    xunit.runner.console (2.1.0)

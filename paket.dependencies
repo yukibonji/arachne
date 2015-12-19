@@ -1,10 +1,14 @@
 source https://nuget.org/api/v2
-framework: net45
+nuget FParsec ~> 1
 
-nuget FAKE
-nuget NUnit
-nuget NUnit.Runners
-nuget Nuget.CommandLine
-nuget SourceLink.Fake
-nuget FParsec
-nuget Unquote
+group Build
+  source http://nuget.org/api/v2
+  nuget FAKE
+  nuget SourceLink.Fake
+
+group Test
+  framework: >= net45
+  source http://nuget.org/api/v2
+  nuget Unquote
+  nuget xunit
+  nuget xunit.runner.console

@@ -1,11 +1,11 @@
 ﻿module Arachne.Http.State.Tests
 
 open System
-open NUnit.Framework
 open Arachne.Core.Tests
 open Arachne.Http.State
+open Xunit
 
-[<Test>]
+[<Fact>]
 let ``Cookie Formatting/Parsing`` () =
     let cookieTyped =
         Cookie [
@@ -14,10 +14,10 @@ let ``Cookie Formatting/Parsing`` () =
     let cookieString =
         "test=value"
 
-    roundTrip (Cookie.Format, Cookie.Parse) [
+    roundTrip (Cookie.format, Cookie.parse) [
         cookieTyped, cookieString ]
 
-[<Test>]
+[<Fact>]
 let ``Multiple Cookie Formatting/Parsing`` () =
     let cookieTyped =
         Cookie [
@@ -27,10 +27,10 @@ let ``Multiple Cookie Formatting/Parsing`` () =
     let cookieString =
         "cookie1=foo; cookie2=bar"
 
-    roundTrip (Cookie.Format, Cookie.Parse) [
+    roundTrip (Cookie.format, Cookie.parse) [
         cookieTyped, cookieString ]
 
-[<Test>]
+[<Fact>]
 let ``Set-Cookie Formatting/Parsing`` () =
     let setCookieTyped =
         SetCookie (
@@ -46,5 +46,5 @@ let ``Set-Cookie Formatting/Parsing`` () =
     let setCookieString =
         "test=value; Expires=Sat, 29 Oct 1994 19:43:31 GMT; Max-Age=42; Domain=www.example.com; Path=/some/path; Secure; HttpOnly"
 
-    roundTrip (SetCookie.Format, SetCookie.Parse) [
+    roundTrip (SetCookie.format, SetCookie.parse) [
         setCookieTyped, setCookieString ]

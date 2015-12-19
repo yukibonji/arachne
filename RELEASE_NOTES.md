@@ -1,3 +1,7 @@
+### New in 3.0.0 - (Released TBD)
+* Naming convention changes
+* Portable library support (Profile259)
+
 ### New in 2.3.28 - (Released TBD)
 * 
 

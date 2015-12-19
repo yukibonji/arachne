@@ -1,13 +1,13 @@
 ﻿module Arachne.Http.Cors.Tests
 
 open System
-open NUnit.Framework
+open Arachne.Core.Tests
 open Arachne.Http
 open Arachne.Http.Cors
 open Arachne.Uri
-open Arachne.Core.Tests
+open Xunit
 
-[<Test>]
+[<Fact>]
 let ``Origin Formatting/Parsing`` () =
     let originTyped =
         Origin (
@@ -20,10 +20,10 @@ let ``Origin Formatting/Parsing`` () =
     let originString =
         "http://www.example.com:8080"
 
-    roundTrip (Origin.Format, Origin.Parse) [
+    roundTrip (Origin.format, Origin.parse) [
         originTyped, originString ]
 
-[<Test>]
+[<Fact>]
 let ``AccessControlAllowOrigin Formatting/Parsing`` () =
     let accessControlAllowOriginTyped =
         AccessControlAllowOrigin (
@@ -37,10 +37,10 @@ let ``AccessControlAllowOrigin Formatting/Parsing`` () =
     let accessControlAllowOriginString =
         "http://www.example.com:8080"
 
-    roundTrip (AccessControlAllowOrigin.Format, AccessControlAllowOrigin.Parse) [
+    roundTrip (AccessControlAllowOrigin.format, AccessControlAllowOrigin.parse) [
         accessControlAllowOriginTyped, accessControlAllowOriginString ]
 
-[<Test>]
+[<Fact>]
 let ``AccessControlAllowCredentials Formatting/Parsing`` () =
     let accessControlAllowCredentialsTyped =
         AccessControlAllowCredentials
@@ -48,10 +48,10 @@ let ``AccessControlAllowCredentials Formatting/Parsing`` () =
     let accessControlAllowCredentialsString =
         "true"
 
-    roundTrip (AccessControlAllowCredentials.Format, AccessControlAllowCredentials.Parse) [
+    roundTrip (AccessControlAllowCredentials.format, AccessControlAllowCredentials.parse) [
         accessControlAllowCredentialsTyped, accessControlAllowCredentialsString ]
 
-[<Test>]
+[<Fact>]
 let ``AccessControlExposeHeaders Formatting/Parsing`` () =
     let accessControlExposeHeadersTyped =
         AccessControlExposeHeaders [ "X-Custom-Header"; "X-Another-Header" ]
@@ -59,10 +59,10 @@ let ``AccessControlExposeHeaders Formatting/Parsing`` () =
     let accessControlExposeHeadersString =
         "X-Custom-Header,X-Another-Header"
 
-    roundTrip (AccessControlExposeHeaders.Format, AccessControlExposeHeaders.Parse) [
+    roundTrip (AccessControlExposeHeaders.format, AccessControlExposeHeaders.parse) [
         accessControlExposeHeadersTyped, accessControlExposeHeadersString ]
 
-[<Test>]
+[<Fact>]
 let ``AccessControlMaxAge Formatting/Parsing`` () =
     let accessControlMaxAgeTyped =
         AccessControlMaxAge (TimeSpan.FromSeconds (1024.))
@@ -70,10 +70,10 @@ let ``AccessControlMaxAge Formatting/Parsing`` () =
     let accessControlMaxAgeString =
         "1024"
 
-    roundTrip (AccessControlMaxAge.Format, AccessControlMaxAge.Parse) [
+    roundTrip (AccessControlMaxAge.format, AccessControlMaxAge.parse) [
         accessControlMaxAgeTyped, accessControlMaxAgeString ]
 
-[<Test>]
+[<Fact>]
 let ``AccessControlAllowMethods Formatting/Parsing`` () =
     let accessControlAllowMethodsTyped =
         AccessControlAllowMethods [ DELETE; PUT ]
@@ -81,10 +81,10 @@ let ``AccessControlAllowMethods Formatting/Parsing`` () =
     let accessControlAllowMethodsString =
         "DELETE,PUT"
 
-    roundTrip (AccessControlAllowMethods.Format, AccessControlAllowMethods.Parse) [
+    roundTrip (AccessControlAllowMethods.format, AccessControlAllowMethods.parse) [
         accessControlAllowMethodsTyped, accessControlAllowMethodsString ]
 
-[<Test>]
+[<Fact>]
 let ``AccessControlAllowHeaders Formatting/Parsing`` () =
     let accessControlAllowHeadersTyped =
         AccessControlAllowHeaders [ "X-Custom-Header"; "X-Another-Header" ]
@@ -92,10 +92,10 @@ let ``AccessControlAllowHeaders Formatting/Parsing`` () =
     let accessControlAllowHeadersString =
         "X-Custom-Header,X-Another-Header"
 
-    roundTrip (AccessControlAllowHeaders.Format, AccessControlAllowHeaders.Parse) [
+    roundTrip (AccessControlAllowHeaders.format, AccessControlAllowHeaders.parse) [
         accessControlAllowHeadersTyped, accessControlAllowHeadersString ]
 
-[<Test>]
+[<Fact>]
 let ``AccessControlRequestMethod Formatting/Parsing`` () =
     let accessControlRequestMethodTyped =
         AccessControlRequestMethod DELETE
@@ -103,10 +103,10 @@ let ``AccessControlRequestMethod Formatting/Parsing`` () =
     let accessControlRequestMethodString =
         "DELETE"
 
-    roundTrip (AccessControlRequestMethod.Format, AccessControlRequestMethod.Parse) [
+    roundTrip (AccessControlRequestMethod.format, AccessControlRequestMethod.parse) [
         accessControlRequestMethodTyped, accessControlRequestMethodString ]
 
-[<Test>]
+[<Fact>]
 let ``AccessControlRequestHeaders Formatting/Parsing`` () =
     let accessControlRequestHeadersTyped =
         AccessControlRequestHeaders [ "X-Custom-Header"; "X-Another-Header" ]
@@ -114,5 +114,5 @@ let ``AccessControlRequestHeaders Formatting/Parsing`` () =
     let accessControlRequestHeadersString =
         "X-Custom-Header,X-Another-Header"
 
-    roundTrip (AccessControlRequestHeaders.Format, AccessControlRequestHeaders.Parse) [
+    roundTrip (AccessControlRequestHeaders.format, AccessControlRequestHeaders.parse) [
         accessControlRequestHeadersTyped, accessControlRequestHeadersString ]

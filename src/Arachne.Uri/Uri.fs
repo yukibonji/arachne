@@ -18,11 +18,9 @@
 //
 //----------------------------------------------------------------------------
 
-namespace Arachne.Uri
+module Arachne.Uri
 
 open System
-open System.Net
-open System.Net.Sockets
 open System.Runtime.CompilerServices
 open System.Text
 open Arachne.Core
@@ -99,7 +97,7 @@ module PercentEncoding =
         Encoding.UTF8.GetBytes >> List.ofArray
 
     let private toString : byte list -> string =
-        List.toArray >> Encoding.UTF8.GetString
+        List.toArray >> fun x -> Encoding.UTF8.GetString (x, 0, x.Length)
 
     (* Indices
 
@@ -108,8 +106,7 @@ module PercentEncoding =
 
     let private hex =
         [ 0x00 .. 0xff ]
-        |> List.map byte
-        |> List.map (fun i -> i, toBytes (i.ToString "X2"))
+        |> List.map (byte >> fun i -> i, toBytes (i.ToString "X2"))
 
     let private byteIndex =
         hex
@@ -172,12 +169,12 @@ module internal IPAddress =
 
     let ipv6AddressP =
         skipChar '[' >>. (many1Satisfy (int >> isIpv6Char) >>= (fun x ->
-            match IPAddress.TryParse x with
-            | true, x when x.AddressFamily = AddressFamily.InterNetworkV6 -> preturn x
+            match Uri.CheckHostName x with
+            | UriHostNameType.IPv6 -> preturn x
             | _ -> pzero)) .>> skipChar ']'
 
-    let ipv6AddressF (x: IPAddress) =
-        append "[" >> append (string x) >> append "]"
+    let ipv6AddressF x =
+        append "[" >> append x >> append "]"
 
     let private isIpv4Char i =
             Grammar.isDigit i
@@ -185,12 +182,12 @@ module internal IPAddress =
 
     let ipv4AddressP =
         many1Satisfy (int >> isIpv4Char) >>= (fun x ->
-            match IPAddress.TryParse x with
-            | true, x when x.AddressFamily = AddressFamily.InterNetwork -> preturn x
+            match Uri.CheckHostName x with
+            | UriHostNameType.IPv4 -> preturn x
             | _ -> pzero)
 
-    let ipv4AddressF (x: IPAddress) =
-        append (string x)
+    let ipv4AddressF x =
+        append x
 
 (* Scheme
 
@@ -221,24 +218,24 @@ type Scheme =
         { Parse = schemeP
           Format = schemeF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Scheme_ =
-        (fun (Scheme s) -> s), (fun s -> Scheme s)
+    static member scheme_ =
+        (fun (Scheme s) -> s), (Scheme)
 
     (* Common *)
 
-    static member Format =
-        Formatting.format Scheme.Mapping.Format
+    static member format =
+        Mapping.format Scheme.Mapping
 
-    static member Parse =
-        Parsing.parse Scheme.Mapping.Parse
+    static member parse =
+        Mapping.parse Scheme.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Scheme.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Scheme.Mapping
 
     override x.ToString () =
-        Scheme.Format x
+        Scheme.format x
 
 (* Authority
 
@@ -272,34 +269,37 @@ type Authority =
         { Parse = authorityP
           Format = authorityF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Host_ =
-        (fun (Authority (h, _, _)) -> h), (fun h (Authority (_, p, u)) -> Authority (h, p, u))
+    static member host_ =
+        (fun (Authority (h, _, _)) -> h),
+        (fun h (Authority (_, p, u)) -> Authority (h, p, u))
 
-    static member Port_ =
-        (fun (Authority (_, p, _)) -> p), (fun p (Authority (h, _, u)) -> Authority (h, Some p, u))
+    static member port_ =
+        (fun (Authority (_, p, _)) -> p),
+        (fun p (Authority (h, _, u)) -> Authority (h, Some p, u))
 
-    static member UserInfo_ =
-        (fun (Authority (_, _, u)) -> u), (fun u (Authority (h, p, _)) -> Authority (h, p, Some u))
+    static member userInfo_ =
+        (fun (Authority (_, _, u)) -> u),
+        (fun u (Authority (h, p, _)) -> Authority (h, p, Some u))
 
     (* Common *)
 
-    static member Format =
-        Formatting.format Authority.Mapping.Format
+    static member format =
+        Mapping.format Authority.Mapping
 
-    static member Parse =
-        Parsing.parse Authority.Mapping.Parse
+    static member parse =
+        Mapping.parse Authority.Mapping
     
-    static member TryParse =
-        Parsing.tryParse Authority.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Authority.Mapping
 
     override x.ToString () =
-        Authority.Format x
+        Authority.format x
 
 (* Section 3.2.1 *)
 
-and UserInfo =
+ and UserInfo =
     | UserInfo of string
 
     static member internal Mapping =
@@ -324,10 +324,10 @@ and UserInfo =
         { Parse = userInfoP
           Format = userInfoF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member UserInfo_ =
-        (fun (UserInfo u) -> u), (fun u -> UserInfo u)
+    static member userInfo_ =
+        (fun (UserInfo u) -> u), (UserInfo)
 
 (* Section 3.2.2 *)
 
@@ -338,9 +338,9 @@ and UserInfo =
    implementing IP-literal as an IPv6 specific type, discarding IPvFuture. As
    it stands, that's unlikely to be an issue, but could perhaps be revisited. *)
 
-and Host =
-    | IPv4 of IPAddress
-    | IPv6 of IPAddress
+ and Host =
+    | IPv4 of string
+    | IPv6 of string
     | Name of RegName
 
     static member internal Mapping =
@@ -359,18 +359,18 @@ and Host =
         { Parse = hostP
           Format = hostF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member IPv4_ =
-        (function | IPv4 i -> Some i | _ -> None), (fun i -> IPv4 i)
+    static member ipv4_ =
+        (function | IPv4 i -> Some i | _ -> None), (IPv4)
 
-    static member IPv6_ =
-        (function | IPv6 i -> Some i | _ -> None), (fun i -> IPv6 i)
+    static member ipv6_ =
+        (function | IPv6 i -> Some i | _ -> None), (IPv6)
 
-    static member Name_ =
-        (function | Name n -> Some n | _ -> None), (fun n -> Name n)
+    static member name_ =
+        (function | Name n -> Some n | _ -> None), (Name)
 
-and RegName =
+ and RegName =
     | RegName of string
 
     static member internal Mapping =
@@ -394,12 +394,12 @@ and RegName =
         { Parse = regNameP
           Format = regNameF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member RegName_ =
-        (fun (RegName n) -> n), (fun n -> RegName n)
+    static member regName_ =
+        (fun (RegName n) -> n), (RegName)
 
-and Port =
+ and Port =
     | Port of int
 
     static member internal Mapping =
@@ -414,10 +414,10 @@ and Port =
         { Parse = portP
           Format = portF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Port_ =
-        (fun (Port p) -> p), (fun p -> Port p)
+    static member port_ =
+        (fun (Port p) -> p), (Port)
 
 (* Path
 
@@ -463,24 +463,24 @@ type PathAbsoluteOrEmpty =
         { Parse = pathAbsoluteOrEmptyP
           Format = pathAbsoluteOrEmptyF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member PathAbsoluteOrEmpty_ =
-        (fun (PathAbsoluteOrEmpty p) -> p), (fun p -> PathAbsoluteOrEmpty p)
+    static member pathAbsoluteOrEmpty_ =
+        (fun (PathAbsoluteOrEmpty p) -> p), (PathAbsoluteOrEmpty)
 
     (* Common *)
 
-    static member Format =
-        Formatting.format PathAbsoluteOrEmpty.Mapping.Format
+    static member format =
+        Mapping.format PathAbsoluteOrEmpty.Mapping
 
-    static member Parse =
-        Parsing.parse PathAbsoluteOrEmpty.Mapping.Parse
+    static member parse =
+        Mapping.parse PathAbsoluteOrEmpty.Mapping
 
-    static member TryParse =
-        Parsing.tryParse PathAbsoluteOrEmpty.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse PathAbsoluteOrEmpty.Mapping
 
     override x.ToString () =
-        PathAbsoluteOrEmpty.Format x
+        PathAbsoluteOrEmpty.format x
 
 (* Absolute *)
 
@@ -500,24 +500,24 @@ type PathAbsolute =
         { Parse = pathAbsoluteP
           Format = pathAbsoluteF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member PathAbsolute_ =
-        (fun (PathAbsolute p) -> p), (fun p -> PathAbsolute p)
+    static member pathAbsolute_ =
+        (fun (PathAbsolute p) -> p), (PathAbsolute)
 
     (* Common *)
 
-    static member Format =
-        Formatting.format PathAbsolute.Mapping.Format
+    static member format =
+        Mapping.format PathAbsolute.Mapping
 
-    static member Parse =
-        Parsing.parse PathAbsolute.Mapping.Parse
+    static member parse =
+        Mapping.parse PathAbsolute.Mapping
 
-    static member TryParse =
-        Parsing.tryParse PathAbsolute.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse PathAbsolute.Mapping
 
     override x.ToString () =
-        PathAbsolute.Format x
+        PathAbsolute.format x
 
 (* No Scheme *)
 
@@ -537,24 +537,24 @@ type PathNoScheme =
         { Parse = pathNoSchemeP
           Format = pathNoSchemeF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member PathNoScheme_ =
-        (fun (PathNoScheme p) -> p), (fun p -> PathNoScheme p)
+    static member pathNoScheme_ =
+        (fun (PathNoScheme p) -> p), (PathNoScheme)
 
     (* Common *)
 
-    static member Format =
-        Formatting.format PathNoScheme.Mapping.Format
+    static member format =
+        Mapping.format PathNoScheme.Mapping
 
-    static member Parse =
-        Parsing.parse PathNoScheme.Mapping.Parse
+    static member parse =
+        Mapping.parse PathNoScheme.Mapping
 
-    static member TryParse =
-        Parsing.tryParse PathNoScheme.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse PathNoScheme.Mapping
 
     override x.ToString () =
-        PathNoScheme.Format x
+        PathNoScheme.format x
 
 (* Rootless *)
 
@@ -574,24 +574,24 @@ type PathRootless =
         { Parse = pathRootlessP
           Format = pathRootlessF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member PathRootless_ =
-        (fun (PathRootless p) -> p), (fun p -> PathRootless p)
+    static member pathRootless_ =
+        (fun (PathRootless p) -> p), (PathRootless)
 
     (* Common *)
 
-    static member Format =
-        Formatting.format PathRootless.Mapping.Format
+    static member format =
+        Mapping.format PathRootless.Mapping
 
-    static member Parse =
-        Parsing.parse PathRootless.Mapping.Parse
+    static member parse =
+        Mapping.parse PathRootless.Mapping
 
-    static member TryParse =
-        Parsing.tryParse PathRootless.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse PathRootless.Mapping
 
     override x.ToString () =
-        PathRootless.Format x
+        PathRootless.format x
 
 (* Query
 
@@ -623,12 +623,12 @@ type Query =
         { Parse = queryP
           Format = queryF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Query_ =
-        (fun (Query q) -> q), (fun q -> Query q)
+    static member query_ =
+        (fun (Query q) -> q), (Query)
 
-    static member Pairs_ =
+    static member pairs_ =
 
         let isEqualsOrAmpersand i =
                 i = 0x3d // =
@@ -655,21 +655,28 @@ type Query =
         let pairsF =
             join pairF (append "&")
 
-        (fun (Query q) -> if String.IsNullOrWhiteSpace q then None else Parsing.tryParse pairsP q), (fun q -> Query (Formatting.format pairsF q))
+        (fun (Query q) ->
+            match q with
+            | q when String.IsNullOrWhiteSpace q -> None
+            | q ->
+                match run pairsP q with
+                | Success (x, _, _) -> Some x
+                | Failure (_) -> None),
+        ((fun a -> string (pairsF a (StringBuilder ()))) >> Query)
 
     (* Common *)
 
-    static member Format =
-        Formatting.format Query.Mapping.Format
+    static member format =
+        Mapping.format Query.Mapping
 
-    static member Parse =
-        Parsing.parse Query.Mapping.Parse
+    static member parse =
+        Mapping.parse Query.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Query.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Query.Mapping
 
     override x.ToString () =
-        Query.Format x
+        Query.format x
 
 (* Fragment
 
@@ -701,24 +708,24 @@ type Fragment =
         { Parse = fragmentP
           Format = fragmentF }
 
-    (* Lenses*)
+    (* Optics*)
 
-    static member Fragment_ =
-        (fun (Fragment f) -> f), (fun f -> Fragment f)
+    static member fragment_ =
+        (fun (Fragment f) -> f), (Fragment)
 
     (* Common *)
 
-    static member Format =
-        Formatting.format Fragment.Mapping.Format
+    static member format =
+        Mapping.format Fragment.Mapping
 
-    static member Parse =
-        Parsing.parse Fragment.Mapping.Parse
+    static member parse =
+        Mapping.parse Fragment.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Fragment.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Fragment.Mapping
 
     override x.ToString () =
-        Fragment.Format x
+        Fragment.format x
 
 (* URI
 
@@ -769,35 +776,39 @@ type Uri =
         { Parse = uriP
           Format = uriF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Scheme_ =
-        (fun (Uri (s, _, _, _)) -> s), (fun s (Uri (_, h, q, f)) -> Uri (s, h, q, f))
+    static member scheme_ =
+        (fun (Uri (s, _, _, _)) -> s),
+        (fun s (Uri (_, h, q, f)) -> Uri (s, h, q, f))
 
-    static member HierarchyPart_ =
-        (fun (Uri (_, h, _, _)) -> h), (fun h (Uri (s, _, q, f)) -> Uri (s, h, q, f))
+    static member hierarchyPart_ =
+        (fun (Uri (_, h, _, _)) -> h),
+        (fun h (Uri (s, _, q, f)) -> Uri (s, h, q, f))
 
-    static member Query_ =
-        (fun (Uri (_, _, q, _)) -> q), (fun q (Uri (s, h, _, f)) -> Uri (s, h, Some q, f))
+    static member query_ =
+        (fun (Uri (_, _, q, _)) -> q),
+        (fun q (Uri (s, h, _, f)) -> Uri (s, h, Some q, f))
 
-    static member Fragment_ =
-        (fun (Uri (_, _, _, f)) -> f), (fun f (Uri (s, h, q, _)) -> Uri (s, h, q, Some f))
+    static member fragment_ =
+        (fun (Uri (_, _, _, f)) -> f),
+        (fun f (Uri (s, h, q, _)) -> Uri (s, h, q, Some f))
 
     (* Common *)
 
-    static member Format =
-        Formatting.format Uri.Mapping.Format
+    static member format =
+        Mapping.format Uri.Mapping
 
-    static member Parse =
-        Parsing.parse Uri.Mapping.Parse
+    static member parse =
+        Mapping.parse Uri.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Uri.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Uri.Mapping
 
     override x.ToString () =
-        Uri.Format x
+        Uri.format x
 
-and HierarchyPart =
+ and HierarchyPart =
     | Authority of Authority * PathAbsoluteOrEmpty
     | Absolute of PathAbsolute
     | Rootless of PathRootless
@@ -831,18 +842,18 @@ and HierarchyPart =
         { Parse = hierarchyPartP
           Format = hierarchyPartF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Authority_ =
+    static member authority_ =
         (function | Authority (a, p) -> Some (a, p) | _ -> None), (fun (a, p) -> Authority (a, p))
 
-    static member Absolute_ =
-        (function | Absolute p -> Some p | _ -> None), (fun p -> Absolute p)
+    static member absolute_ =
+        (function | Absolute p -> Some p | _ -> None), (Absolute)
 
-    static member Rootless_ =
-        (function | Rootless p -> Some p | _ -> None), (fun p -> Rootless p)
+    static member rootless_ =
+        (function | Rootless p -> Some p | _ -> None), (Rootless)
 
-    static member Empty_ =
+    static member empty_ =
         (function | Empty -> Some () | _ -> None), (fun () -> Empty)
 
 (* Relative Reference
@@ -876,32 +887,35 @@ type RelativeReference =
         { Parse = relativeReferenceP
           Format = relativeReferenceF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member RelativePart_ =
-        (fun (RelativeReference (r, _, _)) -> r), (fun r (RelativeReference (_, q, f)) -> RelativeReference (r, q, f))
+    static member relativePart_ =
+        (fun (RelativeReference (r, _, _)) -> r),
+        (fun r (RelativeReference (_, q, f)) -> RelativeReference (r, q, f))
 
-    static member Query_ =
-        (fun (RelativeReference (_, q, _)) -> q), (fun q (RelativeReference (r, _, f)) -> RelativeReference (r, Some q, f))
+    static member query_ =
+        (fun (RelativeReference (_, q, _)) -> q),
+        (fun q (RelativeReference (r, _, f)) -> RelativeReference (r, Some q, f))
 
-    static member Fragment_ =
-        (fun (RelativeReference (_, _, f)) -> f), (fun f (RelativeReference (r, q, _)) -> RelativeReference (r, q, Some f))
+    static member fragment_ =
+        (fun (RelativeReference (_, _, f)) -> f),
+        (fun f (RelativeReference (r, q, _)) -> RelativeReference (r, q, Some f))
 
     (* Common *)
 
-    static member Format =
-        Formatting.format RelativeReference.Mapping.Format
+    static member format =
+        Mapping.format RelativeReference.Mapping
 
-    static member Parse =
-        Parsing.parse RelativeReference.Mapping.Parse
+    static member parse =
+        Mapping.parse RelativeReference.Mapping
 
-    static member TryParse =
-        Parsing.tryParse RelativeReference.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse RelativeReference.Mapping
 
     override x.ToString () =
-        RelativeReference.Format x
+        RelativeReference.format x
 
-and RelativePart =
+ and RelativePart =
     | Authority of Authority * PathAbsoluteOrEmpty
     | Absolute of PathAbsolute
     | NoScheme of PathNoScheme
@@ -935,18 +949,18 @@ and RelativePart =
         { Parse = relativePartP
           Format = relativePartF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Authority_ =
+    static member authority_ =
         (function | Authority (a, p) -> Some (a, p) | _ -> None), (fun (a, p) -> Authority (a, p))
 
-    static member Absolute_ =
-        (function | Absolute p -> Some p | _ -> None), (fun p -> Absolute p)
+    static member absolute_ =
+        (function | Absolute p -> Some p | _ -> None), (Absolute)
 
-    static member NoScheme_ =
-        (function | NoScheme p -> Some p | _ -> None), (fun p -> NoScheme p)
+    static member noScheme_ =
+        (function | NoScheme p -> Some p | _ -> None), (NoScheme)
 
-    static member Empty_ =
+    static member empty_ =
         (function | Empty -> Some () | _ -> None), (fun () -> Empty)
 
 (* Absolute URI
@@ -980,30 +994,33 @@ type AbsoluteUri =
         { Parse = absoluteUriP
           Format = absoluteUriF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Scheme_ =
-        (fun (AbsoluteUri (s, _, _)) -> s), (fun s (AbsoluteUri (_, h, q)) -> AbsoluteUri (s, h, q))
+    static member scheme_ =
+        (fun (AbsoluteUri (s, _, _)) -> s),
+        (fun s (AbsoluteUri (_, h, q)) -> AbsoluteUri (s, h, q))
 
-    static member HierarchyPart_ =
-        (fun (AbsoluteUri (_, h, _)) -> h), (fun h (AbsoluteUri (s, _, q)) -> AbsoluteUri (s, h, q))
+    static member hierarchyPart_ =
+        (fun (AbsoluteUri (_, h, _)) -> h),
+        (fun h (AbsoluteUri (s, _, q)) -> AbsoluteUri (s, h, q))
 
-    static member Query_ =
-        (fun (AbsoluteUri (_, _, q)) -> q), (fun q (AbsoluteUri (s, h, _)) -> AbsoluteUri (s, h, Some q))
+    static member query_ =
+        (fun (AbsoluteUri (_, _, q)) -> q),
+        (fun q (AbsoluteUri (s, h, _)) -> AbsoluteUri (s, h, Some q))
 
     (* Common *)
 
-    static member Format =
-        Formatting.format AbsoluteUri.Mapping.Format
+    static member format =
+        Mapping.format AbsoluteUri.Mapping
 
-    static member Parse =
-        Parsing.parse AbsoluteUri.Mapping.Parse
+    static member parse =
+        Mapping.parse AbsoluteUri.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AbsoluteUri.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AbsoluteUri.Mapping
 
     override x.ToString () =
-        AbsoluteUri.Format x
+        AbsoluteUri.format x
 
 (* URI Reference
 
@@ -1028,24 +1045,24 @@ type UriReference =
         { Parse = uriReferenceP
           Format = uriReferenceF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Uri_ =
-        (function | Uri u -> Some u | _ -> None), (fun u -> Uri u)
+    static member uri_ =
+        (function | Uri u -> Some u | _ -> None), (Uri)
 
-    static member Relative_ =
-        (function | Relative r -> Some r | _ -> None), (fun r -> Relative r)
+    static member relative_ =
+        (function | Relative r -> Some r | _ -> None), (Relative)
 
     (* Common *)
 
-    static member Format =
-        Formatting.format UriReference.Mapping.Format
+    static member format =
+        Mapping.format UriReference.Mapping
 
-    static member Parse =
-        Parsing.parse UriReference.Mapping.Parse
+    static member parse =
+        Mapping.parse UriReference.Mapping
 
-    static member TryParse =
-        Parsing.tryParse UriReference.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse UriReference.Mapping
 
     override x.ToString () =
-        UriReference.Format x
+        UriReference.format x

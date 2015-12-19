@@ -18,7 +18,7 @@
 //
 //----------------------------------------------------------------------------
 
-namespace Arachne.Http.Cors
+module Arachne.Http.Cors
 
 open System
 open Arachne.Core
@@ -55,17 +55,17 @@ type Origin =
         { Parse = originP
           Format = originF }
 
-    static member Format =
-        Formatting.format Origin.Mapping.Format
+    static member format =
+        Mapping.format Origin.Mapping
 
-    static member Parse =
-        Parsing.parse Origin.Mapping.Parse
+    static member parse =
+        Mapping.parse Origin.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Origin.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Origin.Mapping
 
     override x.ToString () =
-        Origin.Format x
+        Origin.format x
 
 and OriginListOrNull =
     | Origins of SerializedOrigin list
@@ -140,17 +140,17 @@ type AccessControlAllowOrigin =
         { Parse = accessControlAllowOriginP
           Format = accessControlAllowOriginF }
 
-    static member Format =
-        Formatting.format AccessControlAllowOrigin.Mapping.Format
+    static member format =
+        Mapping.format AccessControlAllowOrigin.Mapping
 
-    static member Parse =
-        Parsing.parse AccessControlAllowOrigin.Mapping.Parse
+    static member parse =
+        Mapping.parse AccessControlAllowOrigin.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AccessControlAllowOrigin.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AccessControlAllowOrigin.Mapping
 
     override x.ToString () =
-        AccessControlAllowOrigin.Format x
+        AccessControlAllowOrigin.format x
 
 and AccessControlAllowOriginRange =
     | Origins of OriginListOrNull
@@ -175,17 +175,17 @@ type AccessControlAllowCredentials =
         { Parse = accessControlAllowCredentialsP
           Format = accessControlAllowCredentialsF }
 
-    static member Format =
-        Formatting.format AccessControlAllowCredentials.Mapping.Format
+    static member format =
+        Mapping.format AccessControlAllowCredentials.Mapping
 
-    static member Parse =
-        Parsing.parse AccessControlAllowCredentials.Mapping.Parse
+    static member parse =
+        Mapping.parse AccessControlAllowCredentials.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AccessControlAllowCredentials.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AccessControlAllowCredentials.Mapping
 
     override x.ToString () =
-        AccessControlAllowCredentials.Format x
+        AccessControlAllowCredentials.format x
 
 (* Access-Control-Expose-Headers
 
@@ -206,17 +206,17 @@ type AccessControlExposeHeaders =
         { Parse = accessControlExposeHeadersP
           Format = accessControlExposeHeadersF }
 
-    static member Format =
-        Formatting.format AccessControlExposeHeaders.Mapping.Format
+    static member format =
+        Mapping.format AccessControlExposeHeaders.Mapping
 
-    static member Parse =
-        Parsing.parse AccessControlExposeHeaders.Mapping.Parse
+    static member parse =
+        Mapping.parse AccessControlExposeHeaders.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AccessControlExposeHeaders.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AccessControlExposeHeaders.Mapping
 
     override x.ToString () =
-        AccessControlExposeHeaders.Format x
+        AccessControlExposeHeaders.format x
 
 (* Access-Control-Max-Age
 
@@ -237,17 +237,17 @@ type AccessControlMaxAge =
         { Parse = accessControlMaxAgeP
           Format = accessControlMaxAgeF }
 
-    static member Format =
-        Formatting.format AccessControlMaxAge.Mapping.Format
+    static member format =
+        Mapping.format AccessControlMaxAge.Mapping
 
-    static member Parse =
-        Parsing.parse AccessControlMaxAge.Mapping.Parse
+    static member parse =
+        Mapping.parse AccessControlMaxAge.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AccessControlMaxAge.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AccessControlMaxAge.Mapping
 
     override x.ToString () =
-        AccessControlMaxAge.Format x
+        AccessControlMaxAge.format x
 
 (* Access-Control-Allow-Methods
 
@@ -268,17 +268,17 @@ type AccessControlAllowMethods =
         { Parse = accessControlAllowMethodsP
           Format = accessControlAllowMethodsF }
 
-    static member Format =
-        Formatting.format AccessControlAllowMethods.Mapping.Format
+    static member format =
+        Mapping.format AccessControlAllowMethods.Mapping
 
-    static member Parse =
-        Parsing.parse AccessControlAllowMethods.Mapping.Parse
+    static member parse =
+        Mapping.parse AccessControlAllowMethods.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AccessControlAllowMethods.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AccessControlAllowMethods.Mapping
 
     override x.ToString () =
-        AccessControlAllowMethods.Format x
+        AccessControlAllowMethods.format x
 
 (* Access-Control-Allow-Headers
 
@@ -299,17 +299,17 @@ type AccessControlAllowHeaders =
         { Parse = accessControlAllowHeadersP
           Format = accessControlAllowHeadersF }
 
-    static member Format =
-        Formatting.format AccessControlAllowHeaders.Mapping.Format
+    static member format =
+        Mapping.format AccessControlAllowHeaders.Mapping
 
-    static member Parse =
-        Parsing.parse AccessControlAllowHeaders.Mapping.Parse
+    static member parse =
+        Mapping.parse AccessControlAllowHeaders.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AccessControlAllowHeaders.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AccessControlAllowHeaders.Mapping
 
     override x.ToString () =
-        AccessControlAllowHeaders.Format x
+        AccessControlAllowHeaders.format x
 
 (* Access-Control-Request-Method
 
@@ -330,17 +330,17 @@ type AccessControlRequestMethod =
         { Parse = accessControlRequestMethodP
           Format = accessControlRequestMethodF }
 
-    static member Format =
-        Formatting.format AccessControlRequestMethod.Mapping.Format
+    static member format =
+        Mapping.format AccessControlRequestMethod.Mapping
 
-    static member Parse =
-        Parsing.parse AccessControlRequestMethod.Mapping.Parse
+    static member parse =
+        Mapping.parse AccessControlRequestMethod.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AccessControlRequestMethod.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AccessControlRequestMethod.Mapping
 
     override x.ToString () =
-        AccessControlRequestMethod.Format x
+        AccessControlRequestMethod.format x
 
 (* Access-Control-Request-Headers
 
@@ -361,14 +361,14 @@ type AccessControlRequestHeaders =
         { Parse = accessControlRequestHeadersP
           Format = accessControlRequestHeadersF }
 
-    static member Format =
-        Formatting.format AccessControlRequestHeaders.Mapping.Format
+    static member format =
+        Mapping.format AccessControlRequestHeaders.Mapping
 
-    static member Parse =
-        Parsing.parse AccessControlRequestHeaders.Mapping.Parse
+    static member parse =
+        Mapping.parse AccessControlRequestHeaders.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AccessControlRequestHeaders.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AccessControlRequestHeaders.Mapping
 
     override x.ToString () =
-        AccessControlRequestHeaders.Format x
+        AccessControlRequestHeaders.format x
