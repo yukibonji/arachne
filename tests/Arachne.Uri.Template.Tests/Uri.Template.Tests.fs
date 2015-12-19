@@ -30,10 +30,10 @@ let data =
             Key "empty_keys", Keys [] ])
 
 let matches uri path data =
-    UriTemplate.Parse(uri).Match(path) =? UriTemplateData (Map.ofList data)
+    UriTemplate.parse(uri).Match(path) =? UriTemplateData (Map.ofList data)
 
 let (=?) str1 str2 =
-    UriTemplate.Parse(str1).Render(data) =? str2
+    UriTemplate.parse(str1).Render(data) =? str2
 
 
 (* Illustrative Examples

@@ -20,7 +20,7 @@ let ``PartialUri Formatting/Parsing`` () =
     let partialUriString =
         "/some/path?key=val"
 
-    roundTrip (PartialUri.Format, PartialUri.Parse) [
+    roundTrip (PartialUri.format, PartialUri.parse) [
         partialUriTyped, partialUriString ]
 
 [<Fact>]
@@ -29,7 +29,7 @@ let ``HttpVersion Formatting/Parsing`` () =
     let httpVersionTyped = HTTP 1.1
     let httpVersionString = "HTTP/1.1"
 
-    roundTrip (HttpVersion.Format, HttpVersion.Parse) [
+    roundTrip (HttpVersion.format, HttpVersion.parse) [
         httpVersionTyped, httpVersionString ]
 
 [<Fact>]
@@ -38,7 +38,7 @@ let ``ContentLength Formatting/Parsing`` () =
     let contentLengthTyped = ContentLength 1024
     let contentLengthString = "1024"
 
-    roundTrip (ContentLength.Format, ContentLength.Parse) [
+    roundTrip (ContentLength.format, ContentLength.parse) [
         contentLengthTyped, contentLengthString ]
 
 [<Fact>]
@@ -47,7 +47,7 @@ let ``Host Formatting/Parsing`` () =
     let hostTyped = Host (Name (RegName "www.example.com"), Some (Port 8080))
     let hostString = "www.example.com:8080"
 
-    roundTrip (Host.Format, Host.Parse) [
+    roundTrip (Host.format, Host.parse) [
         hostTyped, hostString ]
 
 [<Fact>]
@@ -56,7 +56,7 @@ let ``Connection Formatting/Parsing`` () =
     let connectionTyped = Connection ([ ConnectionOption "close"; ConnectionOption "test" ])
     let connectionString = "close,test"
 
-    roundTrip (Connection.Format, Connection.Parse) [
+    roundTrip (Connection.format, Connection.parse) [
         connectionTyped, connectionString ]
 
 (* RFC 7231 *)
@@ -73,7 +73,7 @@ let ``MediaType Formatting/Parsing`` () =
     let mediaTypeString =
         "application/json;charset=utf-8"
 
-    roundTrip (MediaType.Format, MediaType.Parse) [
+    roundTrip (MediaType.format, MediaType.parse) [
         mediaTypeTyped, mediaTypeString ]
 
 [<Fact>]
@@ -89,7 +89,7 @@ let ``ContentType Formatting/Parsing`` () =
     let contentTypeString =
         "application/json;charset=utf-8"
 
-    roundTrip (ContentType.Format, ContentType.Parse) [
+    roundTrip (ContentType.format, ContentType.parse) [
         contentTypeTyped, contentTypeString ]
 
 [<Fact>]
@@ -103,7 +103,7 @@ let ``ContentEncoding Formatting/Parsing`` () =
     let contentEncodingString =
         "compress,deflate"
 
-    roundTrip (ContentEncoding.Format, ContentEncoding.Parse) [
+    roundTrip (ContentEncoding.format, ContentEncoding.parse) [
         contentEncodingTyped, contentEncodingString ]
 
 [<Fact>]
@@ -125,7 +125,7 @@ let ``ContentLanguage Formatting/Parsing`` () =
     let contentLanguageString =
         "en-GB,hy-Latn-IT-arvela"
 
-    roundTrip (ContentLanguage.Format, ContentLanguage.Parse) [
+    roundTrip (ContentLanguage.format, ContentLanguage.parse) [
         contentLanguageTyped, contentLanguageString ]
 
 [<Fact>]
@@ -142,26 +142,26 @@ let ``ContentLocation Formatting/Parsing`` () =
     let contentLocationString =
         "http:/some/path"
 
-    roundTrip (ContentLocation.Format, ContentLocation.Parse) [
+    roundTrip (ContentLocation.format, ContentLocation.parse) [
         contentLocationTyped, contentLocationString ]
 
 [<Fact>]
 let ``Method Formatting/Parsing`` () =
 
-    roundTrip (Method.Format, Method.Parse) [
+    roundTrip (Method.format, Method.parse) [
         Method.GET, "GET"
         Method.Custom "PATCH", "PATCH" ]
 
 [<Fact>]
 let ``Expect Formatting/Parsing`` () =
 
-    roundTrip (Expect.Format, Expect.Parse) [
+    roundTrip (Expect.format, Expect.parse) [
         Expect (Continue), "100-continue" ]
 
 [<Fact>]
 let ``MaxForwards Formatting/Parsing`` () =
     
-    roundTrip (MaxForwards.Format, MaxForwards.Parse) [
+    roundTrip (MaxForwards.format, MaxForwards.parse) [
         MaxForwards 10, "10" ]
 
 [<Fact>]
@@ -182,7 +182,7 @@ let ``Accept Formatting/Parsing`` () =
     let acceptString =
         "application/json;q=0.7,text/*;q=0.5,*/*"
 
-    roundTrip (Accept.Format, Accept.Parse) [
+    roundTrip (Accept.format, Accept.parse) [
         acceptTyped, acceptString ]
 
 [<Fact>]
@@ -200,7 +200,7 @@ let ``AcceptCharset Formatting/Parsing`` () =
     let acceptCharsetString =
         "utf-8;q=0.7,*;q=0.2"
 
-    roundTrip (AcceptCharset.Format, AcceptCharset.Parse) [
+    roundTrip (AcceptCharset.format, AcceptCharset.parse) [
         acceptCharsetTyped, acceptCharsetString ]
 
 [<Fact>]
@@ -221,7 +221,7 @@ let ``AcceptEncoding Formatting/Parsing`` () =
     let acceptEncodingString =
         "compress;q=0.8,identity,*;q=0.3"
 
-    roundTrip (AcceptEncoding.Format, AcceptEncoding.Parse) [
+    roundTrip (AcceptEncoding.format, AcceptEncoding.parse) [
         acceptEncodingTyped, acceptEncodingString ]
 
 [<Fact>]
@@ -239,7 +239,7 @@ let ``AcceptLanguage Formatting/Parsing`` () =
     let acceptLanguageString =
         "en-GB;q=0.8,*"
 
-    roundTrip (AcceptLanguage.Format, AcceptLanguage.Parse) [
+    roundTrip (AcceptLanguage.format, AcceptLanguage.parse) [
         acceptLanguageTyped, acceptLanguageString ]
 
 [<Fact>]
@@ -255,7 +255,7 @@ let ``Referer Formatting/Parsing`` () =
     let refererString =
         "/some/path"
 
-    roundTrip (Referer.Format, Referer.Parse) [
+    roundTrip (Referer.format, Referer.parse) [
         refererTyped, refererString ]
 
 [<Fact>]
@@ -267,7 +267,7 @@ let ``Date Formatting/Parsing`` () =
     let dateString =
         "Sat, 29 Oct 1994 19:43:31 GMT"
 
-    roundTrip (Date.Format, Date.Parse) [
+    roundTrip (Date.format, Date.parse) [
         dateTyped, dateString ]
 
 [<Fact>]
@@ -285,7 +285,7 @@ let ``Location Formatting/Parsing`` () =
     let locationString =
         "http:/some/path"
 
-    roundTrip (Location.Format, Location.Parse) [
+    roundTrip (Location.format, Location.parse) [
         locationTyped, locationString ]
 
 [<Fact>]
@@ -297,7 +297,7 @@ let ``RetryAfter Formatting/Parsing`` () =
     let retryAfterString =
         "60"
 
-    roundTrip (RetryAfter.Format, RetryAfter.Parse) [
+    roundTrip (RetryAfter.format, RetryAfter.parse) [
         retryAfterTyped, retryAfterString ]
 
 [<Fact>]
@@ -309,7 +309,7 @@ let ``Allow Formatting/Parsing`` () =
     let allowString =
         "DELETE,GET,POST,PUT"
 
-    roundTrip (Allow.Format, Allow.Parse) [
+    roundTrip (Allow.format, Allow.parse) [
         allowTyped, allowString ]
 
 (* RFC 7232 *)
@@ -323,7 +323,7 @@ let ``LastModified Formatting/Parsing`` () =
     let lastModifiedString =
         "Sat, 29 Oct 1994 19:43:31 GMT"
 
-    roundTrip (LastModified.Format, LastModified.Parse) [
+    roundTrip (LastModified.format, LastModified.parse) [
         lastModifiedTyped, lastModifiedString ]
 
 [<Fact>]
@@ -335,7 +335,7 @@ let ``ETag Formatting/Parsing`` () =
     let eTagString =
         "\"sometag\""
 
-    roundTrip (ETag.Format, ETag.Parse) [
+    roundTrip (ETag.format, ETag.parse) [
         eTagTyped, eTagString ]
 
 [<Fact>]
@@ -347,7 +347,7 @@ let ``IfMatch Formatting/Parsing`` () =
     let ifMatchString =
         "\"sometag\",W/\"othertag\""
 
-    roundTrip (IfMatch.Format, IfMatch.Parse) [
+    roundTrip (IfMatch.format, IfMatch.parse) [
         ifMatchTyped, ifMatchString ]
 
 [<Fact>]
@@ -359,7 +359,7 @@ let ``IfNoneMatch Formatting/Parsing`` () =
     let ifNoneMatchString =
         "\"sometag\",W/\"othertag\""
 
-    roundTrip (IfNoneMatch.Format, IfNoneMatch.Parse) [
+    roundTrip (IfNoneMatch.format, IfNoneMatch.parse) [
         ifNoneMatchTyped, ifNoneMatchString ]
 
 [<Fact>]
@@ -371,7 +371,7 @@ let ``IfModifiedSince Formatting/Parsing`` () =
     let ifModifiedSinceString =
         "Sat, 29 Oct 1994 19:43:31 GMT"
 
-    roundTrip (IfModifiedSince.Format, IfModifiedSince.Parse) [
+    roundTrip (IfModifiedSince.format, IfModifiedSince.parse) [
         ifModifiedSinceTyped, ifModifiedSinceString ]
 
 [<Fact>]
@@ -383,7 +383,7 @@ let ``IfUnmodifiedSince Formatting/Parsing`` () =
     let ifUnmodifiedSinceString =
         "Sat, 29 Oct 1994 19:43:31 GMT"
 
-    roundTrip (IfUnmodifiedSince.Format, IfUnmodifiedSince.Parse) [
+    roundTrip (IfUnmodifiedSince.format, IfUnmodifiedSince.parse) [
         ifUnmodifiedSinceTyped, ifUnmodifiedSinceString ]
 
 (* RFC 7233 *)
@@ -397,7 +397,7 @@ let ``IfRange Formatting/Parsing`` () =
     let ifRangeString =
         "Sat, 29 Oct 1994 19:43:31 GMT"
 
-    roundTrip (IfRange.Format, IfRange.Parse) [
+    roundTrip (IfRange.format, IfRange.parse) [
         ifRangeTyped, ifRangeString ]
 
 (* RFC 7234 *)
@@ -411,7 +411,7 @@ let ``Age Formatting/Parsing`` () =
     let ageString =
         "1024"
 
-    roundTrip (Age.Format, Age.Parse) [
+    roundTrip (Age.format, Age.parse) [
         ageTyped, ageString ]
 
 [<Fact>]
@@ -426,7 +426,7 @@ let ``CacheControl Formatting/Parsing`` () =
     let cacheControlString =
         "max-age=1024,no-cache,private"
 
-    roundTrip (CacheControl.Format, CacheControl.Parse) [
+    roundTrip (CacheControl.format, CacheControl.parse) [
         cacheControlTyped, cacheControlString ]
 
 [<Fact>]
@@ -438,5 +438,5 @@ let ``Expires Formatting/Parsing`` () =
     let expiresString =
         "Sat, 29 Oct 1994 19:43:31 GMT"
 
-    roundTrip (Expires.Format, Expires.Parse) [
+    roundTrip (Expires.format, Expires.parse) [
         expiresTyped, expiresString ]

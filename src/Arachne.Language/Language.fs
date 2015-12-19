@@ -18,7 +18,7 @@
 //
 //----------------------------------------------------------------------------
 
-namespace Arachne.Language
+module Arachne.Language
 
 open System.Runtime.CompilerServices
 open Arachne.Core
@@ -102,77 +102,17 @@ type Language =
         { Parse = languageP
           Format = languageF }
 
-    static member Format =
-        Formatting.format Language.Mapping.Format
+    static member format =
+        Mapping.format Language.Mapping
 
-    static member Parse =
-        Parsing.parse Language.Mapping.Parse
+    static member parse =
+        Mapping.parse Language.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Language.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Language.Mapping
 
     override x.ToString () =
-        Language.Format x
-
-(* Script *)
-
-type Script =
-    | Script of string
-
-    static member internal Mapping =
-
-        let scriptP =
-            skipChar '-' >>. alphaP 4 4 |>> Script
-
-        let scriptF =
-            function | Script x -> append "-" >> append x
-
-        { Parse = scriptP
-          Format = scriptF }
-
-(* Region *)
-
-type Region =
-    | Region of string
-
-    static member internal Mapping =
-
-        let regionP =
-            skipChar '-' >>. (alphaP 2 2 <|> digitP 3 3) |>> Region
-
-        let regionF =
-            function | Region x -> append "-" >> append x
-
-        { Parse = regionP
-          Format = regionF }
-
-(* Variant *)
-
-type Variant =
-    | Variant of string list
-
-    static member internal Mapping =
-
-        let alphaPrefixVariantP =
-            alphaNumP 5 8
-
-        let digitPrefixVariantP =
-            satisfy isDigit .>>. alphaNumP 3 3 |>> fun (c, s) -> sprintf "%c%s" c s
-
-        let varP =
-            skipChar '-' >>. (alphaPrefixVariantP <|> digitPrefixVariantP)
-
-        let variantP =
-            many varP |>> Variant
-
-        let varF =
-            function | x -> append "-" >> append x
-
-        let variantF =
-            function | Variant xs -> join varF id xs
-
-        { Parse = variantP
-          Format = variantF }
+        Language.format x
 
 (* Language Tag *)
 
@@ -202,17 +142,77 @@ type LanguageTag =
         { Parse = languageTagP
           Format = languageTagF }
 
-    static member Format =
-        Formatting.format LanguageTag.Mapping.Format
+    static member format =
+        Mapping.format LanguageTag.Mapping
 
-    static member Parse =
-        Parsing.parse LanguageTag.Mapping.Parse
+    static member parse =
+        Mapping.parse LanguageTag.Mapping
 
-    static member TryParse =
-        Parsing.tryParse LanguageTag.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse LanguageTag.Mapping
 
     override x.ToString () =
-        LanguageTag.Format x
+        LanguageTag.format x
+
+(* Script *)
+
+ and Script =
+    | Script of string
+
+    static member internal Mapping =
+
+        let scriptP =
+            skipChar '-' >>. alphaP 4 4 |>> Script
+
+        let scriptF =
+            function | Script x -> append "-" >> append x
+
+        { Parse = scriptP
+          Format = scriptF }
+
+(* Region *)
+
+ and Region =
+    | Region of string
+
+    static member internal Mapping =
+
+        let regionP =
+            skipChar '-' >>. (alphaP 2 2 <|> digitP 3 3) |>> Region
+
+        let regionF =
+            function | Region x -> append "-" >> append x
+
+        { Parse = regionP
+          Format = regionF }
+
+(* Variant *)
+
+ and Variant =
+    | Variant of string list
+
+    static member internal Mapping =
+
+        let alphaPrefixVariantP =
+            alphaNumP 5 8
+
+        let digitPrefixVariantP =
+            satisfy isDigit .>>. alphaNumP 3 3 |>> fun (c, s) -> sprintf "%c%s" c s
+
+        let varP =
+            skipChar '-' >>. (alphaPrefixVariantP <|> digitPrefixVariantP)
+
+        let variantP =
+            many varP |>> Variant
+
+        let varF =
+            function | x -> append "-" >> append x
+
+        let variantF =
+            function | Variant xs -> join varF id xs
+
+        { Parse = variantP
+          Format = variantF }
 
 (* RFC 4647
 
@@ -240,14 +240,14 @@ type LanguageRange =
         { Parse = languageRangeP
           Format = languageRangeF }
 
-    static member Format =
-        Formatting.format LanguageRange.Mapping.Format
+    static member format =
+        Mapping.format LanguageRange.Mapping
 
-    static member Parse =
-        Parsing.parse LanguageRange.Mapping.Parse
+    static member parse =
+        Mapping.parse LanguageRange.Mapping
 
-    static member TryParse =
-        Parsing.tryParse LanguageRange.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse LanguageRange.Mapping
 
     override x.ToString () =
-        LanguageRange.Format x
+        LanguageRange.format x

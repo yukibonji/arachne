@@ -18,7 +18,7 @@
 //
 //----------------------------------------------------------------------------
 
-namespace Arachne.Http.State
+module Arachne.Http.State
 
 open System
 open Arachne.Core
@@ -65,27 +65,27 @@ type Pair =
         { Parse = pairP
           Format = pairF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Name_ =
+    static member name_ =
         (fun (Pair (n, _)) -> n), (fun n (Pair (_, v)) -> Pair (n, v))
 
-    static member Value_ =
+    static member value_ =
         (fun (Pair (_, v)) -> v), (fun v (Pair (n, _)) -> Pair (n, v))
 
     (* Common *)
 
-    static member Format =
-        Formatting.format Pair.Mapping.Format
+    static member format =
+        Mapping.format Pair.Mapping
 
-    static member Parse =
-        Parsing.parse Pair.Mapping.Parse
+    static member parse =
+        Mapping.parse Pair.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Pair.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Pair.Mapping
 
     override x.ToString () =
-        Pair.Format x
+        Pair.format x
 
 and Name =
     | Name of string
@@ -101,10 +101,10 @@ and Name =
         { Parse = nameP
           Format = nameF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Name_ =
-        (fun (Name n) -> n), (fun n -> Name n)
+    static member name_ =
+        (fun (Name n) -> n), (Name)
 
 and Value =
     | Value of string
@@ -130,10 +130,10 @@ and Value =
         { Parse = valueP
           Format = valueF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Value_ =
-        (fun (Value v) -> v), (fun v -> Value v)
+    static member value_ =
+        (fun (Value v) -> v), (Value)
 
 (* Set-Cookie
 
@@ -158,27 +158,27 @@ type SetCookie =
         { Parse = setCookieP
           Format = setCookieF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Pair_ =
+    static member pair_ =
         (fun (SetCookie (p, _)) -> p), (fun p (SetCookie (_, a)) -> SetCookie (p, a))
 
-    static member Attributes_ =
+    static member attributes_ =
         (fun (SetCookie (_, a)) -> a), (fun a (SetCookie (p, _)) -> SetCookie (p, a))
 
     (* Common *)
 
-    static member Format =
-        Formatting.format SetCookie.Mapping.Format
+    static member format =
+        Mapping.format SetCookie.Mapping
 
-    static member Parse =
-        Parsing.parse SetCookie.Mapping.Parse
+    static member parse =
+        Mapping.parse SetCookie.Mapping
 
-    static member TryParse =
-        Parsing.tryParse SetCookie.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse SetCookie.Mapping
 
     override x.ToString () =
-        SetCookie.Format x
+        SetCookie.format x
 
 and Attributes =
     | Attributes of Attribute list
@@ -195,10 +195,10 @@ and Attributes =
         { Parse = attributesP
           Format = attributesF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Attributes_ =
-        (fun (Attributes a) -> a), (fun a -> Attributes a)
+    static member attributes_ =
+        (fun (Attributes a) -> a), (Attributes)
 
 and Attribute =
     | Expires of DateTime
@@ -313,30 +313,30 @@ and Domain =
         { Parse = domainP
           Format = domainF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member IPv4_ =
-        (function | IPv4 i -> Some i | _ -> None), (fun i -> IPv4 i)
+    static member ipv4_ =
+        (function | IPv4 i -> Some i | _ -> None), (IPv4)
 
-    static member IPv6_ =
-        (function | IPv6 i -> Some i | _ -> None), (fun i -> IPv6 i)
+    static member ipv6_ =
+        (function | IPv6 i -> Some i | _ -> None), (IPv6)
 
-    static member SubDomain_ =
-        (function | SubDomain s -> Some s | _ -> None), (fun s -> SubDomain s)
+    static member subDomain_ =
+        (function | SubDomain s -> Some s | _ -> None), (SubDomain)
 
     (* Common *)
 
-    static member Format =
-        Formatting.format Domain.Mapping.Format
+    static member format =
+        Mapping.format Domain.Mapping
 
-    static member Parse =
-        Parsing.parse Domain.Mapping.Parse
+    static member parse =
+        Mapping.parse Domain.Mapping
     
-    static member TryParse =
-        Parsing.tryParse Domain.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Domain.Mapping
 
     override x.ToString () =
-        Domain.Format x
+        Domain.format x
 
 (* Cookie
 
@@ -357,21 +357,21 @@ type Cookie =
         { Parse = cookieP
           Format = cookieF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Pairs_ =
-        (fun (Cookie c) -> c), (fun c -> Cookie c)
+    static member pairs_ =
+        (fun (Cookie c) -> c), (Cookie)
 
     (* Common *)
 
-    static member Format =
-        Formatting.format Cookie.Mapping.Format
+    static member format =
+        Mapping.format Cookie.Mapping
 
-    static member Parse =
-        Parsing.parse Cookie.Mapping.Parse
+    static member parse =
+        Mapping.parse Cookie.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Cookie.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Cookie.Mapping
 
     override x.ToString () =
-        Cookie.Format x
+        Cookie.format x

@@ -18,7 +18,7 @@
 //
 //----------------------------------------------------------------------------
 
-namespace Arachne.Http
+module Arachne.Http
 
 open System
 open System.Globalization
@@ -67,17 +67,17 @@ type PartialUri =
         { Parse = partialUriP
           Format = partialUriF }
 
-    static member Format =
-        Formatting.format PartialUri.Mapping.Format
+    static member format =
+        Mapping.format PartialUri.Mapping
 
-    static member Parse =
-        Parsing.parse PartialUri.Mapping.Parse
+    static member parse =
+        Mapping.parse PartialUri.Mapping
 
-    static member TryParse =
-        Parsing.tryParse PartialUri.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse PartialUri.Mapping
 
     override x.ToString () =
-        PartialUri.Format x
+        PartialUri.format x
 
 [<AutoOpen>]
 module internal Grammar =
@@ -190,17 +190,17 @@ type HttpVersion =
         { Parse = httpVersionP
           Format = httpVersionF }
 
-    static member Format =
-        Formatting.format HttpVersion.Mapping.Format
+    static member format =
+        Mapping.format HttpVersion.Mapping
 
-    static member Parse =
-        Parsing.parse HttpVersion.Mapping.Parse
+    static member parse =
+        Mapping.parse HttpVersion.Mapping
 
-    static member TryParse =
-        Parsing.tryParse HttpVersion.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse HttpVersion.Mapping
 
     override x.ToString () =
-        HttpVersion.Format x
+        HttpVersion.format x
 
 (* Content-Length
 
@@ -221,17 +221,17 @@ type ContentLength =
         { Parse = contentLengthP
           Format = contentLengthF }
 
-    static member Format =
-        Formatting.format ContentLength.Mapping.Format
+    static member format =
+        Mapping.format ContentLength.Mapping
 
-    static member Parse =
-        Parsing.parse ContentLength.Mapping.Parse
+    static member parse =
+        Mapping.parse ContentLength.Mapping
 
-    static member TryParse =
-        Parsing.tryParse ContentLength.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse ContentLength.Mapping
 
     override x.ToString () =
-        ContentLength.Format x
+        ContentLength.format x
 
 (* Host
 
@@ -258,17 +258,17 @@ type Host =
         { Parse = hostP
           Format = hostF }
 
-    static member Format =
-        Formatting.format Host.Mapping.Format
+    static member format =
+        Mapping.format Host.Mapping
 
-    static member Parse =
-        Parsing.parse Host.Mapping.Parse
+    static member parse =
+        Mapping.parse Host.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Host.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Host.Mapping
 
     override x.ToString () =
-        Host.Format x
+        Host.format x
 
 (* Connection
 
@@ -289,17 +289,17 @@ type Connection =
         { Parse = connectionP
           Format = connectionF }
 
-    static member Format =
-        Formatting.format Connection.Mapping.Format
+    static member format =
+        Mapping.format Connection.Mapping
 
-    static member Parse =
-        Parsing.parse Connection.Mapping.Parse
+    static member parse =
+        Mapping.parse Connection.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Connection.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Connection.Mapping
 
     override x.ToString () =
-        Connection.Format x
+        Connection.format x
 
 and ConnectionOption =
     | ConnectionOption of string
@@ -335,31 +335,33 @@ type MediaType =
         { Parse = mediaTypeP
           Format = mediaTypeF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Type_ =
-        (fun (MediaType (x, _, _)) -> x), (fun x (MediaType (_, y, z)) -> MediaType (x, y, z))
+    static member type_ =
+        (fun (MediaType (x, _, _)) -> x),
+        (fun x (MediaType (_, y, z)) -> MediaType (x, y, z))
 
-    static member SubType_ =
-        (fun (MediaType (_, y, _)) -> y), (fun y (MediaType (x, _, z)) -> MediaType (x, y, z))
+    static member subType_ =
+        (fun (MediaType (_, y, _)) -> y),
+        (fun y (MediaType (x, _, z)) -> MediaType (x, y, z))
 
-    static member Parameters_ =
-        (fun (MediaType (_, _, z)) -> z), (fun z (MediaType (x, y, _)) -> MediaType (x, y, z))
+    static member parameters_ =
+        (fun (MediaType (_, _, z)) -> z),
+        (fun z (MediaType (x, y, _)) -> MediaType (x, y, z))
 
     (* Common *)
 
-    static member Format =
-        Formatting.format MediaType.Mapping.Format
+    static member format =
+        Mapping.format MediaType.Mapping
 
-    static member Parse =
-        Parsing.parse MediaType.Mapping.Parse
+    static member parse =
+        Mapping.parse MediaType.Mapping
 
-    static member TryParse =
-        Parsing.tryParse MediaType.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse MediaType.Mapping
 
     override x.ToString () =
-        MediaType.Format x
-
+        MediaType.format x
 
 and Parameters =
     | Parameters of Map<string, string>
@@ -382,10 +384,10 @@ and Parameters =
         { Parse = parametersP
           Format = parametersF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member Parameters_ =
-        (fun (Parameters x) -> x), (fun x -> Parameters x)
+    static member parameters_ =
+        (fun (Parameters x) -> x), (Parameters)
 
 and Type =
     | Type of string
@@ -436,24 +438,24 @@ type ContentType =
         { Parse = contentTypeP
           Format = contentTypeF }
 
-    (* Lenses *)
+    (* Optics *)
 
-    static member MediaType_ =
-        (fun (ContentType x) -> x), (fun x -> ContentType x)
+    static member mediaType_ =
+        (fun (ContentType x) -> x), (ContentType)
 
     (* Common *)
 
-    static member Format =
-        Formatting.format ContentType.Mapping.Format
+    static member format =
+        Mapping.format ContentType.Mapping
 
-    static member Parse =
-        Parsing.parse ContentType.Mapping.Parse
+    static member parse =
+        Mapping.parse ContentType.Mapping
 
-    static member TryParse =
-        Parsing.tryParse ContentType.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse ContentType.Mapping
 
     override x.ToString () =
-        ContentType.Format x
+        ContentType.format x
 
 (* Content-Encoding
 
@@ -474,17 +476,17 @@ type ContentEncoding =
         { Parse = contentEncodingP
           Format = contentEncodingF }
 
-    static member Format =
-        Formatting.format ContentEncoding.Mapping.Format
+    static member format =
+        Mapping.format ContentEncoding.Mapping
 
-    static member Parse =
-        Parsing.parse ContentEncoding.Mapping.Parse
+    static member parse =
+        Mapping.parse ContentEncoding.Mapping
 
-    static member TryParse =
-        Parsing.tryParse ContentEncoding.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse ContentEncoding.Mapping
 
     override x.ToString () =
-        ContentEncoding.Format x
+        ContentEncoding.format x
 
 and ContentCoding =
     | ContentCoding of string
@@ -524,17 +526,17 @@ type ContentLanguage =
         { Parse = contentLanguageP
           Format = contentLanguageF }
 
-    static member Format =
-        Formatting.format ContentLanguage.Mapping.Format
+    static member format =
+        Mapping.format ContentLanguage.Mapping
 
-    static member Parse =
-        Parsing.parse ContentLanguage.Mapping.Parse
+    static member parse =
+        Mapping.parse ContentLanguage.Mapping
 
-    static member TryParse =
-        Parsing.tryParse ContentLanguage.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse ContentLanguage.Mapping
 
     override x.ToString () =
-        ContentLanguage.Format x
+        ContentLanguage.format x
 
 (* Content-Location
 
@@ -558,17 +560,17 @@ type ContentLocation =
         { Parse = contentLocationP
           Format = contentLocationF }
 
-    static member Format =
-        Formatting.format ContentLocation.Mapping.Format
+    static member format =
+        Mapping.format ContentLocation.Mapping
 
-    static member Parse =
-        Parsing.parse ContentLocation.Mapping.Parse
+    static member parse =
+        Mapping.parse ContentLocation.Mapping
 
-    static member TryParse =
-        Parsing.tryParse ContentLocation.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse ContentLocation.Mapping
 
     override x.ToString () =
-        ContentLocation.Format x
+        ContentLocation.format x
 
 and ContentLocationUri =
     | Absolute of AbsoluteUri
@@ -618,14 +620,14 @@ type Method =
         { Parse = methodP
           Format = methodF }
 
-    static member Format =
-        Formatting.format Method.Mapping.Format
+    static member format =
+        Mapping.format Method.Mapping
 
-    static member Parse =
-        Parsing.parse Method.Mapping.Parse
+    static member parse =
+        Mapping.parse Method.Mapping
 
     override x.ToString () =
-        Method.Format x
+        Method.format x
 
 (* Expect
 
@@ -646,17 +648,17 @@ type Expect =
         { Parse = expectP
           Format = expectF }
 
-    static member Format =
-        Formatting.format Expect.Mapping.Format
+    static member format =
+        Mapping.format Expect.Mapping
 
-    static member Parse =
-        Parsing.parse Expect.Mapping.Parse
+    static member parse =
+        Mapping.parse Expect.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Expect.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Expect.Mapping
 
     override x.ToString () =
-        Expect.Format x
+        Expect.format x
 
 and Continue =
     | Continue
@@ -680,17 +682,17 @@ type MaxForwards =
         { Parse = maxForwardsP
           Format = maxForwardsF }
 
-    static member Format =
-        Formatting.format MaxForwards.Mapping.Format
+    static member format =
+        Mapping.format MaxForwards.Mapping
 
-    static member Parse =
-        Parsing.parse MaxForwards.Mapping.Parse
+    static member parse =
+        Mapping.parse MaxForwards.Mapping
 
-    static member TryParse =
-        Parsing.tryParse MaxForwards.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse MaxForwards.Mapping
 
     override x.ToString () =
-        MaxForwards.Format x
+        MaxForwards.format x
 
 (* Quality Values
 
@@ -747,17 +749,17 @@ type Accept =
         { Parse = acceptP
           Format = acceptF }
 
-    static member Format =
-        Formatting.format Accept.Mapping.Format
+    static member format =
+        Mapping.format Accept.Mapping
 
-    static member Parse =
-        Parsing.parse Accept.Mapping.Parse
+    static member parse =
+        Mapping.parse Accept.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Accept.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Accept.Mapping
 
     override x.ToString () =
-        Accept.Format x
+        Accept.format x
 
 and AcceptableMedia =
     | AcceptableMedia of MediaRange * AcceptParameters option
@@ -872,17 +874,17 @@ type AcceptCharset =
         { Parse = acceptCharsetP
           Format = acceptCharsetF }
 
-    static member Format =
-        Formatting.format AcceptCharset.Mapping.Format
+    static member format =
+        Mapping.format AcceptCharset.Mapping
 
-    static member Parse =
-        Parsing.parse AcceptCharset.Mapping.Parse
+    static member parse =
+        Mapping.parse AcceptCharset.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AcceptCharset.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AcceptCharset.Mapping
 
     override x.ToString () =
-        AcceptCharset.Format x
+        AcceptCharset.format x
 
 and AcceptableCharset =
     | AcceptableCharset of CharsetRange * Weight option
@@ -966,17 +968,17 @@ type AcceptEncoding =
         { Parse = acceptEncodingP
           Format = acceptEncodingF }
 
-    static member Format =
-        Formatting.format AcceptEncoding.Mapping.Format
+    static member format =
+        Mapping.format AcceptEncoding.Mapping
 
-    static member Parse =
-        Parsing.parse AcceptEncoding.Mapping.Parse
+    static member parse =
+        Mapping.parse AcceptEncoding.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AcceptEncoding.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AcceptEncoding.Mapping
 
     override x.ToString () =
-        AcceptEncoding.Format x
+        AcceptEncoding.format x
 
 and AcceptableEncoding =
     | AcceptableEncoding of EncodingRange * Weight option
@@ -1047,17 +1049,17 @@ type AcceptLanguage =
         { Parse = acceptLanguageP
           Format = acceptLanguageF }
 
-    static member Format =
-        Formatting.format AcceptLanguage.Mapping.Format
+    static member format =
+        Mapping.format AcceptLanguage.Mapping
 
-    static member Parse =
-        Parsing.parse AcceptLanguage.Mapping.Parse
+    static member parse =
+        Mapping.parse AcceptLanguage.Mapping
 
-    static member TryParse =
-        Parsing.tryParse AcceptLanguage.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse AcceptLanguage.Mapping
 
     override x.ToString () =
-        AcceptLanguage.Format x
+        AcceptLanguage.format x
 
 and AcceptableLanguage =
     | AcceptableLanguage of LanguageRange * Weight option
@@ -1099,17 +1101,17 @@ type Referer =
         { Parse = refererP
           Format = refererF }
 
-    static member Format =
-        Formatting.format Referer.Mapping.Format
+    static member format =
+        Mapping.format Referer.Mapping
 
-    static member Parse =
-        Parsing.parse Referer.Mapping.Parse
+    static member parse =
+        Mapping.parse Referer.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Referer.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Referer.Mapping
 
     override x.ToString () =
-        Referer.Format x
+        Referer.format x
     
 and RefererUri =
     | Absolute of AbsoluteUri
@@ -1153,17 +1155,17 @@ type Date =
         { Parse = dateP
           Format = dateF }
 
-    static member Format =
-        Formatting.format Date.Mapping.Format
+    static member format =
+        Mapping.format Date.Mapping
 
-    static member Parse =
-        Parsing.parse Date.Mapping.Parse
+    static member parse =
+        Mapping.parse Date.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Date.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Date.Mapping
 
     override x.ToString () =
-        Date.Format x
+        Date.format x
 
 (* Location
 
@@ -1184,17 +1186,17 @@ type Location =
         { Parse = locationP
           Format = locationF }
 
-    static member Format =
-        Formatting.format Location.Mapping.Format
+    static member format =
+        Mapping.format Location.Mapping
 
-    static member Parse =
-        Parsing.parse Location.Mapping.Parse
+    static member parse =
+        Mapping.parse Location.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Location.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Location.Mapping
 
     override x.ToString () =
-        Location.Format x
+        Location.format x
 
 (* Retry-After
 
@@ -1218,17 +1220,17 @@ type RetryAfter =
         { Parse = retryAfterP
           Format = retryAfterF }
 
-    static member Format =
-        Formatting.format RetryAfter.Mapping.Format
+    static member format =
+        Mapping.format RetryAfter.Mapping
 
-    static member Parse =
-        Parsing.parse RetryAfter.Mapping.Parse
+    static member parse =
+        Mapping.parse RetryAfter.Mapping
 
-    static member TryParse =
-        Parsing.tryParse RetryAfter.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse RetryAfter.Mapping
 
     override x.ToString () =
-        RetryAfter.Format x
+        RetryAfter.format x
 
 and RetryAfterChoice =
     | Date of DateTime
@@ -1253,17 +1255,17 @@ type Allow =
         { Parse = allowP
           Format = allowF }
 
-    static member Format =
-        Formatting.format Allow.Mapping.Format
+    static member format =
+        Mapping.format Allow.Mapping
 
-    static member Parse =
-        Parsing.parse Allow.Mapping.Parse
+    static member parse =
+        Mapping.parse Allow.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Allow.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Allow.Mapping
 
     override x.ToString () =
-        Allow.Format x
+        Allow.format x
 
 (* RFC 7232
 
@@ -1291,17 +1293,17 @@ type LastModified =
         { Parse = lastModifiedP
           Format = lastModifiedF }
 
-    static member Format =
-        Formatting.format LastModified.Mapping.Format
+    static member format =
+        Mapping.format LastModified.Mapping
 
-    static member Parse =
-        Parsing.parse LastModified.Mapping.Parse
+    static member parse =
+        Mapping.parse LastModified.Mapping
 
-    static member TryParse =
-        Parsing.tryParse LastModified.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse LastModified.Mapping
 
     override x.ToString () =
-        LastModified.Format x
+        LastModified.format x
 
 (* ETag
 
@@ -1322,17 +1324,17 @@ type ETag =
         { Parse = eTagP
           Format = eTagF }
 
-    static member Format =
-        Formatting.format ETag.Mapping.Format
+    static member format =
+        Mapping.format ETag.Mapping
 
-    static member Parse =
-        Parsing.parse ETag.Mapping.Parse
+    static member parse =
+        Mapping.parse ETag.Mapping
 
-    static member TryParse =
-        Parsing.tryParse ETag.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse ETag.Mapping
 
     override x.ToString () =
-        ETag.Format x
+        ETag.format x
 
 and EntityTag =
     | Strong of string
@@ -1384,17 +1386,17 @@ type IfMatch =
         { Parse = ifMatchP
           Format = ifMatchF }
 
-    static member Format =
-        Formatting.format IfMatch.Mapping.Format
+    static member format =
+        Mapping.format IfMatch.Mapping
 
-    static member Parse =
-        Parsing.parse IfMatch.Mapping.Parse
+    static member parse =
+        Mapping.parse IfMatch.Mapping
 
-    static member TryParse =
-        Parsing.tryParse IfMatch.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse IfMatch.Mapping
 
     override x.ToString () =
-        IfMatch.Format x
+        IfMatch.format x
 
 and IfMatchChoice =
     | EntityTags of EntityTag list
@@ -1422,17 +1424,17 @@ type IfNoneMatch =
         { Parse = ifNoneMatchP
           Format = ifNoneMatchF }
 
-    static member Format =
-        Formatting.format IfNoneMatch.Mapping.Format
+    static member format =
+        Mapping.format IfNoneMatch.Mapping
 
-    static member Parse =
-        Parsing.parse IfNoneMatch.Mapping.Parse
+    static member parse =
+        Mapping.parse IfNoneMatch.Mapping
 
-    static member TryParse =
-        Parsing.tryParse IfNoneMatch.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse IfNoneMatch.Mapping
 
     override x.ToString () =
-        IfNoneMatch.Format x
+        IfNoneMatch.format x
 
 and IfNoneMatchChoice =
     | EntityTags of EntityTag list
@@ -1457,17 +1459,17 @@ type IfModifiedSince =
         { Parse = ifModifiedSinceP
           Format = ifModifiedSinceF }
 
-    static member Format =
-        Formatting.format IfModifiedSince.Mapping.Format
+    static member format =
+        Mapping.format IfModifiedSince.Mapping
 
-    static member Parse =
-        Parsing.parse IfModifiedSince.Mapping.Parse
+    static member parse =
+        Mapping.parse IfModifiedSince.Mapping
 
-    static member TryParse =
-        Parsing.tryParse IfModifiedSince.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse IfModifiedSince.Mapping
 
     override x.ToString () =
-        IfModifiedSince.Format x
+        IfModifiedSince.format x
 
 (* If-Unmodified-Since
 
@@ -1488,17 +1490,17 @@ type IfUnmodifiedSince =
         { Parse = ifUnmodifiedSinceP
           Format = ifUnmodifiedSinceF }
 
-    static member Format =
-        Formatting.format IfUnmodifiedSince.Mapping.Format
+    static member format =
+        Mapping.format IfUnmodifiedSince.Mapping
 
-    static member Parse =
-        Parsing.parse IfUnmodifiedSince.Mapping.Parse
+    static member parse =
+        Mapping.parse IfUnmodifiedSince.Mapping
 
-    static member TryParse =
-        Parsing.tryParse IfUnmodifiedSince.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse IfUnmodifiedSince.Mapping
 
     override x.ToString () =
-        IfUnmodifiedSince.Format x
+        IfUnmodifiedSince.format x
 
 (* RFC 7233
 
@@ -1528,17 +1530,17 @@ type IfRange =
         { Parse = ifRangeP
           Format = ifRangeF }
 
-    static member Format =
-        Formatting.format IfRange.Mapping.Format
+    static member format =
+        Mapping.format IfRange.Mapping
 
-    static member Parse =
-        Parsing.parse IfRange.Mapping.Parse
+    static member parse =
+        Mapping.parse IfRange.Mapping
 
-    static member TryParse =
-        Parsing.tryParse IfRange.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse IfRange.Mapping
 
     override x.ToString () =
-        IfRange.Format x
+        IfRange.format x
 
 and IfRangeChoice =
     | Date of DateTime
@@ -1570,17 +1572,17 @@ type Age =
         { Parse = ageP
           Format = ageF }
 
-    static member Format =
-        Formatting.format Age.Mapping.Format
+    static member format =
+        Mapping.format Age.Mapping
 
-    static member Parse =
-        Parsing.parse Age.Mapping.Parse
+    static member parse =
+        Mapping.parse Age.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Age.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Age.Mapping
 
     override x.ToString () =
-        Age.Format x
+        Age.format x
 
 (* Cache-Control
 
@@ -1606,17 +1608,17 @@ type CacheControl =
         { Parse = cacheControlP
           Format = cacheControlF }
 
-    static member Format =
-        Formatting.format CacheControl.Mapping.Format
+    static member format =
+        Mapping.format CacheControl.Mapping
 
-    static member Parse =
-        Parsing.parse CacheControl.Mapping.Parse
+    static member parse =
+        Mapping.parse CacheControl.Mapping
 
-    static member TryParse =
-        Parsing.tryParse CacheControl.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse CacheControl.Mapping
 
     override x.ToString () =
-        CacheControl.Format x
+        CacheControl.format x
 
 and CacheDirective =
     | MaxAge of TimeSpan
@@ -1690,14 +1692,14 @@ type Expires =
         { Parse = expiresP
           Format = expiresF }
 
-    static member Format =
-        Formatting.format Expires.Mapping.Format
+    static member format =
+        Mapping.format Expires.Mapping
 
-    static member Parse =
-        Parsing.parse Expires.Mapping.Parse
+    static member parse =
+        Mapping.parse Expires.Mapping
 
-    static member TryParse =
-        Parsing.tryParse Expires.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse Expires.Mapping
 
     override x.ToString () =
-        Expires.Format x
+        Expires.format x

@@ -93,7 +93,7 @@ let ``LanguageTag Formatting/Parsing`` () =
 
     (* Round trip *)
 
-    roundTrip (LanguageTag.Format, LanguageTag.Parse) [
+    roundTrip (LanguageTag.format, LanguageTag.parse) [
         langTyped,                    langString
         langScriptTyped,              langScriptString
         langScriptRegionTyped,        langScriptRegionString

@@ -18,7 +18,7 @@
 //
 //----------------------------------------------------------------------------
 
-namespace Arachne.Uri.Template
+module Arachne.Uri.Template
 
 open System.Text
 open Arachne.Core
@@ -33,8 +33,8 @@ open FParsec
 type UriTemplateData =
     | UriTemplateData of Map<UriTemplateKey, UriTemplateValue>
 
-    static member UriTemplateData_ =
-        (fun (UriTemplateData x) -> x), (fun x -> UriTemplateData x)
+    static member uriTemplateData_ =
+        (fun (UriTemplateData x) -> x), (UriTemplateData)
 
     static member (+) (UriTemplateData a, UriTemplateData b) =
         UriTemplateData (Map.ofList (Map.toList a @ Map.toList b))
@@ -47,14 +47,14 @@ and UriTemplateValue =
     | List of string list
     | Keys of (string * string) list
 
-    static member Atom_ =
-        (function | Atom x -> Some x | _ -> None), (fun x -> Atom x)
+    static member atom_ =
+        (function | Atom x -> Some x | _ -> None), (Atom)
 
-    static member List_ =
-        (function | List x -> Some x | _ -> None), (fun x -> List x)
+    static member list_ =
+        (function | List x -> Some x | _ -> None), (List)
 
-    static member Keys_ =
-        (function | Keys x -> Some x | _ -> None), (fun x -> Keys x)
+    static member keys_ =
+        (function | Keys x -> Some x | _ -> None), (Keys)
 
 (* Matching *)
 
@@ -193,14 +193,14 @@ type UriTemplate =
 
         { Render = uriTemplateR }
 
-    static member Format =
-        Formatting.format UriTemplate.Mapping.Format
+    static member format =
+        Mapping.format UriTemplate.Mapping
 
-    static member Parse =
-        Parsing.parse UriTemplate.Mapping.Parse
+    static member parse =
+        Mapping.parse UriTemplate.Mapping
 
-    static member TryParse =
-        Parsing.tryParse UriTemplate.Mapping.Parse
+    static member tryParse =
+        Mapping.tryParse UriTemplate.Mapping
 
     static member (+) (UriTemplate x, UriTemplate y) =
         match List.rev x, y with
@@ -211,7 +211,7 @@ type UriTemplate =
             UriTemplate (x @ y)
 
     override x.ToString () =
-        UriTemplate.Format x
+        UriTemplate.format x
 
     member x.Match uri =
         match' UriTemplate.Matching.Match uri x
@@ -251,11 +251,11 @@ and UriTemplatePart =
 
         { Render = uriTemplatePartR }
 
-    static member Format =
-        Formatting.format UriTemplatePart.Mapping.Format
+    static member format =
+        Mapping.format UriTemplatePart.Mapping
 
     override x.ToString () =
-        UriTemplatePart.Format x
+        UriTemplatePart.format x
 
     member x.Match part =
         match' UriTemplatePart.Matching.Match part x

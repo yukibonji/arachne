@@ -18,7 +18,7 @@
 //
 //----------------------------------------------------------------------------
 
-namespace Arachne.Core
+module Arachne.Core
 
 open System.Runtime.CompilerServices
 open System.Text
@@ -34,33 +34,44 @@ open FParsec
 [<assembly:InternalsVisibleTo ("Arachne.Uri.Template")>]
 do ()
 
-[<AutoOpen>]
+(* Types *)
+
+type Mapping<'a> =
+    { Parse: Parse<'a>
+      Format: Format<'a> }
+
+ and Parse<'a> =
+    Parser<'a,unit>
+
+ and Format<'a> =
+    'a -> StringBuilder -> StringBuilder
+
+(* Mapping *)
+
+[<RequireQualifiedAccess>]
 module internal Mapping =
 
-    (* Types *)
+    let format (mapping: Mapping<'a>) =
+        fun a ->
+            string (mapping.Format a (StringBuilder ()))
 
-    type Mapping<'a> =
-        { Parse: Parse<'a>
-          Format: Format<'a> }
+    let parse (mapping: Mapping<'a>) =
+        fun s ->
+            match run mapping.Parse s with
+            | Success (x, _, _) -> x
+            | Failure (e, _, _) -> failwith e
 
-    and Parse<'a> =
-        Parser<'a,unit>
+    let tryParse (mapping: Mapping<'a>) =
+        fun s ->
+            match run mapping.Parse s with
+            | Success (x, _, _) -> Some x
+            | Failure (_) -> None
 
-    and Format<'a> =
-        'a -> StringBuilder -> StringBuilder
+(* Helpers *)
 
 [<AutoOpen>]
-module internal Formatting =
+module internal Helpers =
 
-    (* Types *)
-
-    let format (format: Format<'a>) =
-        fun a -> string (format a (StringBuilder ()))
-
-    (* Helpers *)
-
-    type Separator =
-        StringBuilder -> StringBuilder
 
     let append (s: string) (b: StringBuilder) =
         b.Append s
@@ -71,7 +82,7 @@ module internal Formatting =
     let appendf2 (s: string) (v1: obj) (v2: obj) (b: StringBuilder) =
         b.AppendFormat (s, v1, v2)
 
-    let join<'a> (f: Format<'a>) (s: Separator) =
+    let join<'a> (f: Format<'a>) (s: StringBuilder -> StringBuilder) =
         let rec join values (b: StringBuilder) =
             match values with
             | [] -> b
@@ -80,20 +91,7 @@ module internal Formatting =
 
         join
 
-[<AutoOpen>]
-module internal Parsing =
-
-    (* Parsing *)
-
-    let parse (p: Parse<'a>) s =
-        match run p s with
-        | Success (x, _, _) -> x
-        | Failure (e, _, _) -> failwith e
-
-    let tryParse (p: Parse<'a>) s =
-        match run p s with
-        | Success (x, _, _) -> Some x
-        | Failure (_) -> None
+(* Grammar *)
 
 [<AutoOpen>]
 module internal Grammar =
