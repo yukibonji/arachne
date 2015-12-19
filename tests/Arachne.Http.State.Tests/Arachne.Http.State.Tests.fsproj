@@ -56,6 +56,34 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Compile Include="Http.State.Tests.fs" />
+    <Content Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <ProjectReference Include="..\..\src\Arachne.Core\Arachne.Core.fsproj">
+      <Name>Arachne.Core</Name>
+      <Project>{7cf420be-13a1-4ad1-ae20-3dd855dea83f}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Arachne.Http.State\Arachne.Http.State.fsproj">
+      <Name>Arachne.Http.State</Name>
+      <Project>{91db0e82-30d1-4074-be15-88a4fb823539}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Arachne.Core.Tests\Arachne.Core.Tests.fsproj">
+      <Name>Arachne.Core.Tests</Name>
+      <Project>{1bf336fc-964f-42b0-9ab2-46553d29a2d1}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.0' Or $(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1')">
       <ItemGroup>
@@ -141,32 +169,4 @@
       </ItemGroup>
     </When>
   </Choose>
-  <ItemGroup>
-    <Compile Include="Http.State.Tests.fs" />
-    <Content Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-    <ProjectReference Include="..\..\src\Arachne.Core\Arachne.Core.fsproj">
-      <Name>Arachne.Core</Name>
-      <Project>{7cf420be-13a1-4ad1-ae20-3dd855dea83f}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\Arachne.Http.State\Arachne.Http.State.fsproj">
-      <Name>Arachne.Http.State</Name>
-      <Project>{91db0e82-30d1-4074-be15-88a4fb823539}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Arachne.Core.Tests\Arachne.Core.Tests.fsproj">
-      <Name>Arachne.Core.Tests</Name>
-      <Project>{1bf336fc-964f-42b0-9ab2-46553d29a2d1}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
 </Project>
