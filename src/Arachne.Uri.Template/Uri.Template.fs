@@ -39,10 +39,10 @@ type UriTemplateData =
     static member (+) (UriTemplateData a, UriTemplateData b) =
         UriTemplateData (Map.ofList (Map.toList a @ Map.toList b))
 
-and UriTemplateKey =
+ and UriTemplateKey =
     | Key of string
 
-and UriTemplateValue =
+ and UriTemplateValue =
     | Atom of string
     | List of string list
     | Keys of (string * string) list
@@ -219,7 +219,7 @@ type UriTemplate =
     member x.Render data =
         render UriTemplate.Rendering.Render data x
 
-and UriTemplatePart =
+ and UriTemplatePart =
     | Literal of Literal
     | Expression of Expression
 
@@ -260,16 +260,18 @@ and UriTemplatePart =
     member x.Match part =
         match' UriTemplatePart.Matching.Match part x
 
-and Literal =
+ and Literal =
     | Literal of string
 
     static member internal Mapping =
+
+        // TODO: Consider where isomorphisms are now required...
 
         let parser =
             PercentEncoding.makeParser isLiteral
 
         let formatter =
-            PercentEncoding.makeFormatter isLiteral
+            PercentEncoding.makeFormatter ()
 
         let literalP =
             notEmpty parser |>> Literal.Literal
@@ -281,7 +283,7 @@ and Literal =
           Format = literalF }
 
     static member Matching =
-        
+
         let literalM =
             function | Literal l -> pstring l >>% UriTemplateData Map.empty
 
@@ -294,7 +296,7 @@ and Literal =
 
         { Render = literalR }
 
-and Expression =
+ and Expression =
     | Expression of Operator option * VariableList
 
     static member internal Mapping =
@@ -327,14 +329,20 @@ and Expression =
             preturn ()
 
         let simpleP =
-            PercentEncoding.makeParser isUnreserved
+            let parser = PercentEncoding.makeParser isUnreserved
+            let decoder = PercentEncoding.makeDecoder ()
+
+            parser |>> decoder
 
         let isReserved i =
                 isReserved i
              || isUnreserved i
 
         let reservedP =
-            PercentEncoding.makeParser isReserved
+            let parser = PercentEncoding.makeParser isReserved
+            let decoder = PercentEncoding.makeDecoder ()
+
+            parser |>> decoder
 
         (* Characters *)
 
@@ -453,7 +461,10 @@ and Expression =
         (* Simple Expansion *)
 
         let simpleF =
-            PercentEncoding.makeFormatter isUnreserved
+            let encoder = PercentEncoding.makeEncoder isUnreserved
+            let formatter = PercentEncoding.makeFormatter ()
+
+            encoder >> formatter
 
         let simpleExpansion =
             renderUnary id simpleF (append ",")
@@ -465,7 +476,10 @@ and Expression =
              || isUnreserved i
 
         let reservedF =
-            PercentEncoding.makeFormatter isReserved
+            let encoder = PercentEncoding.makeEncoder isReserved
+            let formatter = PercentEncoding.makeFormatter ()
+
+            encoder >> formatter
 
         let reservedExpansion =
             renderUnary id reservedF (append ",")
@@ -520,7 +534,7 @@ and Expression =
    Taken from RFC 6570, Section 2.2 Expressions
    See [http://tools.ietf.org/html/rfc6570#section-2.2] *)
 
-and Operator =
+ and Operator =
     | Level2 of OperatorLevel2
     | Level3 of OperatorLevel3
     | Reserved of OperatorReserved
@@ -541,7 +555,7 @@ and Operator =
         { Parse = operatorP
           Format = operatorF }
 
-and OperatorLevel2 =
+ and OperatorLevel2 =
     | Reserved
     | Fragment
 
@@ -559,7 +573,7 @@ and OperatorLevel2 =
         { Parse = operatorLevel2P
           Format = operatorLevel2F }
 
-and OperatorLevel3 =
+ and OperatorLevel3 =
     | Label
     | Segment
     | Parameter
@@ -586,7 +600,7 @@ and OperatorLevel3 =
         { Parse = operatorLevel3P
           Format = operatorLevel3F }
 
-and OperatorReserved =
+ and OperatorReserved =
     | Equals
     | Comma
     | Exclamation
@@ -618,7 +632,7 @@ and OperatorReserved =
    Taken from RFC 6570, Section 2.3 Variables
    See [http://tools.ietf.org/html/rfc6570#section-2.3] *)
 
-and VariableList =
+ and VariableList =
     | VariableList of VariableSpec list
 
     static member internal Mapping =
@@ -633,7 +647,7 @@ and VariableList =
         { Parse = variableListP
           Format = variableListF }
 
-and VariableSpec =
+ and VariableSpec =
     | VariableSpec of VariableName * Modifier option
 
     static member internal Mapping =
@@ -652,7 +666,7 @@ and VariableSpec =
         { Parse = variableSpecP
           Format = variableSpecF }
 
-and VariableName =
+ and VariableName =
     | VariableName of string
 
     static member internal Mapping =
@@ -668,7 +682,7 @@ and VariableName =
             PercentEncoding.makeParser isVarchar
 
         let formatter =
-            PercentEncoding.makeFormatter isVarchar
+            PercentEncoding.makeFormatter ()
 
         let variableNameP =
             sepBy1 (notEmpty parser) (skipChar '.')
@@ -686,7 +700,7 @@ and VariableName =
    Taken from RFC 6570, Section 2.4 Value Modifiers
    See [http://tools.ietf.org/html/rfc6570#section-2.4] *)
 
-and Modifier =
+ and Modifier =
     | Level4 of ModifierLevel4
 
     static member internal Mapping =
@@ -700,7 +714,7 @@ and Modifier =
         { Parse = modifierP
           Format = modifierF }
 
-and ModifierLevel4 =
+ and ModifierLevel4 =
     | Prefix of int
     | Explode
 
