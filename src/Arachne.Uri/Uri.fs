@@ -89,9 +89,9 @@ module PercentEncoding =
 
     (* UTF-8
 
-       Shorthand for UTF-8 encoding and decoding of strings (given
-       the assumption that the .NET UTF-16/Unicode string is our
-       basic string type). *)
+        Shorthand for UTF-8 encoding and decoding of strings (given
+        the assumption that the .NET UTF-16/Unicode string is our
+        basic string type). *)
 
     let private toBytes : string -> byte list =
         Encoding.UTF8.GetBytes >> List.ofArray
@@ -101,47 +101,52 @@ module PercentEncoding =
 
     (* Indices
 
-       Simple lookups/indices for converting between bytes and the hex
-       encoding of those bytes. *)
+        Simple lookups/indices for converting between bytes and the hex
+        encoding of those bytes. *)
 
-    let private hex =
+    let private index =
         [ 0x00 .. 0xff ]
         |> List.map (byte >> fun i -> i, toBytes (i.ToString "X2"))
 
     let private byteIndex =
-        hex
+        index
         |> Map.ofList
 
     let private hexIndex =
-        hex
+        index
         |> List.map (fun (a, b) -> (b, a))
         |> Map.ofList
 
     (* Parsing
 
-       Parsing functions, providing a function to create a parser
-       given a whitelist of allowed characters within the input (pct-encoded
-       values are implicitly allowed, and converted to their Unicode/UTF-16
-       form). *)
-
-    let private hexdigP =
-        satisfy (int >> isHexdig)
+        Parsing functions, providing a function to create a parser
+        given a whitelist of allowed characters within the input (pct-encoded
+        values are implicitly allowed, and remain unaltered by the parser. *)
 
     let private pctP =
-        skipChar '%' >>. hexdigP .>>. hexdigP
-        |>> fun (a, b) ->
-            char (Map.find [ byte a; byte b ] hexIndex)
+        tuple3 (pchar '%') hex hex 
+        |>> (fun (p, a, b) ->
+            [| p; a; b |])
 
-    let makeParser p =
-        many (attempt pctP <|> satisfy (int >> p))
+    let makeParser (pred: int -> bool) =
+        many (attempt pctP <|> (satisfy (int >> pred) |>> fun x -> [| x |]))
         |>> fun x ->
-            new String (List.toArray x)
+            new string (Array.concat x)
 
     (* Formatting
 
-       Formatting functions, providing a function to create an formatter
-       given a whitelist set of allowed characters within the encoded
-       output. *)
+        Formatting functions, providing a function to create an formatter
+        for a given string. No encoding is done as part of formatting, any
+        characters within the provided string are assumed to be valid. *)
+
+    let makeFormatter () =
+        append
+
+    (* Encoding
+
+       Encoding functions, providing a function to create an encoder for
+       a string given a whitelist of allowed characters within the input
+       (non-whitelisted characters are pct-encoded automatically). *)
 
     let private hexdig =
         int >> isHexdig
@@ -149,14 +154,36 @@ module PercentEncoding =
     let private format p =
         let rec format r =
             function | [] -> r
-                     | h :: x :: y :: t when h = pct && hexdig x && hexdig y -> format (r @ [ h; x; y ]) t
-                     | h :: t when p (int h) -> format (r @ [ h ]) t
-                     | h :: t -> format (r @ [ pct ] @ Map.find h byteIndex) t
+                        | h :: x :: y :: t when h = pct && hexdig x && hexdig y -> format (r @ [ h; x; y ]) t
+                        | h :: t when p (int h) -> format (r @ [ h ]) t
+                        | h :: t -> format (r @ [ pct ] @ Map.find h byteIndex) t
 
         format []
 
-    let makeFormatter res =
-        toBytes >> format res >> toString >> append
+    let makeEncoder (pred: int -> bool) =
+        toBytes >> format pred >> toString
+
+    (* Decoding
+
+       Decoding functions, providing a function to create a decoder for a
+       pct-encoded string, converting pct-encoded values to their Unicode/UTF-16
+       form. *)
+
+    let private pctDecodeP : Parser<char,unit> =
+        pchar '%' >>. hex .>>. hex
+        |>> fun (a, b) ->
+            char (Map.find [ byte a; byte b ] hexIndex)
+
+    let private decodeP =
+        many (attempt pctDecodeP <|> anyChar)
+        |>> fun x ->
+            new string (Array.ofList x)
+
+    let makeDecoder () =
+        fun s ->
+            match run decodeP s with
+            | Success (s, _, _) -> s
+            | _ -> failwith "Decode Failure"
 
 (* IP Address Parsing and Formatting *)
 
@@ -302,18 +329,18 @@ type Authority =
  and UserInfo =
     | UserInfo of string
 
+    static member private Predicate i =
+            isUnreserved i
+         || isSubDelim i
+         || i = 0x3a // :
+
     static member internal Mapping =
 
-        let isUserInfoChar i =
-                isUnreserved i
-             || isSubDelim i
-             || i = 0x3a // :
-
         let parser =
-            PercentEncoding.makeParser isUserInfoChar
+            PercentEncoding.makeParser UserInfo.Predicate
 
         let formatter =
-            PercentEncoding.makeFormatter isUserInfoChar
+            PercentEncoding.makeFormatter ()
 
         let userInfoP =
             notEmpty parser |>> UserInfo
@@ -326,8 +353,18 @@ type Authority =
 
     (* Optics *)
 
-    static member userInfo_ =
+    static member raw_ =
         (fun (UserInfo u) -> u), (UserInfo)
+
+    static member decoded_ =
+        
+        let encoder =
+            PercentEncoding.makeEncoder UserInfo.Predicate
+
+        let decoder =
+            PercentEncoding.makeDecoder ()
+
+        (fun (UserInfo u) -> decoder u), (encoder >> UserInfo)
 
 (* Section 3.2.2 *)
 
@@ -373,17 +410,17 @@ type Authority =
  and RegName =
     | RegName of string
 
+    static member private Predicate  i =
+            isUnreserved i
+         || isSubDelim i
+
     static member internal Mapping =
 
-        let isRegNameChar i =
-                isUnreserved i
-             || isSubDelim i
-
         let parser =
-            PercentEncoding.makeParser isRegNameChar
+            PercentEncoding.makeParser RegName.Predicate
 
         let formatter =
-            PercentEncoding.makeFormatter isRegNameChar
+            PercentEncoding.makeFormatter ()
 
         let regNameP =
             notEmpty parser |>> RegName
@@ -396,8 +433,18 @@ type Authority =
 
     (* Optics *)
 
-    static member regName_ =
+    static member raw_ =
         (fun (RegName n) -> n), (RegName)
+
+    static member decoded_ =
+
+        let encoder =
+            PercentEncoding.makeEncoder RegName.Predicate
+
+        let decoder =
+            PercentEncoding.makeDecoder ()
+
+        (fun (RegName n) -> decoder n), (encoder >> RegName)
 
  and Port =
     | Port of int
@@ -432,6 +479,12 @@ module private Path =
          || isSubDelim i
          || i = 0x40 // @
 
+    let pcharNcParser =
+        PercentEncoding.makeParser isPcharNc
+
+    let pcharNcEncoder =
+        PercentEncoding.makeEncoder isPcharNc
+
     let isPchar i =
             isPcharNc i
          || i = 0x3a // :
@@ -439,11 +492,14 @@ module private Path =
     let pcharParser =
         PercentEncoding.makeParser isPchar
 
-    let pcharNcParser =
-        PercentEncoding.makeParser isPcharNc
-
     let pcharFormatter =
-        PercentEncoding.makeFormatter isPchar
+        PercentEncoding.makeFormatter ()
+
+    let pcharEncoder =
+        PercentEncoding.makeEncoder isPchar
+
+    let pcharDecoder =
+        PercentEncoding.makeDecoder ()
 
 (* Absolute Or Empty *)
 
@@ -465,8 +521,12 @@ type PathAbsoluteOrEmpty =
 
     (* Optics *)
 
-    static member pathAbsoluteOrEmpty_ =
+    static member raw_ =
         (fun (PathAbsoluteOrEmpty p) -> p), (PathAbsoluteOrEmpty)
+
+    static member decoded_ =
+        (fun (PathAbsoluteOrEmpty p) -> List.map pcharDecoder p),
+        (fun p -> PathAbsoluteOrEmpty (List.map pcharEncoder p))
 
     (* Common *)
 
@@ -502,8 +562,12 @@ type PathAbsolute =
 
     (* Optics *)
 
-    static member pathAbsolute_ =
+    static member raw_ =
         (fun (PathAbsolute p) -> p), (PathAbsolute)
+
+    static member decoded_ =
+        (fun (PathAbsolute p) -> List.map pcharDecoder p),
+        (fun p -> PathAbsolute (List.map pcharEncoder p))
 
     (* Common *)
 
@@ -539,8 +603,12 @@ type PathNoScheme =
 
     (* Optics *)
 
-    static member pathNoScheme_ =
+    static member raw_ =
         (fun (PathNoScheme p) -> p), (PathNoScheme)
+
+    static member decoded_ =
+        (fun (PathNoScheme p) -> List.map pcharDecoder p),
+        (fun p -> PathNoScheme (List.map pcharNcEncoder p))
 
     (* Common *)
 
@@ -576,8 +644,12 @@ type PathRootless =
 
     (* Optics *)
 
-    static member pathRootless_ =
+    static member raw_ =
         (fun (PathRootless p) -> p), (PathRootless)
+
+    static member decoded_ =
+        (fun (PathRootless p) -> List.map pcharDecoder p),
+        (fun p -> PathRootless (List.map pcharEncoder p))
 
     (* Common *)
 
@@ -601,18 +673,18 @@ type PathRootless =
 type Query =
     | Query of string
 
+    static member private Predicate i =
+            isPchar i
+         || i = 0x2f // /
+         || i = 0x3f // ?
+
     static member internal Mapping =
 
-        let isQueryChar i =
-                isPchar i
-             || i = 0x2f // /
-             || i = 0x3f // ?
-
         let parser =
-            PercentEncoding.makeParser isQueryChar
+            PercentEncoding.makeParser Query.Predicate
 
         let formatter =
-            PercentEncoding.makeFormatter isQueryChar
+            PercentEncoding.makeFormatter ()
 
         let queryP =
             parser |>> Query
@@ -625,8 +697,20 @@ type Query =
 
     (* Optics *)
 
-    static member query_ =
+    static member raw_ =
         (fun (Query q) -> q), (Query)
+
+    static member decoded_ =
+
+        let encoder =
+            PercentEncoding.makeEncoder Query.Predicate
+
+        let decoder =
+            PercentEncoding.makeDecoder ()
+
+        (fun (Query q) -> decoder q), (encoder >> Query)
+
+    // TODO: Review the Pairs optics...
 
     static member pairs_ =
 
@@ -686,18 +770,18 @@ type Query =
 type Fragment =
     | Fragment of string
 
-    static member internal Mapping =
-    
-        let isFragmentChar i =
+    static member private Predicate i =
                 isPchar i
              || i = 0x2f // /
              || i = 0x3f // ?
 
+    static member internal Mapping =
+
         let parser =
-            PercentEncoding.makeParser isFragmentChar
+            PercentEncoding.makeParser Fragment.Predicate
 
         let formatter =
-            PercentEncoding.makeFormatter isFragmentChar
+            PercentEncoding.makeFormatter ()
 
         let fragmentP =
             parser |>> Fragment
@@ -710,8 +794,18 @@ type Fragment =
 
     (* Optics*)
 
-    static member fragment_ =
+    static member raw_ =
         (fun (Fragment f) -> f), (Fragment)
+
+    static member decoded_ =
+
+        let encoder =
+            PercentEncoding.makeEncoder Fragment.Predicate
+
+        let decoder =
+            PercentEncoding.makeDecoder ()
+
+        (fun (Fragment f) -> decoder f), (encoder >> Fragment)
 
     (* Common *)
 

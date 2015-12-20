@@ -15,7 +15,7 @@ let data =
             Key "count",      List [ "one"; "two"; "three" ]
             Key "dom",        List [ "example"; "com" ]
             Key "dub",        Atom "me/too"
-            Key "he.llo",     Atom "Hello World!"
+            Key "hello",      Atom "Hello World!"
             Key "half",       Atom "50%"
             Key "var",        Atom "value"
             Key "who",        Atom "fred"
@@ -48,7 +48,7 @@ let ``Level 1 Examples Render Correctly`` () =
     (* Simple String Expansion *)
 
     "{var}" =? "value"
-    "{he.llo}" =? "Hello%20World%21"
+    "{hello}" =? "Hello%20World%21"
 
 [<Fact>]
 let ``Level 2 Examples Render Correctly`` () =
@@ -56,14 +56,14 @@ let ``Level 2 Examples Render Correctly`` () =
     (* Reserved String Expansion *)
 
     "{+var}" =? "value"
-    "{+he.llo}" =? "Hello%20World!"
+    "{+hello}" =? "Hello%20World!"
     "{+path}/here" =? "/foo/bar/here"
     "here?ref={+path}" =? "here?ref=/foo/bar"
 
     (* Fragment Expansion *)
 
     "X{#var}" =? "X#value"
-    "X{#he.llo}" =? "X#Hello%20World!"
+    "X{#hello}" =? "X#Hello%20World!"
 
 (* Specifcation Examples
 
@@ -75,12 +75,12 @@ let ``Level 2 Examples Render Correctly`` () =
 [<Fact>]
 let ``Simple Expansion Renders Correctly`` () =
     "{var}" =? "value"
-    "{he.llo}" =? "Hello%20World%21"
+    "{hello}" =? "Hello%20World%21"
     "{half}" =? "50%25"
     "O{empty}X" =? "OX"
     "O{undef}X" =? "OX"
     "{x,y}" =? "1024,768"
-    "{x,he.llo,y}" =? "1024,Hello%20World%21,768"
+    "{x,hello,y}" =? "1024,Hello%20World%21,768"
     "?{x,empty}" =? "?1024,"
     "?{x,undef}" =? "?1024"
     "?{undef,y}" =? "?768"
@@ -102,7 +102,7 @@ let ``Simple Matching Matches Correctly`` () =
 [<Fact>]
 let ``Reserved Expansion Renders Correctly`` () =
     "{+var}" =? "value"
-    "{+he.llo}" =? "Hello%20World!"
+    "{+hello}" =? "Hello%20World!"
     "{+half}" =? "50%25"
     "{base}index" =? "http%3A%2F%2Fexample.com%2Fhome%2Findex"
     "{+base}index" =? "http://example.com/home/index"
@@ -111,7 +111,7 @@ let ``Reserved Expansion Renders Correctly`` () =
     "{+path}/here" =? "/foo/bar/here"
     "here?ref={+path}" =? "here?ref=/foo/bar"
     "up{+path}{var}/here" =? "up/foo/barvalue/here"
-    "{+x,he.llo,y}" =? "1024,Hello%20World!,768"
+    "{+x,hello,y}" =? "1024,Hello%20World!,768"
     "{+path,x}/here" =? "/foo/bar,1024/here"
     "{+path:6}/here" =? "/foo/b/here"
     "{+list}" =? "red,green,blue"
@@ -133,11 +133,11 @@ let ``Reserved Matching Matches Correctly`` () =
 [<Fact>]
 let ``Fragment Expansion Renders Correctly`` () =
     "{#var}" =? "#value"
-    "{#he.llo}" =? "#Hello%20World!"
+    "{#hello}" =? "#Hello%20World!"
     "{#half}" =? "#50%25"
     "foo{#empty}" =? "foo#"
     "foo{#undef}" =? "foo"
-    "{#x,he.llo,y}" =? "#1024,Hello%20World!,768"
+    "{#x,hello,y}" =? "#1024,Hello%20World!,768"
     "{#path,x}/here" =? "#/foo/bar,1024/here"
     "{#path:6}/here" =? "#/foo/b/here"
     "{#list}" =? "#red,green,blue"
@@ -225,7 +225,7 @@ let ``Parameter Expansion Renders Correctly`` () =
     "{;x,y}" =? ";x=1024;y=768"
     "{;x,y,empty}" =? ";x=1024;y=768;empty"
     "{;x,y,undef}" =? ";x=1024;y=768"
-    "{;he.llo:5}" =? ";he.llo=Hello"
+    "{;hello:5}" =? ";hello=Hello"
     "{;list}" =? ";list=red,green,blue"
     "{;list*}" =? ";list=red;list=green;list=blue"
     "{;keys}" =? ";keys=semi,%3B,dot,.,comma,%2C"

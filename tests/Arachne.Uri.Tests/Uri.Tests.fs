@@ -37,7 +37,7 @@ let ``Authority Formatting/Parsing`` () =
     (* Host, Port and UserInfo *)
 
     let hostPortUserTyped =
-        Authority.Authority (Name (RegName "www.example.com"), Some (Port 8080),Some (UserInfo "user name:pass"))
+        Authority.Authority (Name (RegName "www.example.com"), Some (Port 8080),Some (UserInfo "user%20name:pass"))
 
     let hostPortUserString =
         "user%20name:pass@www.example.com:8080"
@@ -53,7 +53,7 @@ let ``Authority Formatting/Parsing`` () =
 let ``PathAbsoluteOrEmpty Formatting/Parsing`` () =
 
     let pathAbEmptyFullTyped = 
-        PathAbsoluteOrEmpty [ "some value?"; "path" ]
+        PathAbsoluteOrEmpty [ "some%20value%3F"; "path" ]
 
     let pathAbEmptyFullString =
         "/some%20value%3F/path"
@@ -72,7 +72,7 @@ let ``PathAbsoluteOrEmpty Formatting/Parsing`` () =
 let ``PathAbsolute Formatting/Parsing`` () =
 
     let pathAbsoluteFullTyped = 
-        PathAbsolute [ "some value?"; "path" ]
+        PathAbsolute [ "some%20value%3F"; "path" ]
 
     let pathAbsoluteFullString =
         "/some%20value%3F/path"
@@ -96,9 +96,9 @@ let ``Uri Formatting/Parsing`` () =
         Uri.Uri (
             Scheme "http",
             HierarchyPart.Authority (
-                Authority.Authority (Name (RegName "www.example.com"), Some (Port 8080), Some (UserInfo "user name:pass")),
+                Authority.Authority (Name (RegName "www.example.com"), Some (Port 8080), Some (UserInfo "user%20name:pass")),
                 PathAbsoluteOrEmpty [ "seg1"; "seg2" ]),
-            Some (Query "key=some value"),
+            Some (Query "key=some%20value"),
             Some (Fragment "frag1"))
 
     let authorityString =
