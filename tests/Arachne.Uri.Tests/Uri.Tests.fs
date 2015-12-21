@@ -90,6 +90,20 @@ let ``PathAbsolute Formatting/Parsing`` () =
 [<Fact>]
 let ``Uri Formatting/Parsing`` () =
 
+    (* File URI *)
+
+    let fileTyped =
+        Uri.Uri (
+            Scheme "file",
+            HierarchyPart.Authority (
+                Authority.Authority (Name (RegName ""), None, None),
+                PathAbsoluteOrEmpty [ "etc"; "fstab" ]),
+            None,
+            None)
+
+    let fileString =
+        "file:///etc/fstab"
+
     (* Authority Hierarchy *)
     
     let authorityTyped =
@@ -142,7 +156,8 @@ let ``Uri Formatting/Parsing`` () =
 
     (* Round Trip *)
 
-    roundTrip (Uri.format, Uri.parse) [ 
+    roundTrip (Uri.format, Uri.parse) [
+        fileTyped,      fileString
         authorityTyped, authorityString
         rootlessTyped,  rootlessString
         absoluteTyped,  absoluteString

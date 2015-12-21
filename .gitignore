@@ -45,3 +45,4 @@ tools/
 AssemblyInfo.fs
 .fake/
 *paket.template
+*.FSharpLint

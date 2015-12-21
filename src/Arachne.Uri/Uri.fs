@@ -278,7 +278,7 @@ type Authority =
 
         let authorityP =
                  opt (attempt (UserInfo.Mapping.Parse .>> skipChar '@')) 
-            .>>. Host.Mapping.Parse 
+            .>>. Host.Mapping.Parse
             .>>. opt Port.Mapping.Parse
              |>> fun ((user, host), port) -> Authority (host, port, user)
 
@@ -423,7 +423,7 @@ type Authority =
             PercentEncoding.makeFormatter ()
 
         let regNameP =
-            notEmpty parser |>> RegName
+            parser |>> RegName
 
         let regNameF =
             function | RegName x -> formatter x
@@ -526,7 +526,7 @@ type PathAbsoluteOrEmpty =
 
     static member decoded_ =
         (fun (PathAbsoluteOrEmpty p) -> List.map pcharDecoder p),
-        (fun p -> PathAbsoluteOrEmpty (List.map pcharEncoder p))
+        (List.map pcharEncoder >> PathAbsoluteOrEmpty)
 
     (* Common *)
 
@@ -567,7 +567,7 @@ type PathAbsolute =
 
     static member decoded_ =
         (fun (PathAbsolute p) -> List.map pcharDecoder p),
-        (fun p -> PathAbsolute (List.map pcharEncoder p))
+        (List.map pcharEncoder >>PathAbsolute)
 
     (* Common *)
 
@@ -608,7 +608,7 @@ type PathNoScheme =
 
     static member decoded_ =
         (fun (PathNoScheme p) -> List.map pcharDecoder p),
-        (fun p -> PathNoScheme (List.map pcharNcEncoder p))
+        (List.map pcharNcEncoder >> PathNoScheme)
 
     (* Common *)
 
@@ -649,7 +649,7 @@ type PathRootless =
 
     static member decoded_ =
         (fun (PathRootless p) -> List.map pcharDecoder p),
-        (fun p -> PathRootless (List.map pcharEncoder p))
+        (List.map pcharEncoder >> PathRootless)
 
     (* Common *)
 

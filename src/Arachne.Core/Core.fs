@@ -55,17 +55,17 @@ module internal Mapping =
         fun a ->
             string (mapping.Format a (StringBuilder ()))
 
-    let parse (mapping: Mapping<'a>) =
-        fun s ->
-            match run mapping.Parse s with
-            | Success (x, _, _) -> x
-            | Failure (e, _, _) -> failwith e
-
     let tryParse (mapping: Mapping<'a>) =
         fun s ->
             match run mapping.Parse s with
-            | Success (x, _, _) -> Some x
-            | Failure (_) -> None
+            | Success (x, _, _) -> Choice1Of2 x
+            | Failure (e, _, _) -> Choice2Of2 e
+
+    let parse (mapping: Mapping<'a>) =
+        fun s ->
+            match tryParse mapping s with
+            | Choice1Of2 x -> x
+            | Choice2Of2 e -> failwith e
 
 (* Helpers *)
 
