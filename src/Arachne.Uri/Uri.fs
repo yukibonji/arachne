@@ -278,7 +278,7 @@ type Authority =
 
         let authorityP =
                  opt (attempt (UserInfo.Mapping.Parse .>> skipChar '@')) 
-            .>>. Host.Mapping.Parse 
+            .>>. Host.Mapping.Parse
             .>>. opt Port.Mapping.Parse
              |>> fun ((user, host), port) -> Authority (host, port, user)
 
@@ -423,7 +423,7 @@ type Authority =
             PercentEncoding.makeFormatter ()
 
         let regNameP =
-            notEmpty parser |>> RegName
+            parser |>> RegName
 
         let regNameF =
             function | RegName x -> formatter x
