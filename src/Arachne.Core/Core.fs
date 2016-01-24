@@ -20,19 +20,9 @@
 
 module Arachne.Core
 
-open System.Runtime.CompilerServices
+open System.Globalization
 open System.Text
 open FParsec
-
-(* Internals *)
-
-[<assembly:InternalsVisibleTo ("Arachne.Http")>]
-[<assembly:InternalsVisibleTo ("Arachne.Http.Cors")>]
-[<assembly:InternalsVisibleTo ("Arachne.Http.State")>]
-[<assembly:InternalsVisibleTo ("Arachne.Language")>]
-[<assembly:InternalsVisibleTo ("Arachne.Uri")>]
-[<assembly:InternalsVisibleTo ("Arachne.Uri.Template")>]
-do ()
 
 (* Types *)
 
@@ -49,7 +39,7 @@ type Mapping<'a> =
 (* Mapping *)
 
 [<RequireQualifiedAccess>]
-module internal Mapping =
+module Mapping =
 
     let format (mapping: Mapping<'a>) =
         fun a ->
@@ -67,21 +57,19 @@ module internal Mapping =
             | Choice1Of2 x -> x
             | Choice2Of2 e -> failwith e
 
-(* Helpers *)
+(* Formatting *)
 
-[<AutoOpen>]
-module internal Helpers =
-
-    open System.Globalization
+[<RequireQualifiedAccess>]
+module Formatting =
 
     let append (s: string) (b: StringBuilder) =
-        b.Append s
+        b.Append (s)
 
     let appendf1 (s: string) (v1: obj) (b: StringBuilder) =
         b.AppendFormat (CultureInfo.InvariantCulture, s, v1)
 
     let appendf2 (s: string) (v1: obj) (v2: obj) (b: StringBuilder) =
-        b.AppendFormat (s, v1, v2)
+        b.AppendFormat (CultureInfo.InvariantCulture, s, v1, v2)
 
     let join<'a> (f: Format<'a>) (s: StringBuilder -> StringBuilder) =
         let rec join values (b: StringBuilder) =
@@ -94,8 +82,8 @@ module internal Helpers =
 
 (* Grammar *)
 
-[<AutoOpen>]
-module internal Grammar =
+[<RequireQualifiedAccess>]
+module Grammar =
 
     (* RFC 5234
 

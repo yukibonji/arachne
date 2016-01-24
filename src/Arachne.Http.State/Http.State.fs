@@ -34,11 +34,20 @@ open FParsec
 
    Taken from [http://tools.ietf.org/html/rfc6265] *)
 
-[<AutoOpen>]
-module internal Grammar =
+[<RequireQualifiedAccess>]
+module Grammar =
 
-    let spP =
-        skipSatisfy (int >> isSp)
+    [<RequireQualifiedAccess>]
+    module Parse =
+
+        let sp =
+            skipSatisfy (int >> Grammar.isSp)
+
+(* Aliases *)
+
+module F = Formatting
+module G = Grammar
+module M = Mapping
 
 (* Cookie Common Types
 
@@ -48,7 +57,7 @@ module internal Grammar =
 type Pair =
     | Pair of Name * Value
 
-    static member internal Mapping =
+    static member Mapping =
 
         let pairP =
                 Name.Mapping.Parse 
@@ -59,7 +68,7 @@ type Pair =
         let pairF =
             function | Pair (n, v) ->
                             Name.Mapping.Format n 
-                         >> append "=" 
+                         >> F.append "=" 
                          >> Value.Mapping.Format v
 
         { Parse = pairP
@@ -76,13 +85,13 @@ type Pair =
     (* Common *)
 
     static member format =
-        Mapping.format Pair.Mapping
+        M.format Pair.Mapping
 
     static member parse =
-        Mapping.parse Pair.Mapping
+        M.parse Pair.Mapping
 
     static member tryParse =
-        Mapping.tryParse Pair.Mapping
+        M.tryParse Pair.Mapping
 
     override x.ToString () =
         Pair.format x
@@ -90,13 +99,13 @@ type Pair =
 and Name =
     | Name of string
 
-    static member internal Mapping =
+    static member Mapping =
 
         let nameP =
-            tokenP |>> Name
+            G.Parse.token |>> Name
 
         let nameF =
-            function | Name x -> append x
+            function | Name x -> F.append x
 
         { Parse = nameP
           Format = nameF }
@@ -109,7 +118,7 @@ and Name =
 and Value =
     | Value of string
 
-    static member internal Mapping =
+    static member Mapping =
 
         let isCookieOctet i =
                 i = 0x21 // !
@@ -125,7 +134,7 @@ and Value =
             skipChar '"' >>. cookieOctetsP .>> skipChar '"' <|> cookieOctetsP |>> Value
 
         let valueF =
-            function | Value x -> append x
+            function | Value x -> F.append x
 
         { Parse = valueP
           Format = valueF }
@@ -143,7 +152,7 @@ and Value =
 type SetCookie =
     | SetCookie of Pair * Attributes
 
-    static member internal Mapping =
+    static member Mapping =
 
         let setCookieP =
                 Pair.Mapping.Parse
@@ -169,13 +178,13 @@ type SetCookie =
     (* Common *)
 
     static member format =
-        Mapping.format SetCookie.Mapping
+        M.format SetCookie.Mapping
 
     static member parse =
-        Mapping.parse SetCookie.Mapping
+        M.parse SetCookie.Mapping
 
     static member tryParse =
-        Mapping.tryParse SetCookie.Mapping
+        M.tryParse SetCookie.Mapping
 
     override x.ToString () =
         SetCookie.format x
@@ -183,14 +192,14 @@ type SetCookie =
 and Attributes =
     | Attributes of Attribute list
 
-    static member internal Mapping =
+    static member Mapping =
 
         let attributesP =
                 many Attribute.Mapping.Parse
             |>> Attributes
 
         let attributesF =
-            function | Attributes a -> join Attribute.Mapping.Format id a
+            function | Attributes a -> F.join Attribute.Mapping.Format id a
 
         { Parse = attributesP
           Format = attributesF }
@@ -208,7 +217,7 @@ and Attribute =
     | Secure
     | HttpOnly
 
-    static member internal Mapping =
+    static member Mapping =
 
         let isNonCtlSemiOctet i =
                 i >= 0x20 && i <= 0x3a
@@ -218,7 +227,7 @@ and Attribute =
             manySatisfy (int >> isNonCtlSemiOctet)
 
         let expiresP =
-            skipString "Expires=" >>. (httpDateP (manySatisfy ((<>) ';'))) |>> Expires
+            skipString "Expires=" >>. (HttpDate.Parse.httpDate (manySatisfy ((<>) ';'))) |>> Expires
 
         let maxAgeP =
             skipString "Max-Age=" >>. puint32 |>> (float >> TimeSpan.FromSeconds >> MaxAge)
@@ -237,7 +246,7 @@ and Attribute =
 
         let attributeP =
                 skipChar ';'
-            >>. spP
+            >>. G.Parse.sp
             >>. choice [
                     expiresP
                     maxAgeP
@@ -247,12 +256,12 @@ and Attribute =
                     httpOnlyP ]
 
         let attributeF =
-            function | Expires x -> appendf1 "; Expires={0}" (x.ToString "r")
-                     | MaxAge x -> appendf1 "; Max-Age={0}" (int x.TotalSeconds)
-                     | Domain x -> appendf1 "; Domain={0}" (string x)
-                     | Path x -> appendf1 "; Path={0}" (string x)
-                     | Secure -> append "; Secure"
-                     | HttpOnly -> append "; HttpOnly"
+            function | Expires x -> F.appendf1 "; Expires={0}" (x.ToString "r")
+                     | MaxAge x -> F.appendf1 "; Max-Age={0}" (int x.TotalSeconds)
+                     | Domain x -> F.appendf1 "; Domain={0}" (string x)
+                     | Path x -> F.appendf1 "; Path={0}" (string x)
+                     | Secure -> F.append "; Secure"
+                     | HttpOnly -> F.append "; HttpOnly"
 
         { Parse = attributeP
           Format = attributeF }
@@ -262,7 +271,7 @@ and Domain =
     | IPv6 of string
     | SubDomain of string
 
-    static member internal Mapping =
+    static member Mapping =
 
         (* RFC 1034/1123
 
@@ -274,8 +283,8 @@ and Domain =
            Refactoring/reimplementation is welcomed. *)
 
         let isLetDig i =
-                isAlpha i
-             || Grammar.isDigit i
+                G.isAlpha i
+             || G.isDigit i
 
         let isLetDigHyp i =
                 isLetDig i
@@ -301,14 +310,14 @@ and Domain =
 
         let domainP =
             choice [
-                ipv6AddressP |>> IPv6
-                ipv4AddressP |>> IPv4
+                IPAddress.Parse.v4 |>> IPv4
+                IPAddress.Parse.v6 |>> IPv6
                 subDomainP ]
 
         let domainF =
-            function | IPv4 x -> ipv4AddressF x
-                     | IPv6 x -> ipv6AddressF x
-                     | SubDomain x -> append x
+            function | IPv4 x -> IPAddress.Format.v4 x
+                     | IPv6 x -> IPAddress.Format.v6 x
+                     | SubDomain x -> F.append x
 
         { Parse = domainP
           Format = domainF }
@@ -327,13 +336,13 @@ and Domain =
     (* Common *)
 
     static member format =
-        Mapping.format Domain.Mapping
+        M.format Domain.Mapping
 
     static member parse =
-        Mapping.parse Domain.Mapping
+        M.parse Domain.Mapping
     
     static member tryParse =
-        Mapping.tryParse Domain.Mapping
+        M.tryParse Domain.Mapping
 
     override x.ToString () =
         Domain.format x
@@ -346,13 +355,13 @@ and Domain =
 type Cookie =
     | Cookie of Pair list
 
-    static member internal Mapping =
+    static member Mapping =
 
         let cookieP =
             sepBy1 Pair.Mapping.Parse (skipString "; ") |>> Cookie
 
         let cookieF =
-            function | Cookie pairs -> join Pair.Mapping.Format (append "; ") pairs
+            function | Cookie pairs -> F.join Pair.Mapping.Format (F.append "; ") pairs
 
         { Parse = cookieP
           Format = cookieF }
@@ -365,13 +374,13 @@ type Cookie =
     (* Common *)
 
     static member format =
-        Mapping.format Cookie.Mapping
+        M.format Cookie.Mapping
 
     static member parse =
-        Mapping.parse Cookie.Mapping
+        M.parse Cookie.Mapping
 
     static member tryParse =
-        Mapping.tryParse Cookie.Mapping
+        M.tryParse Cookie.Mapping
 
     override x.ToString () =
         Cookie.format x
