@@ -72,12 +72,13 @@ module internal Mapping =
 [<AutoOpen>]
 module internal Helpers =
 
+    open System.Globalization
 
     let append (s: string) (b: StringBuilder) =
         b.Append s
 
     let appendf1 (s: string) (v1: obj) (b: StringBuilder) =
-        b.AppendFormat (s, v1)
+        b.AppendFormat (CultureInfo.InvariantCulture, s, v1)
 
     let appendf2 (s: string) (v1: obj) (v2: obj) (b: StringBuilder) =
         b.AppendFormat (s, v1, v2)
