@@ -20,6 +20,7 @@
 
 module Arachne.Core
 
+open System.Globalization
 open System.Text
 open FParsec
 
@@ -34,53 +35,6 @@ type Mapping<'a> =
 
  and Format<'a> =
     'a -> StringBuilder -> StringBuilder
-
-(* Formatting *)
-
-[<RequireQualifiedAccess>]
-module Formatting =
-module internal Mapping =
-
-    let format (mapping: Mapping<'a>) =
-        fun a ->
-            string (mapping.Format a (StringBuilder ()))
-
-    let tryParse (mapping: Mapping<'a>) =
-        fun s ->
-            match run mapping.Parse s with
-            | Success (x, _, _) -> Choice1Of2 x
-            | Failure (e, _, _) -> Choice2Of2 e
-
-    let parse (mapping: Mapping<'a>) =
-        fun s ->
-            match tryParse mapping s with
-            | Choice1Of2 x -> x
-            | Choice2Of2 e -> failwith e
-
-(* Helpers *)
-
-[<AutoOpen>]
-module internal Helpers =
-
-    open System.Globalization
-
-    let append (s: string) (b: StringBuilder) =
-        b.Append s
-
-    let appendf1 (s: string) (v1: obj) (b: StringBuilder) =
-        b.AppendFormat (CultureInfo.InvariantCulture, s, v1)
-
-    let appendf2 (s: string) (v1: obj) (v2: obj) (b: StringBuilder) =
-        b.AppendFormat (s, v1, v2)
-
-    let join<'a> (f: Format<'a>) (s: StringBuilder -> StringBuilder) =
-        let rec join values (b: StringBuilder) =
-            match values with
-            | [] -> b
-            | [v] -> f v b
-            | v :: vs -> (f v >> s >> join vs) b
-
-        join
 
 (* Mapping *)
 
@@ -102,6 +56,29 @@ module Mapping =
             match tryParse mapping s with
             | Choice1Of2 x -> x
             | Choice2Of2 e -> failwith e
+
+(* Formatting *)
+
+[<RequireQualifiedAccess>]
+module Formatting =
+
+    let append (s: string) (b: StringBuilder) =
+        b.Append (s)
+
+    let appendf1 (s: string) (v1: obj) (b: StringBuilder) =
+        b.AppendFormat (CultureInfo.InvariantCulture, s, v1)
+
+    let appendf2 (s: string) (v1: obj) (v2: obj) (b: StringBuilder) =
+        b.AppendFormat (CultureInfo.InvariantCulture, s, v1, v2)
+
+    let join<'a> (f: Format<'a>) (s: StringBuilder -> StringBuilder) =
+        let rec join values (b: StringBuilder) =
+            match values with
+            | [] -> b
+            | [v] -> f v b
+            | v :: vs -> (f v >> s >> join vs) b
+
+        join
 
 (* Grammar *)
 
