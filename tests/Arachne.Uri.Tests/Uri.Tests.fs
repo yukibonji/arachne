@@ -164,6 +164,13 @@ let ``Uri Formatting/Parsing`` () =
         emptyTyped,     emptyString ]
 
 [<Fact>]
+let ``Query Parse With Encoded Equals`` () =
+    let expectedResult = Some [ "one", Some ("two%3d") ]
+    let query = Query.parse "one=two%3d"
+    let queryPairs = query |> fst Query.pairs_
+    Assert.Equal (expectedResult, queryPairs)
+
+[<Fact>]
 let ``Query Pairs``() =
     let expectedResult = Some ["param", Some("exists");"param1", Some("alsoexists")]
     let query = Query.Query("param=exists&param1=alsoexists")

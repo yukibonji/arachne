@@ -20,14 +20,8 @@
 
 module Arachne.Language
 
-open System.Runtime.CompilerServices
 open Arachne.Core
 open FParsec
-
-(* Internals *)
-
-[<assembly:InternalsVisibleTo ("Arachne.Http")>]
-do ()
 
 (* RFC 5646
 
@@ -48,34 +42,43 @@ do ()
    However, if someone does show a valid and even slightly common use case,
    they will be implemented. *)
 
-[<AutoOpen>]
-module internal Grammar =
+[<RequireQualifiedAccess>]
+module Grammar =
 
     let isAlphaDigit i =
-            isAlpha i
+            Grammar.isAlpha i
          || Grammar.isDigit i
 
-    let alphaP min max =
-            manyMinMaxSatisfy min max (int >> isAlpha) 
-       .>>? notFollowedBy (skipSatisfy (int >> isAlpha))
+    [<RequireQualifiedAccess>]
+    module internal Parse =
 
-    let digitP min max =
-            manyMinMaxSatisfy min max (int >> isAlpha) 
-       .>>? notFollowedBy (skipSatisfy (int >> isAlpha))
+        let alpha min max =
+                manyMinMaxSatisfy min max (int >> Grammar.isAlpha) 
+           .>>? notFollowedBy (skipSatisfy (int >> Grammar.isAlpha))
 
-    let alphaNumP min max =
-            manyMinMaxSatisfy min max (int >> isAlphaDigit) 
-       .>>? notFollowedBy (skipSatisfy (int >> isAlphaDigit))
+        let digit min max =
+                manyMinMaxSatisfy min max (int >> Grammar.isAlpha) 
+           .>>? notFollowedBy (skipSatisfy (int >> Grammar.isAlpha))
+
+        let alphaNum min max =
+                manyMinMaxSatisfy min max (int >> isAlphaDigit) 
+           .>>? notFollowedBy (skipSatisfy (int >> isAlphaDigit))
+
+(* Aliases *)
+
+module F = Formatting
+module G = Grammar
+module M = Mapping
 
 (* Language *)
 
 type Language =
     | Language of string * string list option
 
-    static member internal Mapping =
+    static member Mapping =
 
         let extP =
-            skipChar '-' >>. alphaP 3 3
+            skipChar '-' >>. G.Parse.alpha 3 3
 
         let extLangP =
             choice [
@@ -85,31 +88,31 @@ type Language =
 
         let languageP =
             choice [
-                alphaP 2 3 .>>. opt (attempt extLangP) |>> Language
-                alphaP 4 4 |>> (fun x -> Language (x, None))
-                alphaP 5 8 |>> (fun x -> Language (x, None)) ]
+                G.Parse.alpha 2 3 .>>. opt (attempt extLangP) |>> Language
+                G.Parse.alpha 4 4 |>> (fun x -> Language (x, None))
+                G.Parse.alpha 5 8 |>> (fun x -> Language (x, None)) ]
 
         let extF =
-            function | x -> append "-" >> append x
+            function | x -> F.append "-" >> F.append x
 
         let extLangF =
-            function | xs -> join extF id xs
+            function | xs -> F.join extF id xs
 
         let languageF =
-            function | Language (x, Some e) -> append x >> extLangF e
-                     | Language (x, _) -> append x 
+            function | Language (x, Some e) -> F.append x >> extLangF e
+                     | Language (x, _) -> F.append x 
 
         { Parse = languageP
           Format = languageF }
 
     static member format =
-        Mapping.format Language.Mapping
+        M.format Language.Mapping
 
     static member parse =
-        Mapping.parse Language.Mapping
+        M.parse Language.Mapping
 
     static member tryParse =
-        Mapping.tryParse Language.Mapping
+        M.tryParse Language.Mapping
 
     override x.ToString () =
         Language.format x
@@ -119,7 +122,7 @@ type Language =
 type LanguageTag =
     | LanguageTag of Language * Script option * Region option * Variant
 
-    static member internal Mapping =
+    static member Mapping =
 
         let languageTagP =
             tuple4 Language.Mapping.Parse 
@@ -143,13 +146,13 @@ type LanguageTag =
           Format = languageTagF }
 
     static member format =
-        Mapping.format LanguageTag.Mapping
+        M.format LanguageTag.Mapping
 
     static member parse =
-        Mapping.parse LanguageTag.Mapping
+        M.parse LanguageTag.Mapping
 
     static member tryParse =
-        Mapping.tryParse LanguageTag.Mapping
+        M.tryParse LanguageTag.Mapping
 
     override x.ToString () =
         LanguageTag.format x
@@ -159,13 +162,13 @@ type LanguageTag =
  and Script =
     | Script of string
 
-    static member internal Mapping =
+    static member Mapping =
 
         let scriptP =
-            skipChar '-' >>. alphaP 4 4 |>> Script
+            skipChar '-' >>. G.Parse.alpha 4 4 |>> Script
 
         let scriptF =
-            function | Script x -> append "-" >> append x
+            function | Script x -> F.append "-" >> F.append x
 
         { Parse = scriptP
           Format = scriptF }
@@ -175,13 +178,13 @@ type LanguageTag =
  and Region =
     | Region of string
 
-    static member internal Mapping =
+    static member Mapping =
 
         let regionP =
-            skipChar '-' >>. (alphaP 2 2 <|> digitP 3 3) |>> Region
+            skipChar '-' >>. (G.Parse.alpha 2 2 <|> G.Parse.digit 3 3) |>> Region
 
         let regionF =
-            function | Region x -> append "-" >> append x
+            function | Region x -> F.append "-" >> F.append x
 
         { Parse = regionP
           Format = regionF }
@@ -191,13 +194,13 @@ type LanguageTag =
  and Variant =
     | Variant of string list
 
-    static member internal Mapping =
+    static member Mapping =
 
         let alphaPrefixVariantP =
-            alphaNumP 5 8
+            G.Parse.alphaNum 5 8
 
         let digitPrefixVariantP =
-            satisfy isDigit .>>. alphaNumP 3 3 |>> fun (c, s) -> sprintf "%c%s" c s
+            satisfy isDigit .>>. G.Parse.alphaNum 3 3 |>> fun (c, s) -> sprintf "%c%s" c s
 
         let varP =
             skipChar '-' >>. (alphaPrefixVariantP <|> digitPrefixVariantP)
@@ -206,10 +209,10 @@ type LanguageTag =
             many varP |>> Variant
 
         let varF =
-            function | x -> append "-" >> append x
+            function | x -> F.append "-" >> F.append x
 
         let variantF =
-            function | Variant xs -> join varF id xs
+            function | Variant xs -> F.join varF id xs
 
         { Parse = variantP
           Format = variantF }
@@ -225,29 +228,29 @@ type LanguageRange =
     | Range of string list
     | Any
 
-    static member internal Mapping =
+    static member Mapping =
 
         let languageRangeP =
             choice [
                 skipChar '*' >>% Any
-                alphaP 1 8 .>>. many (skipChar '-' >>. alphaNumP 1 8) |>> (fun (x, xs) -> Range (x :: xs)) ]
+                G.Parse.alpha 1 8 .>>. many (skipChar '-' >>. G.Parse.alphaNum 1 8) |>> (fun (x, xs) -> Range (x :: xs)) ]
 
 
         let languageRangeF =
-            function | Range x -> join append (append "-") x
-                     | Any -> append "*"
+            function | Range x -> F.join F.append (F.append "-") x
+                     | Any -> F.append "*"
 
         { Parse = languageRangeP
           Format = languageRangeF }
 
     static member format =
-        Mapping.format LanguageRange.Mapping
+        M.format LanguageRange.Mapping
 
     static member parse =
-        Mapping.parse LanguageRange.Mapping
+        M.parse LanguageRange.Mapping
 
     static member tryParse =
-        Mapping.tryParse LanguageRange.Mapping
+        M.tryParse LanguageRange.Mapping
 
     override x.ToString () =
         LanguageRange.format x

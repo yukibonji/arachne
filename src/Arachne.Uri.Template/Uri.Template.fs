@@ -25,6 +25,44 @@ open Arachne.Core
 open Arachne.Uri
 open FParsec
 
+(* RFC 6570
+
+   Types, parsers and formatters implemented to mirror the specification of 
+   URI Template semantics as defined in RFC 6570.
+
+   Taken from [http://tools.ietf.org/html/rfc6570] *)
+
+(* Grammar
+
+   NOTE: We do not currently support IRIs - this may
+   be supported in future. *)
+
+[<RequireQualifiedAccess>]
+module internal Grammar =
+
+    let isLiteral i =
+            i = 0x21
+         || i >= 0x23 && i <= 0x24
+         || i = 0x26
+         || i >= 0x28 && i <= 0x3b
+         || i = 0x3d
+         || i >= 0x3f && i <= 0x5b
+         || i = 0x5d
+         || i = 0x5f
+         || i >= 0x61 && i <= 0x7a
+         || i = 0x7e
+
+    let isVarchar i =
+            Grammar.isAlpha i
+         || Grammar.isDigit i
+         || i = 0x5f // _
+
+(* Aliases *)
+
+module F = Formatting
+module G = Grammar
+module M = Mapping
+
 (* Data
 
    Types representing data which may be rendered or extracted
@@ -87,13 +125,6 @@ module private Functions =
     let render (render: Render<'a>) =
         fun d a -> string (render d a (StringBuilder ()))
 
-(* RFC 6570
-
-   Types, parsers and formatters implemented to mirror the specification of 
-   URI Template semantics as defined in RFC 6570.
-
-   Taken from [http://tools.ietf.org/html/rfc6570] *)
-
 (* Parsers
 
    Some extra functions for parsing, in particular for dynamically
@@ -133,31 +164,6 @@ module private Parsers =
 
             eval (false, [], parsers)
 
-(* Grammar
-
-   NOTE: We do not currently support IRIs - this may
-   be supported in future. *)
-
-[<AutoOpen>]
-module internal Grammar =
-
-    let isLiteral i =
-            i = 0x21
-         || i >= 0x23 && i <= 0x24
-         || i = 0x26
-         || i >= 0x28 && i <= 0x3b
-         || i = 0x3d
-         || i >= 0x3f && i <= 0x5b
-         || i = 0x5d
-         || i = 0x5f
-         || i >= 0x61 && i <= 0x7a
-         || i = 0x7e
-
-    let isVarchar i =
-            isAlpha i
-         || Grammar.isDigit i
-         || i = 0x5f // _
-
 (* Template
 
    Taken from RFC 6570, Section 2 Syntax
@@ -166,13 +172,13 @@ module internal Grammar =
 type UriTemplate =
     | UriTemplate of UriTemplatePart list
 
-    static member internal Mapping =
+    static member Mapping =
 
         let uriTemplateP =
             many1 UriTemplatePart.Mapping.Parse |>> UriTemplate
 
         let uriTemplateF =
-            function | UriTemplate u -> join UriTemplatePart.Mapping.Format id u
+            function | UriTemplate u -> F.join UriTemplatePart.Mapping.Format id u
 
         { Parse = uriTemplateP
           Format = uriTemplateF }
@@ -189,18 +195,18 @@ type UriTemplate =
     static member Rendering =
 
         let uriTemplateR (data: UriTemplateData) =
-            function | UriTemplate p -> join (UriTemplatePart.Rendering.Render data) id p
+            function | UriTemplate p -> F.join (UriTemplatePart.Rendering.Render data) id p
 
         { Render = uriTemplateR }
 
     static member format =
-        Mapping.format UriTemplate.Mapping
+        M.format UriTemplate.Mapping
 
     static member parse =
-        Mapping.parse UriTemplate.Mapping
+        M.parse UriTemplate.Mapping
 
     static member tryParse =
-        Mapping.tryParse UriTemplate.Mapping
+        M.tryParse UriTemplate.Mapping
 
     static member (+) (UriTemplate x, UriTemplate y) =
         match List.rev x, y with
@@ -223,7 +229,7 @@ type UriTemplate =
     | Literal of Literal
     | Expression of Expression
 
-    static member internal Mapping =
+    static member Mapping =
 
         let uriTemplatePartP =
             (Expression.Mapping.Parse |>> Expression) <|> (Literal.Mapping.Parse |>> Literal)
@@ -252,7 +258,7 @@ type UriTemplate =
         { Render = uriTemplatePartR }
 
     static member format =
-        Mapping.format UriTemplatePart.Mapping
+        M.format UriTemplatePart.Mapping
 
     override x.ToString () =
         UriTemplatePart.format x
@@ -263,12 +269,12 @@ type UriTemplate =
  and Literal =
     | Literal of string
 
-    static member internal Mapping =
+    static member Mapping =
 
         // TODO: Consider where isomorphisms are now required...
 
         let parser =
-            PercentEncoding.makeParser isLiteral
+            PercentEncoding.makeParser G.isLiteral
 
         let formatter =
             PercentEncoding.makeFormatter ()
@@ -292,14 +298,14 @@ type UriTemplate =
     static member Rendering =
 
         let literalR _ =
-            function | Literal l -> append l
+            function | Literal l -> F.append l
 
         { Render = literalR }
 
  and Expression =
     | Expression of Operator option * VariableList
 
-    static member internal Mapping =
+    static member Mapping =
 
         let expressionP =
             between 
@@ -309,14 +315,14 @@ type UriTemplate =
 
         let expressionF =
             function | Expression (Some o, v) ->
-                           append "{"
+                           F.append "{"
                         >> Operator.Mapping.Format o
                         >> VariableList.Mapping.Format v
-                        >> append "}"
+                        >> F.append "}"
                      | Expression (_, v) ->
-                           append "{"
+                           F.append "{"
                         >> VariableList.Mapping.Format v
-                        >> append "}"
+                        >> F.append "}"
 
         { Parse = expressionP
           Format = expressionF }
@@ -329,14 +335,14 @@ type UriTemplate =
             preturn ()
 
         let simpleP =
-            let parser = PercentEncoding.makeParser isUnreserved
+            let parser = PercentEncoding.makeParser G.isUnreserved
             let decoder = PercentEncoding.makeDecoder ()
 
             parser |>> decoder
 
         let isReserved i =
-                isReserved i
-             || isUnreserved i
+                G.isReserved i
+             || G.isUnreserved i
 
         let reservedP =
             let parser = PercentEncoding.makeParser isReserved
@@ -417,21 +423,21 @@ type UriTemplate =
                      | (_, Keys [], _) -> id
                      | (_, Atom a, Some (Level4 (Prefix i))) -> f (crop a i)
                      | (_, Atom a, _) -> f a
-                     | (_, List l, Some (Level4 Explode)) -> join f s l
-                     | (_, List l, _) -> join f (append ",") l
-                     | (_, Keys k, Some (Level4 Explode)) -> join (fun (k, v) -> f k >> append "=" >> f v) s k
-                     | (_, Keys k, _) -> join (fun (k, v) -> f k >> append "," >> f v) (append ",") k
+                     | (_, List l, Some (Level4 Explode)) -> F.join f s l
+                     | (_, List l, _) -> F.join f (F.append ",") l
+                     | (_, Keys k, Some (Level4 Explode)) -> F.join (fun (k, v) -> f k >> F.append "=" >> f v) s k
+                     | (_, Keys k, _) -> F.join (fun (k, v) -> f k >> F.append "," >> f v) (F.append ",") k
 
         let expandBinary f s omit =
             function | (n, Atom x, _) when omit x -> f n
                      | (n, List [], _)
                      | (n, Keys [], _) -> f n
-                     | (n, Atom a, Some (Level4 (Prefix i))) -> f n >> append "=" >> f (crop a i)
-                     | (n, Atom a, _) -> f n >> append "=" >> f a
-                     | (n, List l, Some (Level4 Explode)) -> join (fun v -> f n >> append "=" >> f v) s l
-                     | (n, List l, _) -> f n >> append "=" >> join f (append ",") l
-                     | (_, Keys k, Some (Level4 Explode)) -> join (fun (k, v) -> f k >> append "=" >> f v) s k
-                     | (n, Keys k, _) -> f n >> append "=" >> join (fun (k, v) -> f k >> append "," >> f v) (append ",") k
+                     | (n, Atom a, Some (Level4 (Prefix i))) -> f n >> F.append "=" >> f (crop a i)
+                     | (n, Atom a, _) -> f n >> F.append "=" >> f a
+                     | (n, List l, Some (Level4 Explode)) -> F.join (fun v -> f n >> F.append "=" >> f v) s l
+                     | (n, List l, _) -> f n >> F.append "=" >> F.join f (F.append ",") l
+                     | (_, Keys k, Some (Level4 Explode)) -> F.join (fun (k, v) -> f k >> F.append "=" >> f v) s k
+                     | (n, Keys k, _) -> f n >> F.append "=" >> F.join (fun (k, v) -> f k >> F.append "," >> f v) (F.append ",") k
 
         (* Filtering *)
 
@@ -453,27 +459,27 @@ type UriTemplate =
             | data -> f data
 
         let renderUnary prefix item sep =
-            render (fun x -> prefix >> join (expandUnary item sep) sep x)
+            render (fun x -> prefix >> F.join (expandUnary item sep) sep x)
 
         let renderBinary prefix item sep omit =
-            render (fun x -> prefix >> join (expandBinary item sep omit) sep x)
+            render (fun x -> prefix >> F.join (expandBinary item sep omit) sep x)
 
         (* Simple Expansion *)
 
         let simpleF =
-            let encoder = PercentEncoding.makeEncoder isUnreserved
+            let encoder = PercentEncoding.makeEncoder G.isUnreserved
             let formatter = PercentEncoding.makeFormatter ()
 
             encoder >> formatter
 
         let simpleExpansion =
-            renderUnary id simpleF (append ",")
+            renderUnary id simpleF (F.append ",")
 
         (* Reserved Expansion *)
 
         let isReserved i =
-                isReserved i
-             || isUnreserved i
+                G.isReserved i
+             || G.isUnreserved i
 
         let reservedF =
             let encoder = PercentEncoding.makeEncoder isReserved
@@ -482,37 +488,37 @@ type UriTemplate =
             encoder >> formatter
 
         let reservedExpansion =
-            renderUnary id reservedF (append ",")
+            renderUnary id reservedF (F.append ",")
 
         (* Fragment Expansion *)
 
         let fragmentExpansion =
-            renderUnary (append "#") reservedF (append ",")
+            renderUnary (F.append "#") reservedF (F.append ",")
 
         (* Label Expansion with Label-Prefix *)
 
         let labelExpansion =
-            renderUnary (append ".") simpleF (append ".")
+            renderUnary (F.append ".") simpleF (F.append ".")
 
         (* Path Segment Expansion *)
 
         let segmentExpansion =
-            renderUnary (append "/") simpleF (append "/")
+            renderUnary (F.append "/") simpleF (F.append "/")
 
         (* Parameter Expansion *)
 
         let parameterExpansion =
-            renderBinary (append ";") simpleF (append ";") ((=) "")
+            renderBinary (F.append ";") simpleF (F.append ";") ((=) "")
 
         (* Query Expansion *)
 
         let queryExpansion =
-            renderBinary (append "?") simpleF (append "&") (fun _ -> false)
+            renderBinary (F.append "?") simpleF (F.append "&") (fun _ -> false)
 
         (* Query Continuation Expansion *)
 
         let queryContinuationExpansion =
-            renderBinary (append "&") simpleF (append "&") (fun _ -> false)
+            renderBinary (F.append "&") simpleF (F.append "&") (fun _ -> false)
 
         (* Expression *)
 
@@ -539,7 +545,7 @@ type UriTemplate =
     | Level3 of OperatorLevel3
     | Reserved of OperatorReserved
 
-    static member internal Mapping =
+    static member Mapping =
 
         let operatorP =
             choice [
@@ -559,7 +565,7 @@ type UriTemplate =
     | Reserved
     | Fragment
 
-    static member internal Mapping =
+    static member Mapping =
 
         let operatorLevel2P =
             choice [
@@ -567,8 +573,8 @@ type UriTemplate =
                 skipChar '#' >>% Fragment ]
 
         let operatorLevel2F =
-            function | Reserved -> append "+"
-                     | Fragment -> append "#"
+            function | Reserved -> F.append "+"
+                     | Fragment -> F.append "#"
 
         { Parse = operatorLevel2P
           Format = operatorLevel2F }
@@ -580,7 +586,7 @@ type UriTemplate =
     | Query
     | QueryContinuation
 
-    static member internal Mapping =
+    static member Mapping =
 
         let operatorLevel3P =
             choice [
@@ -591,11 +597,11 @@ type UriTemplate =
                 skipChar '&' >>% QueryContinuation ]
 
         let operatorLevel3F =
-            function | Label -> append "."
-                     | Segment -> append "/"
-                     | Parameter -> append ";"
-                     | Query -> append "?"
-                     | QueryContinuation -> append "&"
+            function | Label -> F.append "."
+                     | Segment -> F.append "/"
+                     | Parameter -> F.append ";"
+                     | Query -> F.append "?"
+                     | QueryContinuation -> F.append "&"
 
         { Parse = operatorLevel3P
           Format = operatorLevel3F }
@@ -607,7 +613,7 @@ type UriTemplate =
     | At
     | Pipe
 
-    static member internal Mapping =
+    static member Mapping =
 
         let operatorReservedP =
             choice [
@@ -618,11 +624,11 @@ type UriTemplate =
                 skipChar '|' >>% Pipe ]
 
         let operatorReservedF =
-            function | Equals -> append "="
-                     | Comma -> append ","
-                     | Exclamation -> append "!"
-                     | At -> append "@"
-                     | Pipe -> append "!"
+            function | Equals -> F.append "="
+                     | Comma -> F.append ","
+                     | Exclamation -> F.append "!"
+                     | At -> F.append "@"
+                     | Pipe -> F.append "!"
 
         { Parse = operatorReservedP
           Format = operatorReservedF }
@@ -635,14 +641,14 @@ type UriTemplate =
  and VariableList =
     | VariableList of VariableSpec list
 
-    static member internal Mapping =
+    static member Mapping =
 
         let variableListP =
             sepBy1 VariableSpec.Mapping.Parse (skipChar ',')
             |>> VariableList
 
         let variableListF =
-            function | VariableList v -> join VariableSpec.Mapping.Format (append ",") v
+            function | VariableList v -> F.join VariableSpec.Mapping.Format (F.append ",") v
 
         { Parse = variableListP
           Format = variableListF }
@@ -650,7 +656,7 @@ type UriTemplate =
  and VariableSpec =
     | VariableSpec of VariableName * Modifier option
 
-    static member internal Mapping =
+    static member Mapping =
 
         let variableSpecP =
             VariableName.Mapping.Parse .>>. opt Modifier.Mapping.Parse
@@ -669,7 +675,7 @@ type UriTemplate =
  and VariableName =
     | VariableName of string
 
-    static member internal Mapping =
+    static member Mapping =
 
         // TODO: Assess the potential non-compliance
         // with percent encoding in variable names, especially
@@ -679,7 +685,7 @@ type UriTemplate =
         // to avoid keys having list values...)
 
         let parser =
-            PercentEncoding.makeParser isVarchar
+            PercentEncoding.makeParser G.isVarchar
 
         let formatter =
             PercentEncoding.makeFormatter ()
@@ -690,7 +696,7 @@ type UriTemplate =
 
         let variableNameF =
             function | VariableName n ->
-                        join formatter (append ".") (List.ofArray (n.Split ([| '.' |])))
+                        F.join formatter (F.append ".") (List.ofArray (n.Split ([| '.' |])))
 
         { Parse = variableNameP
           Format = variableNameF }
@@ -703,7 +709,7 @@ type UriTemplate =
  and Modifier =
     | Level4 of ModifierLevel4
 
-    static member internal Mapping =
+    static member Mapping =
 
         let modifierP =
             ModifierLevel4.Mapping.Parse |>> Level4
@@ -718,7 +724,7 @@ type UriTemplate =
     | Prefix of int
     | Explode
 
-    static member internal Mapping =
+    static member Mapping =
 
         let modifierLevel4P =
             choice [
@@ -726,8 +732,8 @@ type UriTemplate =
                 skipChar '*' >>% Explode ]
 
         let modifierLevel4F =
-            function | Prefix i -> appendf1 ":{0}" i
-                     | Explode -> append "*"
+            function | Prefix i -> F.appendf1 ":{0}" i
+                     | Explode -> F.append "*"
 
         { Parse = modifierLevel4P
           Format = modifierLevel4F }

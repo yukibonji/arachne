@@ -20,19 +20,8 @@
 
 module Arachne.Core
 
-open System.Runtime.CompilerServices
 open System.Text
 open FParsec
-
-(* Internals *)
-
-[<assembly:InternalsVisibleTo ("Arachne.Http")>]
-[<assembly:InternalsVisibleTo ("Arachne.Http.Cors")>]
-[<assembly:InternalsVisibleTo ("Arachne.Http.State")>]
-[<assembly:InternalsVisibleTo ("Arachne.Language")>]
-[<assembly:InternalsVisibleTo ("Arachne.Uri")>]
-[<assembly:InternalsVisibleTo ("Arachne.Uri.Template")>]
-do ()
 
 (* Types *)
 
@@ -46,32 +35,10 @@ type Mapping<'a> =
  and Format<'a> =
     'a -> StringBuilder -> StringBuilder
 
-(* Mapping *)
+(* Formatting *)
 
 [<RequireQualifiedAccess>]
-module internal Mapping =
-
-    let format (mapping: Mapping<'a>) =
-        fun a ->
-            string (mapping.Format a (StringBuilder ()))
-
-    let tryParse (mapping: Mapping<'a>) =
-        fun s ->
-            match run mapping.Parse s with
-            | Success (x, _, _) -> Choice1Of2 x
-            | Failure (e, _, _) -> Choice2Of2 e
-
-    let parse (mapping: Mapping<'a>) =
-        fun s ->
-            match tryParse mapping s with
-            | Choice1Of2 x -> x
-            | Choice2Of2 e -> failwith e
-
-(* Helpers *)
-
-[<AutoOpen>]
-module internal Helpers =
-
+module Formatting =
 
     let append (s: string) (b: StringBuilder) =
         b.Append s
@@ -91,10 +58,31 @@ module internal Helpers =
 
         join
 
+(* Mapping *)
+
+[<RequireQualifiedAccess>]
+module Mapping =
+
+    let format (mapping: Mapping<'a>) =
+        fun a ->
+            string (mapping.Format a (StringBuilder ()))
+
+    let tryParse (mapping: Mapping<'a>) =
+        fun s ->
+            match run mapping.Parse s with
+            | Success (x, _, _) -> Choice1Of2 x
+            | Failure (e, _, _) -> Choice2Of2 e
+
+    let parse (mapping: Mapping<'a>) =
+        fun s ->
+            match tryParse mapping s with
+            | Choice1Of2 x -> x
+            | Choice2Of2 e -> failwith e
+
 (* Grammar *)
 
-[<AutoOpen>]
-module internal Grammar =
+[<RequireQualifiedAccess>]
+module Grammar =
 
     (* RFC 5234
 

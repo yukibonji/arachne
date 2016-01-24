@@ -33,6 +33,12 @@ open FParsec
 
    Taken from [http://tools.ietf.org/html/rfc6454] *)
 
+(* Aliases *)
+
+module F = Formatting
+module G = Grammar
+module M = Mapping
+
 (* Origin
 
    Taken from RFC 6454, Section 7 Origin
@@ -44,7 +50,7 @@ open FParsec
 type Origin =
     | Origin of OriginListOrNull
 
-    static member internal Mapping =
+    static member Mapping =
 
         let originP =
             OriginListOrNull.Mapping.Parse |>> Origin
@@ -56,13 +62,13 @@ type Origin =
           Format = originF }
 
     static member format =
-        Mapping.format Origin.Mapping
+        M.format Origin.Mapping
 
     static member parse =
-        Mapping.parse Origin.Mapping
+        M.parse Origin.Mapping
 
     static member tryParse =
-        Mapping.tryParse Origin.Mapping
+        M.tryParse Origin.Mapping
 
     override x.ToString () =
         Origin.format x
@@ -71,7 +77,7 @@ and OriginListOrNull =
     | Origins of SerializedOrigin list
     | Null
 
-    static member internal Mapping =
+    static member Mapping =
 
         let originListOrNullP =
             choice [
@@ -79,8 +85,8 @@ and OriginListOrNull =
                 skipString "null" >>% Null ]
 
         let originListOrNullF =
-            function | Origins x -> join SerializedOrigin.Mapping.Format (append " ") x
-                     | Null -> append "null"
+            function | Origins x -> F.join SerializedOrigin.Mapping.Format (F.append " ") x
+                     | Null -> F.append "null"
 
         { Parse = originListOrNullP
           Format = originListOrNullF }
@@ -88,7 +94,7 @@ and OriginListOrNull =
 and SerializedOrigin =
     | SerializedOrigin of Scheme * Host * Port option
 
-    static member internal Mapping =
+    static member Mapping =
 
         let serializedOriginP =
                  Scheme.Mapping.Parse .>> skipString "://" 
@@ -101,7 +107,7 @@ and SerializedOrigin =
             function | SerializedOrigin (s, h, p) ->
                             let formatters =
                                 [ Scheme.Mapping.Format s
-                                  append "://"
+                                  F.append "://"
                                   Host.Mapping.Format h
                                   (function | Some p -> Port.Mapping.Format p
                                             | _ -> id) p ]
@@ -126,7 +132,7 @@ and SerializedOrigin =
 type AccessControlAllowOrigin =
     | AccessControlAllowOrigin of AccessControlAllowOriginRange
 
-    static member internal Mapping =
+    static member Mapping =
 
         let accessControlAllowOriginP =
             choice [
@@ -135,19 +141,19 @@ type AccessControlAllowOrigin =
 
         let accessControlAllowOriginF =
             function | AccessControlAllowOrigin (Origins x) -> OriginListOrNull.Mapping.Format x
-                     | AccessControlAllowOrigin (Any) -> append "*"
+                     | AccessControlAllowOrigin (Any) -> F.append "*"
 
         { Parse = accessControlAllowOriginP
           Format = accessControlAllowOriginF }
 
     static member format =
-        Mapping.format AccessControlAllowOrigin.Mapping
+        M.format AccessControlAllowOrigin.Mapping
 
     static member parse =
-        Mapping.parse AccessControlAllowOrigin.Mapping
+        M.parse AccessControlAllowOrigin.Mapping
 
     static member tryParse =
-        Mapping.tryParse AccessControlAllowOrigin.Mapping
+        M.tryParse AccessControlAllowOrigin.Mapping
 
     override x.ToString () =
         AccessControlAllowOrigin.format x
@@ -164,25 +170,25 @@ and AccessControlAllowOriginRange =
 type AccessControlAllowCredentials =
     | AccessControlAllowCredentials
 
-    static member internal Mapping =
+    static member Mapping =
 
         let accessControlAllowCredentialsP =
             skipString "true" >>% AccessControlAllowCredentials
 
         let accessControlAllowCredentialsF =
-            function | AccessControlAllowCredentials -> append "true"
+            function | AccessControlAllowCredentials -> F.append "true"
 
         { Parse = accessControlAllowCredentialsP
           Format = accessControlAllowCredentialsF }
 
     static member format =
-        Mapping.format AccessControlAllowCredentials.Mapping
+        M.format AccessControlAllowCredentials.Mapping
 
     static member parse =
-        Mapping.parse AccessControlAllowCredentials.Mapping
+        M.parse AccessControlAllowCredentials.Mapping
 
     static member tryParse =
-        Mapping.tryParse AccessControlAllowCredentials.Mapping
+        M.tryParse AccessControlAllowCredentials.Mapping
 
     override x.ToString () =
         AccessControlAllowCredentials.format x
@@ -195,25 +201,25 @@ type AccessControlAllowCredentials =
 type AccessControlExposeHeaders =
     | AccessControlExposeHeaders of string list
 
-    static member internal Mapping =
+    static member Mapping =
 
         let accessControlExposeHeadersP =
-            Grammar.infixP Grammar.tokenP (skipChar ',') |>> AccessControlExposeHeaders
+            G.Parse.infix G.Parse.token (skipChar ',') |>> AccessControlExposeHeaders
 
         let accessControlExposeHeadersF =
-            function | AccessControlExposeHeaders x -> join append (append ",") x
+            function | AccessControlExposeHeaders x -> F.join F.append (F.append ",") x
 
         { Parse = accessControlExposeHeadersP
           Format = accessControlExposeHeadersF }
 
     static member format =
-        Mapping.format AccessControlExposeHeaders.Mapping
+        M.format AccessControlExposeHeaders.Mapping
 
     static member parse =
-        Mapping.parse AccessControlExposeHeaders.Mapping
+        M.parse AccessControlExposeHeaders.Mapping
 
     static member tryParse =
-        Mapping.tryParse AccessControlExposeHeaders.Mapping
+        M.tryParse AccessControlExposeHeaders.Mapping
 
     override x.ToString () =
         AccessControlExposeHeaders.format x
@@ -226,25 +232,25 @@ type AccessControlExposeHeaders =
 type AccessControlMaxAge =
     | AccessControlMaxAge of TimeSpan
 
-    static member internal Mapping =
+    static member Mapping =
 
         let accessControlMaxAgeP =
             puint32 |>> (float >> TimeSpan.FromSeconds >> AccessControlMaxAge)
 
         let accessControlMaxAgeF =
-            function | AccessControlMaxAge x -> append (string x.TotalSeconds)
+            function | AccessControlMaxAge x -> F.append (string x.TotalSeconds)
 
         { Parse = accessControlMaxAgeP
           Format = accessControlMaxAgeF }
 
     static member format =
-        Mapping.format AccessControlMaxAge.Mapping
+        M.format AccessControlMaxAge.Mapping
 
     static member parse =
-        Mapping.parse AccessControlMaxAge.Mapping
+        M.parse AccessControlMaxAge.Mapping
 
     static member tryParse =
-        Mapping.tryParse AccessControlMaxAge.Mapping
+        M.tryParse AccessControlMaxAge.Mapping
 
     override x.ToString () =
         AccessControlMaxAge.format x
@@ -257,25 +263,25 @@ type AccessControlMaxAge =
 type AccessControlAllowMethods =
     | AccessControlAllowMethods of Method list
 
-    static member internal Mapping =
+    static member Mapping =
 
         let accessControlAllowMethodsP =
-            Grammar.infixP Method.Mapping.Parse (skipChar ',') |>> AccessControlAllowMethods
+            G.Parse.infix Method.Mapping.Parse (skipChar ',') |>> AccessControlAllowMethods
 
         let accessControlAllowMethodsF =
-            function | AccessControlAllowMethods x -> join Method.Mapping.Format (append ",") x
+            function | AccessControlAllowMethods x -> F.join Method.Mapping.Format (F.append ",") x
 
         { Parse = accessControlAllowMethodsP
           Format = accessControlAllowMethodsF }
 
     static member format =
-        Mapping.format AccessControlAllowMethods.Mapping
+        M.format AccessControlAllowMethods.Mapping
 
     static member parse =
-        Mapping.parse AccessControlAllowMethods.Mapping
+        M.parse AccessControlAllowMethods.Mapping
 
     static member tryParse =
-        Mapping.tryParse AccessControlAllowMethods.Mapping
+        M.tryParse AccessControlAllowMethods.Mapping
 
     override x.ToString () =
         AccessControlAllowMethods.format x
@@ -288,25 +294,25 @@ type AccessControlAllowMethods =
 type AccessControlAllowHeaders =
     | AccessControlAllowHeaders of string list
 
-    static member internal Mapping =
+    static member Mapping =
 
         let accessControlAllowHeadersP =
-            Grammar.infixP Grammar.tokenP (skipChar ',') |>> AccessControlAllowHeaders
+            G.Parse.infix G.Parse.token (skipChar ',') |>> AccessControlAllowHeaders
 
         let accessControlAllowHeadersF =
-            function | AccessControlAllowHeaders x -> join append (append ",") x
+            function | AccessControlAllowHeaders x -> F.join F.append (F.append ",") x
 
         { Parse = accessControlAllowHeadersP
           Format = accessControlAllowHeadersF }
 
     static member format =
-        Mapping.format AccessControlAllowHeaders.Mapping
+        M.format AccessControlAllowHeaders.Mapping
 
     static member parse =
-        Mapping.parse AccessControlAllowHeaders.Mapping
+        M.parse AccessControlAllowHeaders.Mapping
 
     static member tryParse =
-        Mapping.tryParse AccessControlAllowHeaders.Mapping
+        M.tryParse AccessControlAllowHeaders.Mapping
 
     override x.ToString () =
         AccessControlAllowHeaders.format x
@@ -319,7 +325,7 @@ type AccessControlAllowHeaders =
 type AccessControlRequestMethod =
     | AccessControlRequestMethod of Method
 
-    static member internal Mapping =
+    static member Mapping =
 
         let accessControlRequestMethodP =
             Method.Mapping.Parse |>> AccessControlRequestMethod
@@ -331,13 +337,13 @@ type AccessControlRequestMethod =
           Format = accessControlRequestMethodF }
 
     static member format =
-        Mapping.format AccessControlRequestMethod.Mapping
+        M.format AccessControlRequestMethod.Mapping
 
     static member parse =
-        Mapping.parse AccessControlRequestMethod.Mapping
+        M.parse AccessControlRequestMethod.Mapping
 
     static member tryParse =
-        Mapping.tryParse AccessControlRequestMethod.Mapping
+        M.tryParse AccessControlRequestMethod.Mapping
 
     override x.ToString () =
         AccessControlRequestMethod.format x
@@ -350,25 +356,25 @@ type AccessControlRequestMethod =
 type AccessControlRequestHeaders =
     | AccessControlRequestHeaders of string list
 
-    static member internal Mapping =
+    static member Mapping =
 
         let accessControlRequestHeadersP =
-            Grammar.infixP Grammar.tokenP (skipChar ',') |>> AccessControlRequestHeaders
+            G.Parse.infix G.Parse.token (skipChar ',') |>> AccessControlRequestHeaders
 
         let accessControlRequestHeadersF =
-            function | AccessControlRequestHeaders x -> join append (append ",") x
+            function | AccessControlRequestHeaders x -> F.join F.append (F.append ",") x
 
         { Parse = accessControlRequestHeadersP
           Format = accessControlRequestHeadersF }
 
     static member format =
-        Mapping.format AccessControlRequestHeaders.Mapping
+        M.format AccessControlRequestHeaders.Mapping
 
     static member parse =
-        Mapping.parse AccessControlRequestHeaders.Mapping
+        M.parse AccessControlRequestHeaders.Mapping
 
     static member tryParse =
-        Mapping.tryParse AccessControlRequestHeaders.Mapping
+        M.tryParse AccessControlRequestHeaders.Mapping
 
     override x.ToString () =
         AccessControlRequestHeaders.format x
