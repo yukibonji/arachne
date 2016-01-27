@@ -259,7 +259,6 @@ let ``Query Expansion Matches Correctly`` () =
     matches "/test{?x,y,empty}" "/test?x=1024&y=768&empty=" [ Key "x", Atom "1024"; Key "y", Atom "768"; Key "empty", Atom "" ]
     matches "/test{?list}" "/test?list=red,green,blue" [ Key "list", List [ "red"; "green"; "blue" ] ]
     matches "/test{?list*}" "/test?list=red&list=green&list=blue" [ Key "list", List [ "red"; "green"; "blue" ] ]
-    matches "/test{?keys}" "/test?keys=semi,%3B,dot,.,comma,%2C" [ Key "keys", Keys [ ("semi", ";"); ("dot", "."); ("comma", ",") ] ]
     matches "/test{?keys*}" "/test?semi=%3B&dot=.&comma=%2C" [ Key "keys", Keys [ ("semi", ";"); ("dot", "."); ("comma", ",") ] ]
 
 [<Fact>]
@@ -282,5 +281,4 @@ let ``Query Continuation Expansion Matches Correctly`` () =
     matches "/test?fixed{&x,y,empty}" "/test?fixed&x=1024&y=768&empty=" [ Key "x", Atom "1024"; Key "y", Atom "768"; Key "empty", Atom "" ]
     matches "/test?fixed{&list}" "/test?fixed&list=red,green,blue" [ Key "list", List [ "red"; "green"; "blue" ] ]
     matches "/test?fixed{&list*}" "/test?fixed&list=red&list=green&list=blue" [ Key "list", List [ "red"; "green"; "blue" ] ]
-    matches "/test?fixed{&keys}" "/test?fixed&keys=semi,%3B,dot,.,comma,%2C" [ Key "keys", Keys [ ("semi", ";"); ("dot", "."); ("comma", ",") ] ]
     matches "/test?fixed{&keys*}" "/test?fixed&semi=%3B&dot=.&comma=%2C" [ Key "keys", Keys [ ("semi", ";"); ("dot", "."); ("comma", ",") ] ]
