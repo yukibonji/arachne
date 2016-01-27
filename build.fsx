@@ -71,7 +71,8 @@ let solution =
               "panesofglass" ]
           Authors =
             [ "Andrew Cherry (@kolektiv)"
-              "Ryan Riley (@panesofglass)"]
+              "Ryan Riley (@panesofglass)"
+              "Max Malook (@mexx)" ]
           Keywords =
             [ "parser"
               "web"
