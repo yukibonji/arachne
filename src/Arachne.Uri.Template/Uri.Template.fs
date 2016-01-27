@@ -367,6 +367,15 @@ type UriTemplate =
         let slashP =
             skipChar '/'
 
+        let questionmarkP =
+            skipChar '?'
+
+        let ampersandP =
+            skipChar '&'
+
+        let equalsP =
+            skipChar '='
+
         (* Values *)
 
         let atomP p key =
@@ -376,15 +385,35 @@ type UriTemplate =
             sepBy1 p sep |>> List
 
         let keysP p sep =
-            sepBy1 (p .>> skipChar '=' .>>. p) sep |>> Keys
+            sepBy1 (p .>> equalsP .>>. p) sep |>> Keys
 
         let listOrKeysP p sep key =
             attempt (keysP p sep) <|> listP p sep |>> fun v -> key, v
 
+        let namedListP p (Key name) =
+            skipString name >>. equalsP >>. (sepBy1 p commaP)
+
+        let atomOrList =
+            function | [s] -> Atom s
+                     | v   -> List v
+
+        let namedP p key =
+            namedListP p key |>> atomOrList |>> fun v -> key, v
+
+        let namedExplodedP p sep key =
+            sepBy1 (namedListP p key) sep |>> List.collect id |>> atomOrList
+
+        let namedExplodedListOrKeysP p sep key =
+            attempt (namedExplodedP p sep key) <|> keysP p sep |>> fun v -> key, v
+
         (* Mapping *)
 
         let mapVar key separator =
-            function | Some (Level2 _), Some (Level4 Explode) -> listOrKeysP reservedP separator key
+            function | Some (Level3 Query), Some (Level4 Explode)
+                     | Some (Level3 QueryContinuation), Some (Level4 Explode) -> namedExplodedListOrKeysP simpleP separator key
+                     | Some (Level3 Query), _
+                     | Some (Level3 QueryContinuation), _ -> namedP simpleP key
+                     | Some (Level2 _), Some (Level4 Explode) -> listOrKeysP reservedP separator key
                      | _, Some (Level4 Explode) -> listOrKeysP simpleP separator key
                      | Some (Level2 _), _ -> atomP reservedP key
                      | _ -> atomP simpleP key
@@ -400,8 +429,8 @@ type UriTemplate =
                          | Expression (Some (Level3 Label), vars) -> dotP, mapVars (Some (Level3 Label)) dotP vars
                          | Expression (Some (Level3 Segment), vars) -> slashP, mapVars (Some (Level3 Segment)) slashP vars
                          | Expression (Some (Level3 Parameter), vars) -> semicolonP, mapVars (Some (Level3 Parameter)) semicolonP vars
-                         | Expression (Some (Level3 Query), vars) -> failwith ""
-                         | Expression (Some (Level3 QueryContinuation), vars) -> failwith ""
+                         | Expression (Some (Level3 Query), vars) -> questionmarkP, mapVars (Some (Level3 Query)) ampersandP vars
+                         | Expression (Some (Level3 QueryContinuation), vars) -> ampersandP, mapVars (Some (Level3 QueryContinuation)) ampersandP vars
                          | _ -> failwith ""
              >> fun (prefixP, valuesP) -> opt (prefixP >>. valuesP)
 
