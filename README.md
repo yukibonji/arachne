@@ -44,7 +44,6 @@ Accept
 
 | Platform |  BuildScript | Status of last build |
 | :------ | :------: | :------: |
-| **Mono** | [build.sh](https://github.com/freya-fs/arachne/blob/master/build.sh) | [![Travis build status](https://travis-ci.org/freya-fs/arachne.svg?branch=master)](https://travis-ci.org/freya-fs/arachne) |
 | **Windows** | [build.cmd](https://github.com/freya-fs/arachne/blob/master/build.cmd) | [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/9wk7ybt2q237h4l8/branch/master?svg=true)](https://ci.appveyor.com/project/freyafs/arachne/branch/master) |
 
 [![Issue Stats][badge-issue-stats]][link-issue-stats] [![Pull Requests Stats][badge-pr-stats]][link-issue-stats]
