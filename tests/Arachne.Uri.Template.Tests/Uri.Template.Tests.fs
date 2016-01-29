@@ -260,6 +260,21 @@ let ``Query Expansion Matches Correctly`` () =
     matches "/test{?list}" "/test?list=red,green,blue" [ Key "list", List [ "red"; "green"; "blue" ] ]
     matches "/test{?list*}" "/test?list=red&list=green&list=blue" [ Key "list", List [ "red"; "green"; "blue" ] ]
     matches "/test{?keys*}" "/test?semi=%3B&dot=.&comma=%2C" [ Key "keys", Keys [ ("semi", ";"); ("dot", "."); ("comma", ",") ] ]
+    matches "/test{?who}" "/test" []
+    matches "/test{?who}" "/test?" []
+    matches "/test{?who}" "/test?&" []
+    matches "/test{?who}" "/test?who" [ Key "who", Atom "" ]
+    matches "/test{?who}" "/test?who&" [ Key "who", Atom "" ]
+    matches "/test{?who}" "/test?who=" [ Key "who", Atom "" ]
+    matches "/test{?who}" "/test?who=&" [ Key "who", Atom "" ]
+    matches "/test{?list*}" "/test" []
+    matches "/test{?list*}" "/test?" []
+    matches "/test{?list*}" "/test?&" []
+    matches "/test{?list*}" "/test?list" [ Key "list", Atom "" ]
+    //matches "/test{?list*}" "/test?list&" [ Key "list", Atom "" ]
+    matches "/test{?list*}" "/test?list=" [ Key "list", Atom "" ]
+    //matches "/test{?list*}" "/test?list=&" [ Key "list", Atom "" ]
+    matches "/test{?list*}" "/test?list=&list" [ Key "list", List [ ""; "" ] ]
 
 [<Fact>]
 let ``Query Continuation Expansion Renders Correctly`` () =
@@ -273,7 +288,7 @@ let ``Query Continuation Expansion Renders Correctly`` () =
     "{&list*}" =? "&list=red&list=green&list=blue"
     "{&keys}" =? "&keys=semi,%3B,dot,.,comma,%2C"
     "{&keys*}" =? "&semi=%3B&dot=.&comma=%2C"
-    
+
 [<Fact>]
 let ``Query Continuation Expansion Matches Correctly`` () =
     matches "/test?fixed{&who}" "/test?fixed&who=fred" [ Key "who", Atom "fred" ]
@@ -282,3 +297,18 @@ let ``Query Continuation Expansion Matches Correctly`` () =
     matches "/test?fixed{&list}" "/test?fixed&list=red,green,blue" [ Key "list", List [ "red"; "green"; "blue" ] ]
     matches "/test?fixed{&list*}" "/test?fixed&list=red&list=green&list=blue" [ Key "list", List [ "red"; "green"; "blue" ] ]
     matches "/test?fixed{&keys*}" "/test?fixed&semi=%3B&dot=.&comma=%2C" [ Key "keys", Keys [ ("semi", ";"); ("dot", "."); ("comma", ",") ] ]
+    matches "/test?fixed{&who}" "/test?fixed" []
+    matches "/test?fixed{&who}" "/test?fixed&" []
+    matches "/test?fixed{&who}" "/test?fixed&&" []
+    matches "/test?fixed{&who}" "/test?fixed&who" [ Key "who", Atom "" ]
+    matches "/test?fixed{&who}" "/test?fixed&who&" [ Key "who", Atom "" ]
+    matches "/test?fixed{&who}" "/test?fixed&who=" [ Key "who", Atom "" ]
+    matches "/test?fixed{&who}" "/test?fixed&who=&" [ Key "who", Atom "" ]
+    matches "/test?fixed{&list*}" "/test?fixed" []
+    matches "/test?fixed{&list*}" "/test?fixed&" []
+    matches "/test?fixed{&list*}" "/test?fixed&&" []
+    matches "/test?fixed{&list*}" "/test?fixed&list" [ Key "list", Atom "" ]
+    //matches "/test?fixed{&list*}" "/test?fixed&list&" [ Key "list", Atom "" ]
+    matches "/test?fixed{&list*}" "/test?fixed&list=" [ Key "list", Atom "" ]
+    //matches "/test?fixed{&list*}" "/test?fixed&list=&" [ Key "list", Atom "" ]
+    matches "/test?fixed{&list*}" "/test?fixed&list=&list" [ Key "list", List [ ""; "" ] ]

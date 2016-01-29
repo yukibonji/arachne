@@ -391,17 +391,21 @@ type UriTemplate =
             attempt (keysP p sep) <|> listP p sep |>> fun v -> key, v
 
         let namedListP p (Key name) =
-            skipString name >>. equalsP >>. (sepBy1 p commaP)
+            skipString name >>. opt (equalsP >>. (sepBy1 p commaP))
+
+        let emptyList =
+            function | None   -> [""]
+                     | Some v -> v
 
         let atomOrList =
             function | [s] -> Atom s
                      | v   -> List v
 
         let namedP p key =
-            namedListP p key |>> atomOrList |>> fun v -> key, v
+            namedListP p key |>> emptyList |>> atomOrList |>> fun v -> key, v
 
         let namedExplodedP p sep key =
-            sepBy1 (namedListP p key) sep |>> List.collect id |>> atomOrList
+            sepBy1 (namedListP p key) sep |>> List.collect emptyList |>> atomOrList
 
         let namedExplodedListOrKeysP p sep key =
             attempt (namedExplodedP p sep key) <|> keysP p sep |>> fun v -> key, v
@@ -422,6 +426,10 @@ type UriTemplate =
             multiSepBy (List.map (fun (VariableSpec (VariableName name, modifier)) ->
                 mapVar (Key name) separator (operator, modifier)) vars) separator
 
+        let optMapVars operator separator vars =
+            opt (mapVars operator separator vars) |>> function | Some x -> x
+                                                               | None   -> []
+
         let mapExpression =
                 function | Expression (None, vars) -> idP, mapVars None commaP vars
                          | Expression (Some (Level2 Reserved), vars) -> idP, mapVars (Some (Level2 Reserved)) commaP vars
@@ -429,8 +437,8 @@ type UriTemplate =
                          | Expression (Some (Level3 Label), vars) -> dotP, mapVars (Some (Level3 Label)) dotP vars
                          | Expression (Some (Level3 Segment), vars) -> slashP, mapVars (Some (Level3 Segment)) slashP vars
                          | Expression (Some (Level3 Parameter), vars) -> semicolonP, mapVars (Some (Level3 Parameter)) semicolonP vars
-                         | Expression (Some (Level3 Query), vars) -> questionmarkP, mapVars (Some (Level3 Query)) ampersandP vars
-                         | Expression (Some (Level3 QueryContinuation), vars) -> ampersandP, mapVars (Some (Level3 QueryContinuation)) ampersandP vars
+                         | Expression (Some (Level3 Query), vars) -> questionmarkP, optMapVars (Some (Level3 Query)) ampersandP vars
+                         | Expression (Some (Level3 QueryContinuation), vars) -> ampersandP, optMapVars (Some (Level3 QueryContinuation)) ampersandP vars
                          | _ -> failwith ""
              >> fun (prefixP, valuesP) -> opt (prefixP >>. valuesP)
 
