@@ -405,7 +405,7 @@ type UriTemplate =
             namedListP p key |>> emptyList |>> atomOrList |>> fun v -> key, v
 
         let namedExplodedP p sep key =
-            sepBy1 (namedListP p key) sep |>> List.collect emptyList |>> atomOrList
+            sepBy1 (namedListP p key) sep |>> List.collect emptyList |>> List
 
         let namedExplodedListOrKeysP p sep key =
             attempt (namedExplodedP p sep key) <|> keysP p sep |>> fun v -> key, v
