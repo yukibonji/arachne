@@ -20,6 +20,7 @@
 
 module Arachne.Language
 
+open System
 open Arachne.Core
 open FParsec
 
@@ -117,6 +118,22 @@ type Language =
     override x.ToString () =
         Language.format x
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        Language.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        Language.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        Language.tryParse
+
 (* Language Tag *)
 
 type LanguageTag =
@@ -156,6 +173,22 @@ type LanguageTag =
 
     override x.ToString () =
         LanguageTag.format x
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        LanguageTag.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        LanguageTag.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        LanguageTag.tryParse
 
 (* Script *)
 
@@ -254,3 +287,19 @@ type LanguageRange =
 
     override x.ToString () =
         LanguageRange.format x
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        LanguageRange.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        LanguageRange.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        LanguageRange.tryParse
