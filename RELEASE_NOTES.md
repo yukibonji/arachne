@@ -1,9 +1,7 @@
-### New in 3.0.0 - (Released TBD)
+### New in 3.0.0 - (Released 2016-02-26)
 * Naming convention changes
 * Portable library support (Profile259)
-
-### New in 2.3.28 - (Released TBD)
-* 
+* Fuller URI Template support, including matching.
 
 ### New in 2.3.27 - (Released 2015-11-25)
 * Arachne.Http.State introduced to support Cookie parsing.
