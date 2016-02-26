@@ -96,6 +96,22 @@ type Pair =
     override x.ToString () =
         Pair.format x
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        Pair.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        Pair.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        Pair.tryParse
+
 and Name =
     | Name of string
 
@@ -188,6 +204,22 @@ type SetCookie =
 
     override x.ToString () =
         SetCookie.format x
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        SetCookie.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        SetCookie.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        SetCookie.tryParse
 
 and Attributes =
     | Attributes of Attribute list
@@ -347,6 +379,22 @@ and Domain =
     override x.ToString () =
         Domain.format x
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        Domain.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        Domain.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        Domain.tryParse
+
 (* Cookie
 
    Taken from RFC 6265, Section 4.2 Cookie
@@ -384,3 +432,19 @@ type Cookie =
 
     override x.ToString () =
         Cookie.format x
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        Cookie.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        Cookie.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        Cookie.tryParse

@@ -275,6 +275,26 @@ type Scheme =
     override x.ToString () =
         Scheme.format x
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        Scheme.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        Scheme.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        Scheme.tryParse
+
+    [<Obsolete ("Use scheme_ instead.")>]
+    static member Scheme_ =
+        Scheme.scheme_
+
 (* Authority
 
    Taken from RFC 3986, Section 3.2 Authority
@@ -334,6 +354,34 @@ type Authority =
 
     override x.ToString () =
         Authority.format x
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        Authority.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        Authority.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        Authority.tryParse
+
+    [<Obsolete ("Use host_ instead.")>]
+    static member Host_ =
+        Authority.host_
+
+    [<Obsolete ("Use port_ instead.")>]
+    static member Port_ =
+        Authority.port_
+
+    [<Obsolete ("Use userInfo_ instead.")>]
+    static member UserInfo_ =
+        Authority.userInfo_
 
 (* Section 3.2.1 *)
 
@@ -418,6 +466,23 @@ type Authority =
     static member name_ =
         (function | Name n -> Some n | _ -> None), (Name)
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use ipv4_ instead.")>]
+    static member IPv4_ =
+        Host.ipv4_
+
+    [<Obsolete ("Use ipv6_ instead.")>]
+    static member IPv6_ =
+        Host.ipv6_
+
+    [<Obsolete ("Use name_ instead.")>]
+    static member Name_ =
+        Host.name_
+
+
  and RegName =
     | RegName of string
 
@@ -476,6 +541,14 @@ type Authority =
 
     static member port_ =
         (fun (Port p) -> p), (Port)
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use port_ instead.")>]
+    static member Port_ =
+        Port.port_
 
 (* Path
 
@@ -553,6 +626,22 @@ type PathAbsoluteOrEmpty =
     override x.ToString () =
         PathAbsoluteOrEmpty.format x
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        PathAbsoluteOrEmpty.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        PathAbsoluteOrEmpty.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        PathAbsoluteOrEmpty.tryParse
+
 (* Absolute *)
 
 type PathAbsolute =
@@ -593,6 +682,22 @@ type PathAbsolute =
 
     override x.ToString () =
         PathAbsolute.format x
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        PathAbsolute.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        PathAbsolute.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        PathAbsolute.tryParse
 
 (* No Scheme *)
 
@@ -635,6 +740,22 @@ type PathNoScheme =
     override x.ToString () =
         PathNoScheme.format x
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        PathNoScheme.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        PathNoScheme.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        PathNoScheme.tryParse
+
 (* Rootless *)
 
 type PathRootless =
@@ -675,6 +796,22 @@ type PathRootless =
 
     override x.ToString () =
         PathRootless.format x
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        PathRootless.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        PathRootless.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        PathRootless.tryParse
 
 (* Query
 
@@ -773,6 +910,26 @@ type Query =
     override x.ToString () =
         Query.format x
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        Query.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        Query.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        Query.tryParse
+
+    [<Obsolete ("User pairs_ instead.")>]
+    static member Pairs_ =
+        Query.pairs_
+
 (* Fragment
 
    Taken from RFC 3986, Section 3.5 Fragment
@@ -831,6 +988,22 @@ type Fragment =
 
     override x.ToString () =
         Fragment.format x
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        Fragment.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        Fragment.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        Fragment.tryParse
 
 (* URI
 
@@ -913,6 +1086,38 @@ type Uri =
     override x.ToString () =
         Uri.format x
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        Uri.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        Uri.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        Uri.tryParse
+
+    [<Obsolete ("Use scheme_ instead.")>]
+    static member Scheme_ =
+        Uri.scheme_
+
+    [<Obsolete ("Use hierarchyPart_ instead.")>]
+    static member HierarchyPart_ =
+        Uri.hierarchyPart_
+
+    [<Obsolete ("Use query_ instead.")>]
+    static member Query_ =
+        Uri.query_
+
+    [<Obsolete ("Use fragment_ instead.")>]
+    static member Fragment_ =
+        Uri.fragment_
+
  and HierarchyPart =
     | Authority of Authority * PathAbsoluteOrEmpty
     | Absolute of PathAbsolute
@@ -960,6 +1165,26 @@ type Uri =
 
     static member empty_ =
         (function | Empty -> Some () | _ -> None), (fun () -> Empty)
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use authority_ instead.")>]
+    static member Authority_ =
+        HierarchyPart.authority_
+
+    [<Obsolete ("Use absolute_ instead.")>]
+    static member Absolute_ =
+        HierarchyPart.absolute_
+
+    [<Obsolete ("Use rootless_ instead.")>]
+    static member Rootless_ =
+        HierarchyPart.rootless_
+
+    [<Obsolete ("Use empty_ instead.")>]
+    static member Empty_ =
+        HierarchyPart.empty_
 
 (* Relative Reference
 
@@ -1020,6 +1245,34 @@ type RelativeReference =
     override x.ToString () =
         RelativeReference.format x
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        RelativeReference.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        RelativeReference.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        RelativeReference.tryParse
+
+    [<Obsolete ("Use relativePart_ instead.")>]
+    static member RelativePart_ =
+        RelativeReference.relativePart_
+
+    [<Obsolete ("Use query_ instead.")>]
+    static member Query_ =
+        RelativeReference.query_
+
+    [<Obsolete ("Use fragment_ instead.")>]
+    static member Fragment_ =
+        RelativeReference.fragment_
+
  and RelativePart =
     | Authority of Authority * PathAbsoluteOrEmpty
     | Absolute of PathAbsolute
@@ -1067,6 +1320,26 @@ type RelativeReference =
 
     static member empty_ =
         (function | Empty -> Some () | _ -> None), (fun () -> Empty)
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use authority_ instead.")>]
+    static member Authority_ =
+        RelativePart.authority_
+
+    [<Obsolete ("Use absolute_ instead.")>]
+    static member Absolute_ =
+        RelativePart.absolute_
+
+    [<Obsolete ("Use noScheme_ instead.")>]
+    static member NoScheme_ =
+        RelativePart.noScheme_
+
+    [<Obsolete ("Use empty_ instead.")>]
+    static member Empty_ =
+        RelativePart.empty_
 
 (* Absolute URI
 
@@ -1127,6 +1400,34 @@ type AbsoluteUri =
     override x.ToString () =
         AbsoluteUri.format x
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        AbsoluteUri.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        AbsoluteUri.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        AbsoluteUri.tryParse
+
+    [<Obsolete ("Use scheme_ instead.")>]
+    static member Scheme_ =
+        AbsoluteUri.scheme_
+
+    [<Obsolete ("Use hierarchyPart_ instead.")>]
+    static member HierarchyPart_ =
+        AbsoluteUri.hierarchyPart_
+
+    [<Obsolete ("Use query_ instead.")>]
+    static member Query_ =
+        AbsoluteUri.query_
+
 (* URI Reference
 
    Taken from RFC 3986, Section 4.1 URI Reference
@@ -1171,3 +1472,27 @@ type UriReference =
 
     override x.ToString () =
         UriReference.format x
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        UriReference.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        UriReference.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        UriReference.tryParse
+
+    [<Obsolete ("Use uri_ instead.")>]
+    static member Uri_ =
+        UriReference.uri_
+
+    [<Obsolete ("Use relative_ instead.")>]
+    static member Relative_ =
+        UriReference.relative_

@@ -20,6 +20,7 @@
 
 module Arachne.Uri.Template
 
+open System
 open System.Text
 open Arachne.Core
 open Arachne.Uri
@@ -225,6 +226,23 @@ type UriTemplate =
     member x.Render data =
         render UriTemplate.Rendering.Render data x
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        UriTemplate.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        UriTemplate.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        UriTemplate.tryParse
+
+
  and UriTemplatePart =
     | Literal of Literal
     | Expression of Expression
@@ -265,6 +283,14 @@ type UriTemplate =
 
     member x.Match part =
         match' UriTemplatePart.Matching.Match part x
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        UriTemplatePart.format
 
  and Literal =
     | Literal of string
