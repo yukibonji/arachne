@@ -100,6 +100,14 @@ type Pair =
 
        To be removed in 4.0. *)
 
+    [<Obsolete ("Use name_ instead.")>]
+    static member Name_ =
+        Pair.name_
+
+    [<Obsolete ("Use value_ instead.")>]
+    static member Value_ =
+        Pair.value_
+
     [<Obsolete ("Use format instead.")>]
     static member Format =
         Pair.format
@@ -131,6 +139,14 @@ and Name =
     static member name_ =
         (fun (Name n) -> n), (Name)
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use name_ instead.")>]
+    static member Name_ =
+        Name.name_
+
 and Value =
     | Value of string
 
@@ -159,6 +175,14 @@ and Value =
 
     static member value_ =
         (fun (Value v) -> v), (Value)
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use value_ instead.")>]
+    static member Value_ =
+        Value.value_
 
 (* Set-Cookie
 
@@ -209,6 +233,14 @@ type SetCookie =
 
        To be removed in 4.0. *)
 
+    [<Obsolete ("Use pair_ instead.")>]
+    static member Pair_ =
+        SetCookie.pair_
+
+    [<Obsolete ("Use attributes_ instead.")>]
+    static member Attributes_ =
+        SetCookie.attributes_
+
     [<Obsolete ("Use format instead.")>]
     static member Format =
         SetCookie.format
@@ -240,6 +272,14 @@ and Attributes =
 
     static member attributes_ =
         (fun (Attributes a) -> a), (Attributes)
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use attributes_ instead.")>]
+    static member Attributes_ =
+        Attributes.attributes_
 
 and Attribute =
     | Expires of DateTime
@@ -383,6 +423,18 @@ and Domain =
 
        To be removed in 4.0. *)
 
+    [<Obsolete ("Use ipv4_ instead.")>]
+    static member IPv4_ =
+        Domain.ipv4_
+
+    [<Obsolete ("Use ipv6_ instead.")>]
+    static member IPv6_ =
+        Domain.ipv6_
+
+    [<Obsolete ("Use subDomain_ instead.")>]
+    static member SubDomain_ =
+        Domain.subDomain_
+
     [<Obsolete ("Use format instead.")>]
     static member Format =
         Domain.format
@@ -436,6 +488,10 @@ type Cookie =
     (* Obsolete
 
        To be removed in 4.0. *)
+
+    [<Obsolete ("Use pairs_ instead.")>]
+    static member Pairs_ =
+        Cookie.pairs_
 
     [<Obsolete ("Use format instead.")>]
     static member Format =

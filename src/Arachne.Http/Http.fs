@@ -473,6 +473,18 @@ type MediaType =
 
        To be removed in 4.0. *)
 
+    [<Obsolete ("Use type_ instead.")>]
+    static member Type_ =
+        MediaType.type_
+
+    [<Obsolete ("Use subType_ instead.")>]
+    static member SubType_ =
+        MediaType.subType_
+
+    [<Obsolete ("Use parameters_ instead.")>]
+    static member Parameters_ =
+        MediaType.parameters_
+
     [<Obsolete ("Use format instead.")>]
     static member Format =
         MediaType.format
@@ -510,6 +522,14 @@ and Parameters =
 
     static member parameters_ =
         (fun (Parameters x) -> x), (Parameters)
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use parameters_ instead.")>]
+    static member Parameters_ =
+        Parameters.parameters_
 
 and Type =
     | Type of string
@@ -582,6 +602,10 @@ type ContentType =
     (* Obsolete
 
        To be removed in 4.0. *)
+
+    [<Obsolete ("Use mediaType_ instead.")>]
+    static member MediaType_ =
+        ContentType.mediaType_
 
     [<Obsolete ("Use format instead.")>]
     static member Format =
