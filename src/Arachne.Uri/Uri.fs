@@ -279,6 +279,10 @@ type Scheme =
 
        To be removed in 4.0. *)
 
+    [<Obsolete ("Use scheme_ instead.")>]
+    static member Scheme_ =
+        Scheme.scheme_
+
     [<Obsolete ("Use format instead.")>]
     static member Format =
         Scheme.format
@@ -290,10 +294,6 @@ type Scheme =
     [<Obsolete ("Use tryParse instead.")>]
     static member TryParse =
         Scheme.tryParse
-
-    [<Obsolete ("Use scheme_ instead.")>]
-    static member Scheme_ =
-        Scheme.scheme_
 
 (* Authority
 
@@ -359,18 +359,6 @@ type Authority =
 
        To be removed in 4.0. *)
 
-    [<Obsolete ("Use format instead.")>]
-    static member Format =
-        Authority.format
-
-    [<Obsolete ("Use parse instead.")>]
-    static member Parse =
-        Authority.parse
-
-    [<Obsolete ("Use tryParse instead.")>]
-    static member TryParse =
-        Authority.tryParse
-
     [<Obsolete ("Use host_ instead.")>]
     static member Host_ =
         Authority.host_
@@ -382,6 +370,18 @@ type Authority =
     [<Obsolete ("Use userInfo_ instead.")>]
     static member UserInfo_ =
         Authority.userInfo_
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        Authority.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        Authority.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        Authority.tryParse
 
 (* Section 3.2.1 *)
 
@@ -914,6 +914,10 @@ type Query =
 
        To be removed in 4.0. *)
 
+    [<Obsolete ("User pairs_ instead.")>]
+    static member Pairs_ =
+        Query.pairs_
+
     [<Obsolete ("Use format instead.")>]
     static member Format =
         Query.format
@@ -925,10 +929,6 @@ type Query =
     [<Obsolete ("Use tryParse instead.")>]
     static member TryParse =
         Query.tryParse
-
-    [<Obsolete ("User pairs_ instead.")>]
-    static member Pairs_ =
-        Query.pairs_
 
 (* Fragment
 
@@ -1090,18 +1090,6 @@ type Uri =
 
        To be removed in 4.0. *)
 
-    [<Obsolete ("Use format instead.")>]
-    static member Format =
-        Uri.format
-
-    [<Obsolete ("Use parse instead.")>]
-    static member Parse =
-        Uri.parse
-
-    [<Obsolete ("Use tryParse instead.")>]
-    static member TryParse =
-        Uri.tryParse
-
     [<Obsolete ("Use scheme_ instead.")>]
     static member Scheme_ =
         Uri.scheme_
@@ -1117,6 +1105,18 @@ type Uri =
     [<Obsolete ("Use fragment_ instead.")>]
     static member Fragment_ =
         Uri.fragment_
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        Uri.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        Uri.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        Uri.tryParse
 
  and HierarchyPart =
     | Authority of Authority * PathAbsoluteOrEmpty
@@ -1249,18 +1249,6 @@ type RelativeReference =
 
        To be removed in 4.0. *)
 
-    [<Obsolete ("Use format instead.")>]
-    static member Format =
-        RelativeReference.format
-
-    [<Obsolete ("Use parse instead.")>]
-    static member Parse =
-        RelativeReference.parse
-
-    [<Obsolete ("Use tryParse instead.")>]
-    static member TryParse =
-        RelativeReference.tryParse
-
     [<Obsolete ("Use relativePart_ instead.")>]
     static member RelativePart_ =
         RelativeReference.relativePart_
@@ -1272,6 +1260,18 @@ type RelativeReference =
     [<Obsolete ("Use fragment_ instead.")>]
     static member Fragment_ =
         RelativeReference.fragment_
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        RelativeReference.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        RelativeReference.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        RelativeReference.tryParse
 
  and RelativePart =
     | Authority of Authority * PathAbsoluteOrEmpty
@@ -1404,18 +1404,6 @@ type AbsoluteUri =
 
        To be removed in 4.0. *)
 
-    [<Obsolete ("Use format instead.")>]
-    static member Format =
-        AbsoluteUri.format
-
-    [<Obsolete ("Use parse instead.")>]
-    static member Parse =
-        AbsoluteUri.parse
-
-    [<Obsolete ("Use tryParse instead.")>]
-    static member TryParse =
-        AbsoluteUri.tryParse
-
     [<Obsolete ("Use scheme_ instead.")>]
     static member Scheme_ =
         AbsoluteUri.scheme_
@@ -1427,6 +1415,18 @@ type AbsoluteUri =
     [<Obsolete ("Use query_ instead.")>]
     static member Query_ =
         AbsoluteUri.query_
+
+    [<Obsolete ("Use format instead.")>]
+    static member Format =
+        AbsoluteUri.format
+
+    [<Obsolete ("Use parse instead.")>]
+    static member Parse =
+        AbsoluteUri.parse
+
+    [<Obsolete ("Use tryParse instead.")>]
+    static member TryParse =
+        AbsoluteUri.tryParse
 
 (* URI Reference
 
@@ -1477,6 +1477,14 @@ type UriReference =
 
        To be removed in 4.0. *)
 
+    [<Obsolete ("Use uri_ instead.")>]
+    static member Uri_ =
+        UriReference.uri_
+
+    [<Obsolete ("Use relative_ instead.")>]
+    static member Relative_ =
+        UriReference.relative_
+
     [<Obsolete ("Use format instead.")>]
     static member Format =
         UriReference.format
@@ -1488,11 +1496,3 @@ type UriReference =
     [<Obsolete ("Use tryParse instead.")>]
     static member TryParse =
         UriReference.tryParse
-
-    [<Obsolete ("Use uri_ instead.")>]
-    static member Uri_ =
-        UriReference.uri_
-
-    [<Obsolete ("Use relative_ instead.")>]
-    static member Relative_ =
-        UriReference.relative_

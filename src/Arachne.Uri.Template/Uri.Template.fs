@@ -78,6 +78,14 @@ type UriTemplateData =
     static member (+) (UriTemplateData a, UriTemplateData b) =
         UriTemplateData (Map.ofList (Map.toList a @ Map.toList b))
 
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use uriTemplateData_ instead.")>]
+    static member UriTemplateData_ =
+        UriTemplateData.uriTemplateData_
+
  and UriTemplateKey =
     | Key of string
 
@@ -94,6 +102,22 @@ type UriTemplateData =
 
     static member keys_ =
         (function | Keys x -> Some x | _ -> None), (Keys)
+
+    (* Obsolete
+
+       To be removed in 4.0. *)
+
+    [<Obsolete ("Use atom_ instead.")>]
+    static member Atom_ =
+        UriTemplateValue.atom_
+
+    [<Obsolete ("Use list_ instead.")>]
+    static member List_ =
+        UriTemplateValue.list_
+
+    [<Obsolete ("Use keys_ instead.")>]
+    static member Keys_ =
+        UriTemplateValue.keys_
 
 (* Matching *)
 
